@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
-import { SignupDto } from '../auth/dto/signup.dto';
+import SignupDto from '../auth/dto/signup.dto';
 
 @Injectable()
 export class UserService {
@@ -46,5 +46,9 @@ export class UserService {
     if (user.emailOtpCode !== otp) return null;
     user.emailVerified = true;
     return this.userRepository.save(user);
+  }
+
+  async updatePassword(id: number, newPassword: string) {
+    return this.userRepository.update(id, { password: newPassword });
   }
 }
