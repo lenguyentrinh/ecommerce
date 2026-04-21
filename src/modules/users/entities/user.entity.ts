@@ -32,13 +32,13 @@ export class User {
   @Column({ nullable: true })
   phoneNumber: string;
 
-  @Column({default: false})
+  @Column({ default: false })
   emailVerified: boolean;
 
-  @Column({nullable: true})
+  @Column({ nullable: true })
   emailOtpCode: string;
 
-  @Column({type:'timestamp', nullable: true})
+  @Column({ type: 'timestamp', nullable: true })
   emailOtpExpires: Date | null;
 
   @Column({ nullable: true })

@@ -9,9 +9,8 @@
       "runtimeArgs": ["start:debug"],
       "console": "integratedTerminal",
       "restart": true,
-      "protocol": "inspector",
       "sourceMaps": true,
-      "cwd": "${workspaceFolder}/be-ecommerce",
+      "cwd": "${workspaceFolder}",
       "env": {
         "NODE_ENV": "development"
       },
@@ -24,7 +23,18 @@
       "port": 9229,
       "restart": true,
       "sourceMaps": true,
-      "cwd": "${workspaceFolder}/be-ecommerce",
+      "cwd": "${workspaceFolder}",
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug Nest (ts-node)",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["-r", "ts-node/register", "-r", "tsconfig-paths/register", "src/main.ts"],
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "env": { "NODE_ENV": "development" },
       "skipFiles": ["<node_internals>/**"]
     },
     {
@@ -36,7 +46,7 @@
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "sourceMaps": true,
-      "cwd": "${workspaceFolder}/be-ecommerce",
+      "cwd": "${workspaceFolder}",
       "skipFiles": ["<node_internals>/**"]
     }
   ]

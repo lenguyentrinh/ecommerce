@@ -1,32 +1,45 @@
-import { Body, Controller, Post } from "@nestjs/common";
-import { AuthService } from "./auth.service";
-import { LoginDto } from "./dto/login.dto";
-import ForgotPasswordDto from "./dto/forgot-password.dto";
-import { Sign } from "crypto";
-import { SignupDto } from "./dto/signup.dto";
-import VerifyEmailDto from "./dto/verify-email.dto";
+import { Body, Controller, Post, Res } from '@nestjs/common';
+import type { Response } from 'express';
+import { AuthService } from './auth.service';
+import { LoginDto } from './dto/login.dto';
+import ForgotPasswordDto from './dto/forgot-password.dto';
+import { SignupDto } from './dto/signup.dto';
+import VerifyEmailDto from './dto/verify-email.dto';
 
 @Controller('auth')
-export class AuthController{
-    constructor(private authService: AuthService){}
+export class AuthController {
+  constructor(private authService: AuthService) {}
 
-    @Post('login')
-    login(@Body() loginDto: LoginDto){
-        return this.authService.login(loginDto);
-    }
+  @Post('login')
+  async login(
+    @Body() loginDto: LoginDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const { token } = await this.authService.login(loginDto);
 
-    @Post('signup')
-    signup(@Body() signupDto: SignupDto){
-        return this.authService.signup(signupDto);
-    }
+    res.cookie('access_token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
+    });
 
-    @Post('forgot-password')
-    forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto){
-        return this.authService.forgotPassword(forgotPasswordDto);
-    }
+    return { message: 'Login successful' };
+  }
 
-    @Post('verify-email')
-    verifyEmail(@Body() verifyEmailDto: VerifyEmailDto){
-        return this.authService.verifyEmail(verifyEmailDto);
-    }
+  @Post('signup')
+  signup(@Body() signupDto: SignupDto) {
+    return this.authService.signup(signupDto);
+  }
+
+  @Post('forgot-password')
+  forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
+    return this.authService.forgotPassword(forgotPasswordDto);
+  }
+
+  @Post('verify-email')
+  verifyEmail(@Body() verifyEmailDto: VerifyEmailDto) {
+    return this.authService.verifyEmail(verifyEmailDto);
+  }
 }
