@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsEmail, IsOptional } from 'class-validator';
 
-export class SignupDto {
+export default class SignupDto {
   @IsNotEmpty({ message: 'User name should not be empty!' })
   userName: string;
 

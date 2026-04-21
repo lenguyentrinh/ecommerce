@@ -2,17 +2,21 @@ import {
   Injectable,
   UnauthorizedException,
   ConflictException,
+  BadRequestException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../users/user.service';
-import { SignupDto } from './dto/signup.dto';
+import SignupDto  from './dto/signup.dto';
 import * as bcrypt from 'bcrypt';
-import { LoginDto } from './dto/login.dto';
+import LoginDto from './dto/login.dto';
 import { randomUUID } from 'crypto';
 import ForgotPasswordDto from './dto/forgot-password.dto';
 import { QueryFailedError } from 'typeorm';
 import VerifyEmailDto from './dto/verify-email.dto';
 import { MailService } from '../mail/mail.service';
+import SendOtpDto from './dto/send-otp.dto';
+import VerifyOtpDto from './dto/verify-otp.dto';
+import ResetPasswordDto from './dto/reset-password.dto';
 
 @Injectable()
 export class AuthService {
@@ -94,5 +98,49 @@ export class AuthService {
       message: 'Email verified successfully',
       email: user.email,
     };
+  }
+
+  async sendOtp(sendOtpDto: SendOtpDto) {
+    const user = await this.userService.findByEmail(sendOtpDto.email);
+    if (!user) throw new UnauthorizedException('Invalid email');
+    const code = this.generateOTP();
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
+    await this.userService.setEmailOTP(user.id, code, expiresAt);
+    await this.sendEmailOtp(user.email, code, expiresAt);
+    return { message: 'OTP sent to your email', email: user.email };
+  }
+
+  async verifyOtp(verifyOtpDto: VerifyOtpDto) {
+    const user = await this.userService.verifyEmailOtp(
+      verifyOtpDto.email,
+      verifyOtpDto.otp,
+    );
+    if (!user) throw new UnauthorizedException('Invalid OTP');
+    return { message: 'OTP verified successfully', email: user.email };
+  }
+
+  async resetPassword(resetPasswordDto: ResetPasswordDto) {
+    const user = await this.userService.findByEmail(resetPasswordDto.email);
+    if (!user) throw new UnauthorizedException('Invalid email');
+
+    if (resetPasswordDto.newPassword !== resetPasswordDto.confirmNewPassword) {
+      throw new BadRequestException(
+        'New password and confirm password do not match',
+      );
+    }
+
+    const isSamePassword = await bcrypt.compare(
+      resetPasswordDto.newPassword,
+      user.password,
+    );
+    if (isSamePassword) {
+      throw new BadRequestException(
+        'New password must be different from current password',
+      );
+    }
+
+    const newPassword = await bcrypt.hash(resetPasswordDto.newPassword, 10);
+    await this.userService.updatePassword(user.id, newPassword);
+    return { message: 'Password reset successfully', email: user.email };
   }
 }

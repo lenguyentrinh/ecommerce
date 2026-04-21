@@ -1,10 +1,13 @@
 import { Body, Controller, Post, Res } from '@nestjs/common';
 import type { Response } from 'express';
 import { AuthService } from './auth.service';
-import { LoginDto } from './dto/login.dto';
+import  LoginDto from './dto/login.dto';
 import ForgotPasswordDto from './dto/forgot-password.dto';
-import { SignupDto } from './dto/signup.dto';
+import  SignupDto from './dto/signup.dto';
 import VerifyEmailDto from './dto/verify-email.dto';
+import  SendOtpDto from './dto/send-otp.dto';
+import  ResetPasswordDto from './dto/reset-password.dto';
+import VerifyOtpDto from './dto/verify-otp.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -41,5 +44,20 @@ export class AuthController {
   @Post('verify-email')
   verifyEmail(@Body() verifyEmailDto: VerifyEmailDto) {
     return this.authService.verifyEmail(verifyEmailDto);
+  }
+
+  @Post('send-otp')
+  sendOtp(@Body() sendOtpDto: SendOtpDto) {
+    return this.authService.sendOtp(sendOtpDto);
+  }
+
+  @Post('verify-otp')
+  verifyOtp(@Body() verifyOtpDto: VerifyOtpDto) {
+    return this.authService.verifyOtp(verifyOtpDto);
+  }
+
+  @Post('reset-password')
+  resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+    return this.authService.resetPassword(resetPasswordDto);
   }
 }
