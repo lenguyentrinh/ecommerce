@@ -15,7 +15,7 @@ pnpm install
 Create a `.env` file in the backend directory with the following variables:
 
 ```env
-DATABASE_URL=postgresql://user:password@localhost:5432/ecommerce
+DATABASE_URL=mysql://root:password@localhost:3306/ecommerce
 JWT_SECRET=your-secret-key
 JWT_EXPIRATION=7d
 NODE_ENV=development
@@ -89,7 +89,7 @@ Authorization: Bearer <token>
 
 ## Database
 
-Uses PostgreSQL for data persistence. See `../docs/data-models.md` for schema details.
+Uses MySQL for data persistence. See `../docs/data-models.md` for schema details.
 
 ## Building for Production
 
