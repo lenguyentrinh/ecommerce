@@ -8,6 +8,7 @@ import { DatabaseModule } from './database/database.config';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      envFilePath: '.env',
       load: [jwtConfig],
     }),
     DatabaseModule,
