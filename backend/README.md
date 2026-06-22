@@ -16,8 +16,8 @@ Create a `.env` file in the backend directory with the following variables:
 
 ```env
 DATABASE_URL=mysql://root:password@localhost:3306/ecommerce
-JWT_SECRET=your-secret-key
-JWT_EXPIRATION=7d
+JWT_SECRET_KEY=your-super-secret-jwt-key-change-this-in-production
+JWT_EXPIRES_IN=7d
 NODE_ENV=development
 ```
 
