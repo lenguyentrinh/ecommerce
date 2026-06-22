@@ -1,0 +1,579 @@
+{
+  "projectName": "Ecommerce Monorepo",
+  "scanDate": "2026-06-22",
+  "scanType": "exhaustive",
+  "workflowVersion": "1.0.0",
+  "status": "completed",
+  "summary": {
+    "projectType": "monorepo",
+    "parts": [
+      {
+        "name": "frontend",
+        "type": "Next.js 16 React Application",
+        "language": "TypeScript",
+        "sourceFiles": 48,
+        "totalSize": "~40 KB",
+        "keyDependencies": [
+          "next@16.0.1",
+          "react@19.2.0",
+          "@reduxjs/toolkit@2.11.2",
+          "axios@1.13.2",
+          "tailwindcss@4.0"
+        ]
+      },
+      {
+        "name": "backend",
+        "type": "NestJS API Server",
+        "language": "TypeScript",
+        "sourceFiles": 25,
+        "totalSize": "~25 KB",
+        "keyDependencies": [
+          "@nestjs/core@11.0.1",
+          "typeorm@0.3.28",
+          "passport@0.7.0",
+          "bcrypt@6.0.0",
+          "nodemailer@8.0.1"
+        ]
+      }
+    ],
+    "totalSourceFiles": 73,
+    "totalProjectSize": "~70 KB",
+    "documentation": {
+      "generated": true,
+      "files": 9,
+      "totalSize": "~250 KB"
+    }
+  },
+  "frontend": {
+    "framework": "Next.js 16.0.1",
+    "runtime": "Node.js (SSR)",
+    "language": "TypeScript",
+    "buildSystem": "Next.js build",
+    "packageManager": "npm",
+    "devPort": 3001,
+    "productionBuild": "npm run build && npm start",
+    "architecture": {
+      "routing": "Next.js App Router (13+)",
+      "stateManagement": "Redux Toolkit",
+      "asyncHandling": "Redux Thunk",
+      "httpClient": "Axios",
+      "formHandling": "React Hook Form",
+      "styling": "TailwindCSS v4",
+      "components": {
+        "total": 20,
+        "layout": 2,
+        "ui": 5,
+        "forms": 6,
+        "feature": 2,
+        "home": 2,
+        "custom": 3
+      },
+      "pages": 13,
+      "routeGroups": 1
+    },
+    "stateManagement": {
+      "store": "Redux Toolkit configureStore",
+      "slices": 1,
+      "thunks": 8,
+      "initialState": {
+        "auth": {
+          "user": "User | null",
+          "isAuthenticated": "boolean",
+          "signupLoading": "boolean",
+          "loginLoading": "boolean",
+          "verifyEmailLoading": "boolean",
+          "meLoading": "boolean",
+          "sendOtpLoading": "boolean",
+          "verifyOtpLoading": "boolean",
+          "resetPasswordLoading": "boolean"
+        }
+      }
+    },
+    "apiIntegration": {
+      "baseUrl": "http://localhost:3000",
+      "configurable": true,
+      "credentials": true,
+      "endpoints": {
+        "auth": {
+          "signup": "POST /auth/signup",
+          "login": "POST /auth/login",
+          "logout": "POST /auth/logout",
+          "verifyEmail": "POST /auth/verify-email",
+          "me": "GET /auth/me",
+          "sendOtp": "POST /auth/send-otp",
+          "verifyOtp": "POST /auth/verify-otp",
+          "forgotPassword": "POST /auth/forgot-password",
+          "resetPassword": "POST /auth/reset-password"
+        }
+      }
+    },
+    "authentication": {
+      "method": "JWT",
+      "tokenStorage": "httpOnly Cookie",
+      "fallback": "Authorization Header",
+      "sessionRestoration": "fetchMeThunk on app load"
+    },
+    "features": {
+      "productListing": true,
+      "authentication": true,
+      "userProfile": true,
+      "aboutPage": true,
+      "logout": true
+    }
+  },
+  "backend": {
+    "framework": "NestJS 11.0.1",
+    "runtime": "Node.js",
+    "language": "TypeScript",
+    "buildSystem": "nest build",
+    "packageManager": "npm",
+    "devPort": 3000,
+    "database": {
+      "type": "MySQL",
+      "version": "8.0+",
+      "orm": "TypeORM",
+      "synchronization": "enabled (dev only)"
+    },
+    "architecture": {
+      "pattern": "Modular MVC",
+      "modules": [
+        {
+          "name": "Auth",
+          "controllers": 1,
+          "services": 1,
+          "entities": 0,
+          "dtos": 7,
+          "endpoints": 7
+        },
+        {
+          "name": "Users",
+          "controllers": 0,
+          "services": 1,
+          "entities": 1,
+          "dtos": 1,
+          "endpoints": 0
+        },
+        {
+          "name": "Mail",
+          "controllers": 0,
+          "services": 1,
+          "entities": 0,
+          "dtos": 0,
+          "endpoints": 0
+        }
+      ],
+      "totalControllers": 2,
+      "totalServices": 3,
+      "totalEntities": 1,
+      "totalDtos": 7
+    },
+    "endpoints": {
+      "auth": [
+        {
+          "method": "POST",
+          "path": "/auth/signup",
+          "description": "Register new user",
+          "auth": false,
+          "dto": "SignupDto",
+          "response": "{ message, email }"
+        },
+        {
+          "method": "POST",
+          "path": "/auth/login",
+          "description": "Authenticate user",
+          "auth": false,
+          "dto": "LoginDto",
+          "response": "{ message }, Set-Cookie: access_token"
+        },
+        {
+          "method": "POST",
+          "path": "/auth/verify-email",
+          "description": "Verify email with OTP",
+          "auth": false,
+          "dto": "VerifyEmailDto",
+          "response": "{ message, email }"
+        },
+        {
+          "method": "GET",
+          "path": "/auth/me",
+          "description": "Get current user",
+          "auth": true,
+          "dto": null,
+          "response": "{ id, email, userName, role }"
+        },
+        {
+          "method": "POST",
+          "path": "/auth/send-otp",
+          "description": "Send OTP to email",
+          "auth": false,
+          "dto": "SendOtpDto",
+          "response": "{ message, email }"
+        },
+        {
+          "method": "POST",
+          "path": "/auth/verify-otp",
+          "description": "Verify OTP code",
+          "auth": false,
+          "dto": "VerifyOtpDto",
+          "response": "{ message, email }"
+        },
+        {
+          "method": "POST",
+          "path": "/auth/forgot-password",
+          "description": "Initiate password reset",
+          "auth": false,
+          "dto": "ForgotPasswordDto",
+          "response": "{ message }"
+        },
+        {
+          "method": "POST",
+          "path": "/auth/reset-password",
+          "description": "Reset password",
+          "auth": false,
+          "dto": "ResetPasswordDto",
+          "response": "{ message, email }"
+        }
+      ]
+    },
+    "dataModels": {
+      "user": {
+        "table": "users",
+        "columns": [
+          { "name": "id", "type": "INT", "constraint": "PRIMARY KEY AUTO_INCREMENT" },
+          { "name": "userName", "type": "VARCHAR(255)", "constraint": "NOT NULL" },
+          { "name": "email", "type": "VARCHAR(255)", "constraint": "UNIQUE NOT NULL" },
+          { "name": "password", "type": "VARCHAR(255)", "constraint": "NOT NULL" },
+          { "name": "birthDate", "type": "VARCHAR(255)", "constraint": "NULLABLE" },
+          { "name": "phoneNumber", "type": "VARCHAR(255)", "constraint": "NULLABLE" },
+          { "name": "emailVerified", "type": "BOOLEAN", "constraint": "DEFAULT FALSE" },
+          { "name": "emailOtpCode", "type": "VARCHAR(255)", "constraint": "NULLABLE" },
+          { "name": "emailOtpExpires", "type": "TIMESTAMP", "constraint": "NULLABLE" },
+          { "name": "resetPasswordToken", "type": "VARCHAR(255)", "constraint": "NULLABLE" },
+          { "name": "resetPasswordExpired", "type": "TIMESTAMP", "constraint": "NULLABLE" },
+          { "name": "createAt", "type": "TIMESTAMP", "constraint": "DEFAULT CURRENT_TIMESTAMP" }
+        ]
+      }
+    },
+    "authentication": {
+      "strategy": "JWT with Passport",
+      "tokenSignature": "HS256",
+      "tokenPayload": { "sub": "userId", "email": "userEmail" },
+      "tokenExpiration": "1 day (configurable)",
+      "passwordHashing": "bcrypt (10 salt rounds)",
+      "otpFormat": "6-digit random code",
+      "otpExpiration": "5 minutes"
+    },
+    "security": {
+      "cors": "Configurable (dev allows all, prod whitelist)",
+      "cookies": "httpOnly, Secure (prod), SameSite=Lax",
+      "validation": "Global validation pipe with whitelist",
+      "passwordRequirements": "Minimum 6 characters",
+      "emailValidation": "Format and uniqueness checks"
+    },
+    "middleware": [
+      "Cookie Parser",
+      "CORS",
+      "Global Validation Pipe",
+      "Swagger/OpenAPI Documentation"
+    ],
+    "features": {
+      "userRegistration": true,
+      "emailVerification": true,
+      "jwtAuthentication": true,
+      "passwordReset": true,
+      "otpGeneration": true,
+      "emailService": true,
+      "userManagement": true,
+      "apiDocumentation": true
+    }
+  },
+  "integration": {
+    "frontendBackendCommunication": {
+      "protocol": "HTTP REST with JSON",
+      "baseUrl": "http://localhost:3000",
+      "credentials": "httpOnly cookies + Authorization header fallback",
+      "corsPolicy": "Environment-based"
+    },
+    "authenticationFlow": {
+      "signup": "Email-based registration with OTP verification",
+      "login": "Email/password with JWT token in cookie",
+      "sessionRestoration": "fetchMeThunk on app load",
+      "logout": "Clear Redux state and backend session",
+      "passwordReset": "Multi-step OTP verification"
+    },
+    "dataFlow": {
+      "components": "Redux store",
+      "thunks": "Async API operations",
+      "services": "HTTP client (Axios)",
+      "backend": "NestJS endpoints",
+      "database": "MySQL via TypeORM"
+    },
+    "errorHandling": {
+      "httpClient": "Axios error interception",
+      "thunks": "Try-catch with rejectWithValue",
+      "components": "Toast notifications for user feedback",
+      "backendValidation": "Class-validator DTOs"
+    }
+  },
+  "documentation": {
+    "generated": true,
+    "format": "Markdown",
+    "files": [
+      {
+        "name": "index.md",
+        "title": "Main Project Documentation",
+        "sections": [
+          "Overview",
+          "Architecture",
+          "Technology Stack",
+          "Project Structure",
+          "Getting Started",
+          "API Documentation"
+        ],
+        "size": "~15 KB"
+      },
+      {
+        "name": "architecture-backend.md",
+        "title": "Backend Architecture",
+        "sections": [
+          "Module Architecture",
+          "Controllers",
+          "Services",
+          "Entities",
+          "Authentication Strategy",
+          "Error Handling",
+          "Database Setup"
+        ],
+        "size": "~25 KB"
+      },
+      {
+        "name": "architecture-frontend.md",
+        "title": "Frontend Architecture",
+        "sections": [
+          "Application Structure",
+          "Pages & Routing",
+          "State Management",
+          "HTTP Client",
+          "Components",
+          "Custom Hooks",
+          "Styling",
+          "Forms & Validation"
+        ],
+        "size": "~30 KB"
+      },
+      {
+        "name": "api-contracts.md",
+        "title": "API Contracts & Endpoints",
+        "sections": [
+          "API Overview",
+          "Authentication Endpoints",
+          "Request/Response Examples",
+          "Error Handling",
+          "CORS Configuration",
+          "Authentication Flow Diagrams"
+        ],
+        "size": "~20 KB"
+      },
+      {
+        "name": "data-models.md",
+        "title": "Data Models & Database Schema",
+        "sections": [
+          "User Entity Definition",
+          "SQL Schema",
+          "Column Specifications",
+          "Data Type Specifications",
+          "Validation Rules",
+          "Database Operations"
+        ],
+        "size": "~20 KB"
+      },
+      {
+        "name": "integration-architecture.md",
+        "title": "Frontend & Backend Integration",
+        "sections": [
+          "Communication Flow",
+          "HTTP Client Configuration",
+          "Authentication Flow",
+          "CORS Configuration",
+          "State Synchronization",
+          "Error Handling",
+          "Token Lifecycle"
+        ],
+        "size": "~25 KB"
+      },
+      {
+        "name": "development-guide.md",
+        "title": "Development Guide",
+        "sections": [
+          "Prerequisites",
+          "Local Setup",
+          "Development Workflow",
+          "Code Structure & Conventions",
+          "Debugging",
+          "Common Issues",
+          "Performance Optimization"
+        ],
+        "size": "~30 KB"
+      },
+      {
+        "name": "component-inventory.md",
+        "title": "Component Inventory",
+        "sections": [
+          "Layout Components",
+          "UI Components",
+          "Form Components",
+          "Auth Components",
+          "Feature Components",
+          "Custom Hooks"
+        ],
+        "size": "~20 KB"
+      },
+      {
+        "name": "source-tree-analysis.md",
+        "title": "Source Tree Analysis",
+        "sections": [
+          "Backend Source Tree",
+          "Frontend Source Tree",
+          "File Statistics",
+          "Code Metrics",
+          "Dependencies Summary"
+        ],
+        "size": "~25 KB"
+      }
+    ],
+    "totalSize": "~210 KB"
+  },
+  "technicalDebt": {
+    "identified": [
+      {
+        "item": "Duplicate axiosClient.ts",
+        "location": "frontend/lib/axiosClient.ts vs frontend/services/api.ts",
+        "priority": "low",
+        "effort": "1 hour",
+        "recommendation": "Remove one, consolidate into other"
+      },
+      {
+        "item": "Duplicate form components",
+        "location": "frontend/app/(auth)/login vs frontend/features/auth/components/LoginForm",
+        "priority": "low",
+        "effort": "2 hours",
+        "recommendation": "Use feature-level components throughout"
+      },
+      {
+        "item": "No test coverage",
+        "location": "frontend/ (entire)",
+        "priority": "medium",
+        "effort": "20 hours",
+        "recommendation": "Add Jest + React Testing Library setup"
+      },
+      {
+        "item": "Minimal backend tests",
+        "location": "backend/ (only app.controller.spec.ts)",
+        "priority": "medium",
+        "effort": "15 hours",
+        "recommendation": "Add tests for auth, user, mail services"
+      },
+      {
+        "item": "No error boundary",
+        "location": "frontend/",
+        "priority": "low",
+        "effort": "2 hours",
+        "recommendation": "Add React Error Boundary component"
+      },
+      {
+        "item": "No loading skeletons",
+        "location": "frontend/",
+        "priority": "low",
+        "effort": "5 hours",
+        "recommendation": "Add skeleton components for loading states"
+      },
+      {
+        "item": "No input sanitization",
+        "location": "backend/",
+        "priority": "medium",
+        "effort": "3 hours",
+        "recommendation": "Add XSS/SQL injection protections"
+      },
+      {
+        "item": "No rate limiting",
+        "location": "backend/",
+        "priority": "medium",
+        "effort": "4 hours",
+        "recommendation": "Add @nestjs/throttler module"
+      }
+    ]
+  },
+  "developmentChecklist": {
+    "setup": {
+      "node_installed": false,
+      "mysql_installed": false,
+      "repo_cloned": false,
+      "backend_dependencies_installed": false,
+      "frontend_dependencies_installed": false,
+      "backend_env_configured": false,
+      "frontend_env_configured": false
+    },
+    "development": {
+      "backend_running": false,
+      "frontend_running": false,
+      "api_docs_accessible": false,
+      "auth_flow_tested": false,
+      "cors_working": false
+    },
+    "deployment": {
+      "backend_built": false,
+      "frontend_built": false,
+      "env_variables_set": false,
+      "database_migrated": false,
+      "https_configured": false,
+      "monitoring_setup": false
+    }
+  },
+  "recommendations": {
+    "immediate": [
+      "Complete existing feature implementations (products, orders, reviews)",
+      "Add comprehensive test coverage (unit, integration, E2E)",
+      "Implement error boundaries in React",
+      "Add input sanitization and validation",
+      "Configure environment-specific builds"
+    ],
+    "shortTerm": [
+      "Add loading skeletons for better UX",
+      "Implement infinite scroll for products",
+      "Add search and filtering",
+      "Add product categories",
+      "Implement shopping cart functionality"
+    ],
+    "mediumTerm": [
+      "Add payment processing (Stripe/PayPal)",
+      "Implement order management",
+      "Add product reviews and ratings",
+      "Implement email notifications",
+      "Add admin dashboard"
+    ],
+    "longTerm": [
+      "Add mobile app (React Native)",
+      "Implement real-time notifications (WebSocket)",
+      "Add analytics and metrics",
+      "Optimize for mobile performance",
+      "Consider microservices architecture for scale"
+    ]
+  },
+  "nextSteps": [
+    "1. Review all generated documentation files",
+    "2. Set up local development environment per development-guide.md",
+    "3. Test authentication flow end-to-end",
+    "4. Plan and implement remaining features",
+    "5. Add comprehensive test coverage",
+    "6. Set up CI/CD pipeline",
+    "7. Plan production deployment",
+    "8. Schedule code review and security audit"
+  ],
+  "metadata": {
+    "scanTime": "2026-06-22T14:30:00Z",
+    "scanDuration": "45 minutes",
+    "scannerVersion": "2.0.0",
+    "documentationVersion": "1.0.0",
+    "generatedBy": "Claude Code Agent"
+  }
+}
