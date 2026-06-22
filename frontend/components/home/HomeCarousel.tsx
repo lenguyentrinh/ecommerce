@@ -7,20 +7,17 @@ const slides = [
   {
     title: "Fresh Organic Fruits",
     subtitle: "Up to 30% off this week",
-    image:
-      "https://images.unsplash.com/photo-1610832958506-aa56368176cf?auto=format&fit=crop&w=1200&q=80",
+    image: "/images/slide-fruits.svg",
   },
   {
     title: "Healthy Breakfast Deals",
     subtitle: "Start your day with quality food",
-    image:
-      "https://images.unsplash.com/photo-1490818387583-1baba5e638af?auto=format&fit=crop&w=1200&q=80",
+    image: "/images/slide-breakfast.svg",
   },
   {
     title: "Best Local Vegetables",
     subtitle: "Farm-picked and delivered fast",
-    image:
-      "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1200&q=80",
+    image: "/images/slide-vegetables.svg",
   },
 ];
 

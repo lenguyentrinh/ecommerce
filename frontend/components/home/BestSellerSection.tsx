@@ -15,36 +15,31 @@ const bestSellerProducts: Product[] = [
     name: "Premium Avocado",
     category: "Fruits",
     price: "$9.99",
-    image:
-      "https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?auto=format&fit=crop&w=800&q=80",
+    image: "/images/product-avocado.svg",
   },
   {
     name: "Fresh Orange Pack",
     category: "Fruits",
     price: "$7.49",
-    image:
-      "https://images.unsplash.com/photo-1547514701-42782101795e?auto=format&fit=crop&w=800&q=80",
+    image: "/images/product-orange.svg",
   },
   {
     name: "Organic Tomato",
     category: "Vegetables",
     price: "$5.20",
-    image:
-      "https://images.unsplash.com/photo-1592841200221-a6898f307baa?auto=format&fit=crop&w=800&q=80",
+    image: "/images/product-tomato.svg",
   },
   {
     name: "Green Salad Box",
     category: "Healthy",
     price: "$6.80",
-    image:
-      "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=800&q=80",
+    image: "/images/product-salad.svg",
   },
   {
     name: "Blueberry Mix",
     category: "Fruits",
     price: "$8.20",
-    image:
-      "https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea?auto=format&fit=crop&w=800&q=80",
+    image: "/images/product-blueberry.svg",
   },
 ];
 
