@@ -1,20 +1,24 @@
 import type { Metadata } from "next";
-import { Geist_Mono, Nunito } from "next/font/google";
+import localFont from "next/font/local";
 import Footer from "@/components/layout/Footer";
 import Header from "@/components/layout/Header";
 import Providers from "./providers";
 import "./globals.css";
 
-const nunito = Nunito({
+// Self-hosted fonts: the corporate TLS proxy blocks next/font/google's
+// download of Google Fonts, so the font files are bundled in ./fonts.
+const nunito = localFont({
+  src: "./fonts/Nunito-variable.ttf",
   variable: "--font-nunito",
-  weight: ["400", "500", "700"],
-  subsets: ["latin", "vietnamese"],
+  weight: "200 1000",
   display: "swap",
 });
 
-const geistMono = Geist_Mono({
+const geistMono = localFont({
+  src: "./fonts/GeistMono-variable.woff2",
   variable: "--font-geist-mono",
-  subsets: ["latin"],
+  weight: "100 900",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
