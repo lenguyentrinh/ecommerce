@@ -1,12 +1,22 @@
-import { Body, Controller, Post, Res } from '@nestjs/common';
-import type { Response } from 'express';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import type { Request, Response } from 'express';
 import { AuthService } from './auth.service';
-import  LoginDto from './dto/login.dto';
+import type { User } from '../users/entities/user.entity';
+import LoginDto from './dto/login.dto';
 import ForgotPasswordDto from './dto/forgot-password.dto';
-import  SignupDto from './dto/signup.dto';
+import SignupDto from './dto/signup.dto';
 import VerifyEmailDto from './dto/verify-email.dto';
-import  SendOtpDto from './dto/send-otp.dto';
-import  ResetPasswordDto from './dto/reset-password.dto';
+import SendOtpDto from './dto/send-otp.dto';
+import ResetPasswordDto from './dto/reset-password.dto';
 import VerifyOtpDto from './dto/verify-otp.dto';
 
 @Controller('auth')
@@ -29,6 +39,24 @@ export class AuthController {
     });
 
     return { message: 'Login successful' };
+  }
+
+  @Get('me')
+  @UseGuards(AuthGuard('jwt'))
+  me(@Req() req: Request) {
+    // The JWT strategy's validate() attaches the full user entity to req.user.
+    // Return an explicit allow-list so sensitive fields (password, OTP/reset
+    // tokens) never leak to the client.
+    const user = (req as Request & { user: User }).user;
+    return {
+      id: user.id,
+      userName: user.userName,
+      email: user.email,
+      birthDate: user.birthDate,
+      phoneNumber: user.phoneNumber,
+      emailVerified: user.emailVerified,
+      createAt: user.createAt,
+    };
   }
 
   @Post('signup')
