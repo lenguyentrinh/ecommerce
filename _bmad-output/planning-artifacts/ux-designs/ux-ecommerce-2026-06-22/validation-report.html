@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>UX Design Validation: Oren (ecommerce)</title>
+<style>
+  :root {
+    --bg: #fafaf9;
+    --surface: #ffffff;
+    --border: #e7e5e4;
+    --text: #1c1917;
+    --muted: #78716c;
+
+    --verdict-strong: #16a34a;
+    --verdict-adequate: #65a30d;
+    --verdict-thin: #d97706;
+    --verdict-broken: #dc2626;
+
+    --sev-low: #64748b;
+    --sev-medium: #ca8a04;
+    --sev-high: #ea580c;
+    --sev-critical: #dc2626;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    font-size: 15px;
+  }
+  .container { max-width: 960px; margin: 0 auto; padding: 32px 24px 64px; }
+
+  header.report-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 24px;
+  }
+  .title h1 { margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -0.01em; }
+  .title .subtitle { color: var(--muted); font-size: 13px; margin-top: 4px; font-family: ui-monospace, "SF Mono", Menlo, monospace; }
+  .sev-summary { text-align: right; font-size: 12.5px; color: var(--muted); white-space: nowrap; }
+  .sev-summary b { color: var(--text); }
+
+  .synthesis {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--muted);
+    border-radius: 8px;
+    padding: 18px 22px;
+    margin-bottom: 24px;
+    font-size: 15.5px;
+  }
+  .synthesis p { margin: 0 0 10px; }
+  .synthesis p:last-child { margin-bottom: 0; }
+
+  .dimension-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  .dim-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+  }
+  .dim-card .dim-name { font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+  .dim-card .dim-verdict { font-size: 14px; font-weight: 600; }
+
+  section.dimension, section.reviewer-section { margin-bottom: 14px; }
+  section.dimension details, section.reviewer-section details {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  section summary {
+    padding: 14px 20px;
+    cursor: pointer;
+    user-select: none;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  section summary::-webkit-details-marker { display: none; }
+  section summary::before {
+    content: "▸";
+    display: inline-block;
+    color: var(--muted);
+    transition: transform 0.15s ease;
+  }
+  section details[open] summary::before { transform: rotate(90deg); }
+  section summary h2 {
+    display: inline;
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -0.005em;
+    flex: 1;
+  }
+  .verdict-pill {
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: white;
+  }
+  .verdict-strong { background: var(--verdict-strong); }
+  .verdict-adequate { background: var(--verdict-adequate); }
+  .verdict-thin { background: var(--verdict-thin); }
+  .verdict-broken { background: var(--verdict-broken); }
+
+  .dim-body { padding: 4px 20px 18px; }
+  .dim-judgment { color: var(--text); font-size: 14.5px; }
+  .dim-judgment p { margin: 0 0 10px; }
+
+  .findings-list { padding: 0 20px 4px; }
+  article.finding {
+    padding: 14px 0;
+    border-top: 1px solid var(--border);
+  }
+  article.finding:first-child { border-top: none; }
+  article.finding header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+  }
+  .badge {
+    font-size: 10.5px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    line-height: 1.4;
+  }
+  .badge-sev-low { background: rgba(100, 116, 139, 0.12); color: var(--sev-low); }
+  .badge-sev-medium { background: rgba(202, 138, 4, 0.14); color: var(--sev-medium); }
+  .badge-sev-high { background: rgba(234, 88, 12, 0.14); color: var(--sev-high); }
+  .badge-sev-critical { background: rgba(220, 38, 38, 0.14); color: var(--sev-critical); }
+  .finding-title { margin: 0; font-size: 15px; font-weight: 500; flex: 1; min-width: 200px; }
+  .finding-location { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 12.5px; color: var(--muted); }
+  .finding-note, .finding-fix { margin-top: 6px; font-size: 14px; }
+  .finding-fix strong { color: var(--muted); font-weight: 500; }
+
+  .mechanical {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-top: 24px;
+    font-size: 14px;
+  }
+  .mechanical h3 { margin: 0 0 10px; font-size: 14px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+  .mechanical ul { margin: 0; padding-left: 20px; }
+  .mechanical li { margin-bottom: 4px; color: var(--text); }
+
+  footer.report-footer {
+    margin-top: 40px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--muted);
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  footer .meta { display: flex; gap: 24px; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+  <div class="container">
+
+    <header class="report-header">
+      <div class="title">
+        <h1>Oren (ecommerce) — UX Design Validation Report</h1>
+        <div class="subtitle">_bmad-output/planning-artifacts/ux-designs/ux-ecommerce-2026-06-22/</div>
+      </div>
+      <div class="sev-summary">
+        Lens: Rubric walker<br>
+        <b>0</b> critical · <b>1</b> high · <b>10</b> medium · <b>13</b> low
+      </div>
+    </header>
+
+    <div class="synthesis">
+      <p>The pair is in solid shape after the Stitch reconciliation: the visual purge worked (zero indigo/Inter residue), color tokens are fully defined with hex, and both Key Flows are well-formed (named protagonist Maya, numbered steps, climax beats, failure-avoidance paths).</p>
+      <p>The main weaknesses are <b>scope creep beyond the stated MVP</b> (Cart, Order Confirmation, Order History are speced as IA and appear in flows but have no component/state/flow support), a <b>DESIGN.md ↔ EXPERIENCE.md contradiction on product-card aspect ratio and grid</b>, and an <b>orphaned, off-brand <code>.working/</code> artifact</b> plus the documented-but-absent key-screen mockups. Nothing is broken, but several mediums would bite an implementer.</p>
+    </div>
+
+    <div class="dimension-summary">
+      <div class="dim-card"><div class="dim-name">1. Flow coverage</div><div class="dim-verdict" style="color: var(--verdict-adequate)">adequate</div></div>
+      <div class="dim-card"><div class="dim-name">2. Token completeness</div><div class="dim-verdict" style="color: var(--verdict-strong)">strong</div></div>
+      <div class="dim-card"><div class="dim-name">3. Component coverage</div><div class="dim-verdict" style="color: var(--verdict-adequate)">adequate</div></div>
+      <div class="dim-card"><div class="dim-name">4. State coverage</div><div class="dim-verdict" style="color: var(--verdict-adequate)">adequate</div></div>
+      <div class="dim-card"><div class="dim-name">5. Visual reference coverage</div><div class="dim-verdict" style="color: var(--verdict-thin)">thin</div></div>
+      <div class="dim-card"><div class="dim-name">6. Bloat &amp; overspecification</div><div class="dim-verdict" style="color: var(--verdict-adequate)">adequate</div></div>
+      <div class="dim-card"><div class="dim-name">7. Inheritance discipline</div><div class="dim-verdict" style="color: var(--verdict-adequate)">adequate</div></div>
+      <div class="dim-card"><div class="dim-name">8. Shape fit</div><div class="dim-verdict" style="color: var(--verdict-strong)">strong</div></div>
+    </div>
+
+    <!-- 1. Flow coverage -->
+    <section class="dimension">
+      <details>
+        <summary><h2>1. Flow coverage</h2><span class="verdict-pill verdict-adequate">adequate</span></summary>
+        <div class="dim-body"><div class="dim-judgment">
+          <p>Both Key Flows have a named protagonist (Maya), numbered steps, a "Decide/Act" climax beat, explicit "Critical moments," and a failure path expressed as friction/conversion-killer lists. Flow 2 is a clean zoom-in on PDP conversion.</p>
+        </div></div>
+        <div class="findings-list">
+          <article class="finding"><header><span class="badge badge-sev-medium">medium</span><h3 class="finding-title">Flow 1 promises Cart→Checkout→Confirmation the spec doesn't cover</h3><span class="finding-location">Flow 1 steps 9–10</span></header><div class="finding-note">Those surfaces have no Key Flow of their own, no state coverage, and Checkout is explicitly Deferred — the flow writes checks the spec can't cash.</div><div class="finding-fix"><strong>Fix:</strong> trim Flow 1 to the add-to-cart success beat (matching the declared MVP loop), or add minimal Cart/Confirmation flow + states.</div></article>
+          <article class="finding"><header><span class="badge badge-sev-low">low</span><h3 class="finding-title">Failure paths are "to avoid" lists, not inline forks</h3><span class="finding-location">Flows 1 & 2</span></header><div class="finding-fix"><strong>Fix:</strong> add a one-line failure fork to each flow's climax step for parity with the example shape.</div></article>
+          <article class="finding"><header><span class="badge badge-sev-low">low</span><h3 class="finding-title">Order History &amp; Category Browse have no journey</h3><span class="finding-location">IA surfaces 3, 7</span></header><div class="finding-fix"><strong>Fix:</strong> mark navigational-only or defer explicitly.</div></article>
+        </div>
+      </details>
+    </section>
+
+    <!-- 2. Token completeness -->
+    <section class="dimension">
+      <details>
+        <summary><h2>2. Token completeness</h2><span class="verdict-pill verdict-strong">strong</span></summary>
+        <div class="dim-body"><div class="dim-judgment">
+          <p>Every frontmatter color token carries a hex value and every color referenced in prose resolves. No <code>{path.to.token}</code> syntax is used (references are name+hex), so there are no dangling paths.</p>
+        </div></div>
+        <div class="findings-list">
+          <article class="finding"><header><span class="badge badge-sev-medium">medium</span><h3 class="finding-title">Warm-gray price/metadata color ships sub-AA</h3><span class="finding-location">DESIGN.md Product Card / PDP</span></header><div class="finding-note">Warm Gray <code>#787770</code> on Soft Ivory <code>#faf7f2</code> ≈ 3.1:1, below the 4.5:1 body floor; line 141 leaves "darken where it fails" as a live TODO inside a source-of-truth doc.</div><div class="finding-fix"><strong>Fix:</strong> bump metadata to <code>#6a6a63</code>+ that passes, or classify price/metadata as large-text and state the 3:1 target.</div></article>
+          <article class="finding"><header><span class="badge badge-sev-low">low</span><h3 class="finding-title">Permitted text roles on <code>surface-secondary</code> unstated</h3><span class="finding-location">DESIGN.md Colors</span></header><div class="finding-fix"><strong>Fix:</strong> state which text roles are allowed on Warm Beige <code>#e8dccb</code> (Warm Gray repeats the sub-AA risk).</div></article>
+          <article class="finding"><header><span class="badge badge-sev-low">low</span><h3 class="finding-title">Unreferenced semantic reserves not tagged</h3><span class="finding-location">DESIGN.md frontmatter</span></header><div class="finding-fix"><strong>Fix:</strong> tag <code>success</code>/<code>alert</code>/<code>error-container</code>/<code>surface-container</code> as "reserved".</div></article>
+        </div>
+      </details>
+    </section>
+
+    <!-- 3. Component coverage -->
+    <section class="dimension">
+      <details>
+        <summary><h2>3. Component coverage</h2><span class="verdict-pill verdict-adequate">adequate</span></summary>
+        <div class="dim-body"><div class="dim-judgment">
+          <p>Core set (buttons, product card, PDP, input, search bar, chips) has strong overlap between DESIGN.md visual specs and EXPERIENCE.md behavioral specs. Gaps are on Toast and Filter dropdown.</p>
+        </div></div>
+        <div class="findings-list">
+          <article class="finding"><header><span class="badge badge-sev-medium">medium</span><h3 class="finding-title">Toast/notification has no DESIGN.md visual spec</h3><span class="finding-location">Components</span></header><div class="finding-note">It's the success-feedback climax of both flows and the error channel, but has no surface/radius/shadow/position token.</div><div class="finding-fix"><strong>Fix:</strong> add a Toast entry (surface <code>#fff8f4</code>, radius lg 16px, ambient shadow, dismiss timing) so "luxury doesn't shout" applies to it.</div></article>
+          <article class="finding"><header><span class="badge badge-sev-medium">medium</span><h3 class="finding-title">Filter dropdown has no DESIGN.md visual anatomy</h3><span class="finding-location">Components</span></header><div class="finding-fix"><strong>Fix:</strong> add a Filter/dropdown visual spec or fold it under an existing surface.</div></article>
+          <article class="finding"><header><span class="badge badge-sev-low">low</span><h3 class="finding-title">Variant selector naming inconsistent</h3><span class="finding-location">DESIGN.md "Size selector" vs EXPERIENCE.md "Variant Selector"</span></header><div class="finding-fix"><strong>Fix:</strong> unify the name and promote to a named Components entry.</div></article>
+          <article class="finding"><header><span class="badge badge-sev-low">low</span><h3 class="finding-title">Secondary button / chips behavioral gaps</h3><span class="finding-location">Component Patterns</span></header><div class="finding-fix"><strong>Fix:</strong> add secondary-button behavior; give filter/category chips their own toggle behavior.</div></article>
+        </div>
+      </details>
+    </section>
+
+    <!-- 4. State coverage -->
+    <section class="dimension">
+      <details>
+        <summary><h2>4. State coverage</h2><span class="verdict-pill verdict-adequate">adequate</span></summary>
+        <div class="dim-body"><div class="dim-judgment">
+          <p>State Patterns covers high-value surfaces well (grid skeleton, search loading+timeout, empty states, errors w/ retry, offline banner). Gaps are at the PDP, Cart, and Confirmation.</p>
+        </div></div>
+        <div class="findings-list">
+          <article class="finding"><header><span class="badge badge-sev-medium">medium</span><h3 class="finding-title">PDP has no state coverage</h3><span class="finding-location">State Patterns</span></header><div class="finding-note">No PDP cold-load skeleton, no product-fetch error/404, and out-of-stock lives only on the card.</div><div class="finding-fix"><strong>Fix:</strong> add PDP skeleton, product-not-found error, and PDP out-of-stock state.</div></article>
+          <article class="finding"><header><span class="badge badge-sev-medium">medium</span><h3 class="finding-title">Cart &amp; Order Confirmation have no states</h3><span class="finding-location">State Patterns</span></header><div class="finding-note">Empty cart is covered, but cart loading, item-removed, and confirmation success/failure are not.</div><div class="finding-fix"><strong>Fix:</strong> defer these surfaces out of MVP explicitly (and trim Flow 1) or add their states.</div></article>
+          <article class="finding"><header><span class="badge badge-sev-low">low</span><h3 class="finding-title">Order History has no states</h3><span class="finding-location">IA surface 7</span></header><div class="finding-fix"><strong>Fix:</strong> flag as deferred.</div></article>
+          <article class="finding"><header><span class="badge badge-sev-low">low</span><h3 class="finding-title">Offline behavior under-specified</h3><span class="finding-location">State Patterns</span></header><div class="finding-fix"><strong>Fix:</strong> one line on what "Offline mode limited" actually means (e.g. add-to-cart while offline).</div></article>
+        </div>
+      </details>
+    </section>
+
+    <!-- 5. Visual reference coverage -->
+    <section class="dimension">
+      <details open>
+        <summary><h2>5. Visual reference coverage</h2><span class="verdict-pill verdict-thin">thin</span></summary>
+        <div class="dim-body"><div class="dim-judgment">
+          <p>The only artifact in <code>.working/</code> is <code>design-direction.html</code>; no <code>mockups/</code>, <code>wireframes/</code>, or <code>imports/</code> exist. Neither spine links to the artifact.</p>
+        </div></div>
+        <div class="findings-list">
+          <article class="finding"><header><span class="badge badge-sev-high">high</span><h3 class="finding-title">Orphaned, off-brand <code>.working/design-direction.html</code></h3><span class="finding-location">.working/design-direction.html</span></header><div class="finding-note">Pre-pivot residue contradicting the source of truth: indigo <code>#4f46e5</code>/<code>#4338ca</code> CTAs, near-black + warm-brown text, system fonts (no Nunito Sans), "Warm Boutique Commerce" subtitle, 6–12px radii, and "Wireless Headphones / Electronics" content — exactly what D4 says was purged. Not referenced by either spine.</div><div class="finding-fix"><strong>Fix:</strong> delete or regenerate it to the Oren system; in its current state it is a trap for any reader opening <code>.working/</code>.</div></article>
+          <article class="finding"><header><span class="badge badge-sev-medium">medium</span><h3 class="finding-title">No key-screen mockups exist</h3><span class="finding-location">Document Status / D4 "Next"</span></header><div class="finding-note">Both footers and the log promise Home/Search/PDP mockups, and the Stitch source has 3 screens, but no openable artifact lives in the run folder.</div><div class="finding-fix"><strong>Fix:</strong> reconcile the 3 Stitch screens into <code>mockups/</code> and link them inline at IA / Components / Flow sections.</div></article>
+          <article class="finding"><header><span class="badge badge-sev-low">low</span><h3 class="finding-title">Stitch reference unresolvable in-repo</h3><span class="finding-location">DESIGN.md References</span></header><div class="finding-fix"><strong>Fix:</strong> export the canonical screens locally.</div></article>
+        </div>
+      </details>
+    </section>
+
+    <!-- 6. Bloat & overspecification -->
+    <section class="dimension">
+      <details>
+        <summary><h2>6. Bloat &amp; overspecification</h2><span class="verdict-pill verdict-adequate">adequate</span></summary>
+        <div class="dim-body"><div class="dim-judgment">
+          <p>DESIGN.md legitimately carries editorial voice; EXPERIENCE.md is mostly behavioral. A few token restatements and two deferred-scope placeholder blocks.</p>
+        </div></div>
+        <div class="findings-list">
+          <article class="finding"><header><span class="badge badge-sev-low">low</span><h3 class="finding-title">EXPERIENCE.md restates DESIGN.md hex literals</h3><span class="finding-location">Add-to-Cart, Variant, disabled</span></header><div class="finding-fix"><strong>Fix:</strong> drop hex codes, keep role names; let DESIGN.md own the hex.</div></article>
+          <article class="finding"><header><span class="badge badge-sev-low">low</span><h3 class="finding-title">"Design System Reference" duplicates the palette/type/spacing</h3><span class="finding-location">EXPERIENCE.md lines 35–41</span></header><div class="finding-fix"><strong>Fix:</strong> reduce to a one-line "inherits DESIGN.md tokens; deltas below".</div></article>
+          <article class="finding"><header><span class="badge badge-sev-low">low</span><h3 class="finding-title">Admin Experience / Admin IA placeholders for deferred scope</h3><span class="finding-location">EXPERIENCE.md lines 27–31, 97–103</span></header><div class="finding-fix"><strong>Fix:</strong> compress to a single "Admin deferred to v1.1" line.</div></article>
+        </div>
+      </details>
+    </section>
+
+    <!-- 7. Inheritance discipline -->
+    <section class="dimension">
+      <details>
+        <summary><h2>7. Inheritance discipline</h2><span class="verdict-pill verdict-adequate">adequate</span></summary>
+        <div class="dim-body"><div class="dim-judgment">
+          <p>EXPERIENCE.md token references resolve to DESIGN.md by name; glossary is consistent; the purge is verified. Gaps are frontmatter machine-declarations and one cross-file contradiction.</p>
+        </div></div>
+        <div class="findings-list">
+          <article class="finding"><header><span class="badge badge-sev-medium">medium</span><h3 class="finding-title">Aspect-ratio / grid contradiction across the pair</h3><span class="finding-location">DESIGN.md Product Card vs EXPERIENCE.md line 393</span></header><div class="finding-note">DESIGN.md = 4:5 portrait + 2-col staggered masonry; EXPERIENCE.md Responsive = square 1:1 + plain 2-col grid. DESIGN.md is source of truth.</div><div class="finding-fix"><strong>Fix:</strong> correct EXPERIENCE.md to 4:5 + masonry, or log a deliberate deviation.</div></article>
+          <article class="finding"><header><span class="badge badge-sev-medium">medium</span><h3 class="finding-title">EXPERIENCE.md has no <code>sources:</code> frontmatter</h3><span class="finding-location">EXPERIENCE.md frontmatter</span></header><div class="finding-note">Inheritance from DESIGN.md/PRD is prose-only, not machine-declared.</div><div class="finding-fix"><strong>Fix:</strong> add <code>sources:</code> (DESIGN.md and the PRD if one exists).</div></article>
+          <article class="finding"><header><span class="badge badge-sev-medium">medium</span><h3 class="finding-title">DESIGN.md has no <code>components:</code> frontmatter block</h3><span class="finding-location">DESIGN.md frontmatter</span></header><div class="finding-note">Component specs are prose-only, not machine-resolvable.</div><div class="finding-fix"><strong>Fix (recommended):</strong> add a <code>components:</code> map using <code>{colors.*}</code>/<code>{rounded.*}</code> references.</div></article>
+          <article class="finding"><header><span class="badge badge-sev-low">low</span><h3 class="finding-title">Grid counts &amp; PDP split agree across files</h3><span class="finding-location">Foundation / Responsive / DESIGN.md</span></header><div class="finding-note">Positive note — 2/3/4 columns and PDP 60/40 are consistent.</div></article>
+        </div>
+      </details>
+    </section>
+
+    <!-- 8. Shape fit -->
+    <section class="dimension">
+      <details>
+        <summary><h2>8. Shape fit</h2><span class="verdict-pill verdict-strong">strong</span></summary>
+        <div class="dim-body"><div class="dim-judgment">
+          <p>DESIGN.md sections are in canonical order; EXPERIENCE.md has all required defaults and the triggered Responsive section. One triggered section is missing.</p>
+        </div></div>
+        <div class="findings-list">
+          <article class="finding"><header><span class="badge badge-sev-medium">medium</span><h3 class="finding-title">Inspiration &amp; Anti-patterns section missing though triggered</h3><span class="finding-location">EXPERIENCE.md</span></header><div class="finding-note">The log shows explicit references (editorial lookbooks, Pinterest, COS/The Row) and rejects (light 300/400 weights, 4px corners, indigo/Inter, algorithmic search-first).</div><div class="finding-fix"><strong>Fix:</strong> add an Inspiration &amp; Anti-patterns section capturing references + rejected pivots.</div></article>
+          <article class="finding"><header><span class="badge badge-sev-low">low</span><h3 class="finding-title">Structure is clean</h3><span class="finding-location">both spines</span></header><div class="finding-note">Positive note — no invented sections fail to earn their place.</div></article>
+        </div>
+      </details>
+    </section>
+
+    <div class="mechanical">
+      <h3>Mechanical notes</h3>
+      <ul>
+        <li><b>Name inconsistency:</b> "Size selector" (DESIGN.md) vs "Variant Selector (Size/Color)" (EXPERIENCE.md) — unify. Everything else consistent.</li>
+        <li><b>Purge verified:</b> zero <code>indigo</code>/<code>#4f46e5</code>/<code>#4338ca</code>/<code>Inter</code> in either spine. Only surviving instances are in the orphaned <code>.working/design-direction.html</code>.</li>
+        <li><b>Frontmatter:</b> DESIGN.md omits spec's <code>components:</code> and <code>description:</code> keys (<code>title</code> used instead); EXPERIENCE.md omits <code>sources:</code>.</li>
+        <li><b>Token reference style:</b> neither spine uses <code>{path.to.token}</code> syntax — name+hex instead, which invites hex-restatement drift.</li>
+        <li><b>Live TODO:</b> DESIGN.md line 141 leaves "verify Warm Gray… darken where it fails" unresolved inside a source-of-truth doc.</li>
+      </ul>
+    </div>
+
+    <footer class="report-footer">
+      <div class="meta">
+        <span>Rubric: review-rubric.md</span>
+        <span>Generated: 2026-06-22</span>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

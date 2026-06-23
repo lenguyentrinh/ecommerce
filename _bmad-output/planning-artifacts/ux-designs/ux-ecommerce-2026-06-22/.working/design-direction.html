@@ -1,0 +1,1879 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Oren — Design Direction</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,300;0,6..12,400;0,6..12,600;0,6..12,700;0,6..12,800;1,6..12,400;1,6..12,600&display=swap" rel="stylesheet">
+  <style>
+    /* ─────────────────────────────────────────
+       OREN DESIGN TOKENS — Stitch #2621556029010588670
+       Never override these with in-context guesses.
+    ───────────────────────────────────────── */
+    :root {
+      /* Surfaces */
+      --surface:           #fff8f4;
+      --surface-low:       #fff1e7;
+      --surface-mid:       #fdebdc;
+      --surface-high:      #f7e5d7;
+      --surface-variant:   #f1dfd1;
+      --surface-dim:       #e8d7c9;
+
+      /* Text */
+      --on-surface:        #231a11;
+      --on-surface-var:    #474741;
+      --outline:           #787770;
+      --outline-var:       #c8c7be;
+
+      /* Brand */
+      --primary:           #5f5e5b;
+      --on-primary:        #ffffff;
+      --primary-ctn:       #faf7f2;
+      --secondary:         #665d50;
+      --on-secondary:      #ffffff;
+      --secondary-ctn:     #eadecd;
+      --tertiary:          #725855;
+      --error:             #ba1a1a;
+
+      /* Space */
+      --xs: 8px;  --sm: 16px;  --md: 24px;
+      --lg: 48px; --xl: 80px;
+
+      /* Shape */
+      --r-sm:   4px;
+      --r-md:   8px;
+      --r-lg:   12px;
+      --r-xl:   16px;
+      --r-full: 9999px;
+
+      /* Shadow — always warm brown base, never neutral grey */
+      --sh-ambient: 0 8px 40px rgba(74,63,53,0.04);
+      --sh-soft:    0 10px 30px -10px rgba(74,63,53,0.08);
+      --sh-lift:    0 18px 44px -12px rgba(74,63,53,0.15);
+      --sh-btn:     0 4px 16px rgba(95,94,91,0.22);
+
+      /* Motion */
+      --ease: cubic-bezier(0.4, 0, 0.2, 1);
+
+      /* Type */
+      --font: 'Nunito Sans', system-ui, -apple-system, sans-serif;
+    }
+
+    /* ─── RESET ──────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font);
+      background: var(--surface);
+      color: var(--on-surface);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Film grain — fixed overlay, 3 % opacity, feTurbulence */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9000;
+      opacity: 0.03;
+      background-image:
+        url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+    }
+
+    /* ─────────────────────────────────────────
+       THE RISK: Brand preview — the spec opens
+       with a live replica of the Oren homepage
+       first fold, before any spec language.
+    ───────────────────────────────────────── */
+    .brand-preview {
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Nav bar — mirrors the actual Oren nav */
+    .preview-nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 64px;
+      background: rgba(255, 248, 244, 0.82);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: var(--sh-ambient);
+      border-bottom: 1px solid rgba(199,199,190,0.18);
+    }
+
+    .preview-logo {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      color: var(--on-surface);
+      line-height: 1;
+    }
+
+    .preview-nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+
+    .preview-nav-links a {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--on-surface-var);
+      text-decoration: none;
+      transition: color 300ms var(--ease);
+    }
+
+    .preview-nav-links a.active {
+      color: var(--primary);
+      border-bottom: 2px solid var(--primary);
+      padding-bottom: 2px;
+    }
+
+    .preview-nav-links a:hover { color: var(--primary); }
+
+    .preview-nav-icons {
+      display: flex;
+      gap: 20px;
+      color: var(--primary);
+    }
+
+    .preview-nav-icons button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 22px;
+      color: var(--primary);
+      line-height: 1;
+      padding: 4px;
+      border-radius: var(--r-sm);
+      transition: opacity 200ms var(--ease);
+    }
+
+    .preview-nav-icons button:hover { opacity: 0.7; }
+    .preview-nav-icons button:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+    /* Hero section */
+    .preview-hero {
+      min-height: 72vh;
+      background:
+        linear-gradient(to bottom, rgba(255,248,244,0) 0%, rgba(255,248,244,0.45) 100%),
+        linear-gradient(155deg, var(--surface-mid) 0%, var(--surface-variant) 55%, var(--surface-dim) 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      text-align: center;
+      padding: var(--xl) var(--lg);
+      position: relative;
+    }
+
+    .preview-chip {
+      display: inline-block;
+      background: var(--primary);
+      color: var(--on-primary);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      padding: 5px 16px;
+      border-radius: var(--r-full);
+    }
+
+    .preview-hero-title {
+      font-size: clamp(64px, 10vw, 96px);
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      line-height: 0.95;
+      color: var(--on-surface);
+    }
+
+    .preview-tagline {
+      font-size: 19px;
+      font-style: italic;
+      font-weight: 400;
+      color: var(--secondary);
+      max-width: 340px;
+    }
+
+    .preview-scroll {
+      position: absolute;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      opacity: 0.45;
+    }
+
+    .preview-scroll span {
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+    }
+
+    .preview-scroll-line {
+      width: 1px;
+      height: 40px;
+      background: var(--primary);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .preview-scroll-line::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 50%;
+      background: var(--surface);
+      animation: scrollDrop 1.8s var(--ease) infinite;
+    }
+
+    @keyframes scrollDrop {
+      0%   { transform: translateY(-100%); }
+      100% { transform: translateY(200%); }
+    }
+
+    /* Preview product strip */
+    .preview-strip {
+      background: var(--surface-low);
+      padding: var(--lg) var(--lg) var(--xl);
+    }
+
+    .preview-strip-label {
+      text-align: center;
+      margin-bottom: var(--lg);
+    }
+
+    .preview-strip-label h3 {
+      font-size: 36px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--on-surface);
+      margin-bottom: 6px;
+    }
+
+    .preview-strip-label p {
+      font-size: 15px;
+      font-style: italic;
+      color: var(--secondary);
+    }
+
+    .preview-product-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--md);
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .pcard {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .pcard:nth-child(even) { margin-top: 28px; }
+
+    .pcard-img {
+      border-radius: var(--r-xl);
+      overflow: hidden;
+      aspect-ratio: 3/4;
+      position: relative;
+      box-shadow: var(--sh-soft);
+      border: 1px solid rgba(35, 26, 17, 0.07);
+      transition: box-shadow 400ms var(--ease);
+    }
+
+    .pcard-img-inner {
+      width: 100%;
+      height: 100%;
+      transition: transform 700ms var(--ease);
+    }
+
+    .pcard:hover .pcard-img { box-shadow: var(--sh-lift); }
+    .pcard:hover .pcard-img-inner { transform: scale(1.05); }
+
+    .pcard-wish {
+      position: absolute;
+      top: 12px; right: 12px;
+      width: 34px; height: 34px;
+      background: rgba(255,248,244,0.72);
+      backdrop-filter: blur(8px);
+      border: none; border-radius: var(--r-full);
+      cursor: pointer; font-size: 14px;
+      color: var(--primary);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0;
+      transition: opacity 300ms var(--ease);
+    }
+
+    .pcard:hover .pcard-wish { opacity: 1; }
+    .pcard-wish:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+    .pcard-cat {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--secondary);
+    }
+
+    .pcard-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--on-surface);
+      margin-top: -4px;
+    }
+
+    .pcard-price {
+      font-size: 14px;
+      color: var(--on-surface-var);
+    }
+
+    /* Gradient swatches for product image placeholders */
+    .grad-sage    { background: linear-gradient(160deg, #c4cfc0 0%, #a8b5a2 100%); }
+    .grad-ivory   { background: linear-gradient(160deg, var(--surface-mid) 0%, var(--surface-dim) 100%); }
+    .grad-clay    { background: linear-gradient(160deg, #c8a68a 0%, #b08868 100%); }
+    .grad-stone   { background: linear-gradient(160deg, #b0aba4 0%, #928d86 100%); }
+
+    /* Attribution caption */
+    .preview-caption {
+      text-align: center;
+      padding: 14px var(--md);
+      background: var(--on-surface);
+      color: rgba(255,248,244,0.55);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    /* ─────────────────────────────────────────
+       SPEC DOCUMENT
+    ───────────────────────────────────────── */
+    .spec {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: var(--xl) 40px var(--xl);
+    }
+
+    .spec-header {
+      padding-bottom: var(--lg);
+      border-bottom: 1px solid var(--outline-var);
+      margin-bottom: var(--xl);
+    }
+
+    .spec-eyebrow {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--secondary);
+      margin-bottom: 10px;
+    }
+
+    .spec-title {
+      font-size: 44px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--on-surface);
+      line-height: 1.05;
+      margin-bottom: 12px;
+    }
+
+    .spec-desc {
+      font-size: 16px;
+      color: var(--on-surface-var);
+      max-width: 560px;
+      line-height: 1.6;
+    }
+
+    /* Section anatomy */
+    .sec {
+      margin-bottom: var(--xl);
+    }
+
+    .sec-head {
+      margin-bottom: var(--lg);
+      padding-bottom: var(--sm);
+      border-bottom: 1px solid var(--outline-var);
+      display: flex;
+      align-items: baseline;
+      gap: var(--md);
+    }
+
+    .sec-tag {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--secondary);
+      flex-shrink: 0;
+    }
+
+    .sec-title {
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: var(--on-surface);
+    }
+
+    /* ─── COLOR PALETTE ──────────────────── */
+    .palette-group {
+      margin-bottom: var(--lg);
+    }
+
+    .palette-group-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--outline);
+      margin-bottom: var(--sm);
+    }
+
+    .palette-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: var(--sm);
+    }
+
+    .swatch {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .swatch-box {
+      height: 88px;
+      border-radius: var(--r-xl);
+      border: 1px solid rgba(35,26,17,0.07);
+      transition: transform 300ms var(--ease);
+      cursor: default;
+    }
+
+    .swatch-box:hover { transform: scale(1.04); }
+
+    .swatch-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--on-surface);
+      line-height: 1.3;
+    }
+
+    .swatch-hex {
+      font-size: 11px;
+      color: var(--on-surface-var);
+      font-family: 'Courier New', monospace;
+    }
+
+    .swatch-role {
+      font-size: 10px;
+      color: var(--outline);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    /* ─── TYPOGRAPHY ─────────────────────── */
+    .type-hero {
+      padding: var(--lg) var(--xl);
+      background: var(--surface-low);
+      border-radius: var(--r-xl);
+      margin-bottom: var(--md);
+      overflow: hidden;
+    }
+
+    .type-hero-display {
+      font-size: clamp(40px, 6vw, 72px);
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      line-height: 1;
+      color: var(--on-surface);
+      margin-bottom: 16px;
+    }
+
+    .type-hero-sub {
+      font-size: 20px;
+      font-style: italic;
+      color: var(--secondary);
+    }
+
+    .type-scale {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .type-row {
+      display: flex;
+      align-items: baseline;
+      gap: var(--md);
+      padding: var(--md);
+      background: var(--surface-low);
+      border-radius: var(--r-xl);
+    }
+
+    .type-meta {
+      min-width: 160px;
+      flex-shrink: 0;
+    }
+
+    .type-meta-label {
+      display: block;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--secondary);
+    }
+
+    .type-meta-spec {
+      font-size: 10px;
+      color: var(--outline);
+      font-family: 'Courier New', monospace;
+    }
+
+    .t-display  { font-size: 48px; font-weight: 700; line-height: 1.1; letter-spacing: -0.04em; color: var(--on-surface); }
+    .t-headline { font-size: 24px; font-weight: 600; line-height: 1.3; letter-spacing: -0.01em; color: var(--on-surface); }
+    .t-body-lg  { font-size: 18px; font-weight: 400; line-height: 1.6; color: var(--on-surface); }
+    .t-body-md  { font-size: 16px; font-weight: 400; line-height: 1.5; color: var(--on-surface-var); }
+    .t-label    { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--secondary); }
+
+    /* ─── SPACING ────────────────────────── */
+    .spacing-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .spacing-row {
+      display: flex;
+      align-items: center;
+      gap: var(--md);
+    }
+
+    .spacing-bar {
+      background: var(--secondary-ctn);
+      border-radius: 3px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+
+    .spacing-text { font-size: 13px; color: var(--on-surface-var); }
+    .spacing-text strong { color: var(--on-surface); font-weight: 600; }
+
+    /* ─── SHAPE ──────────────────────────── */
+    .shape-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--lg);
+      align-items: flex-end;
+    }
+
+    .shape-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .shape-box {
+      width: 88px;
+      height: 60px;
+      background: var(--secondary-ctn);
+      border: 2px solid var(--outline-var);
+    }
+
+    .shape-label { font-size: 11px; font-weight: 600; color: var(--secondary); text-transform: uppercase; letter-spacing: 0.08em; }
+    .shape-val   { font-size: 10px; color: var(--outline); font-family: 'Courier New', monospace; }
+
+    /* ─── ELEVATION ──────────────────────── */
+    .shadow-row {
+      display: flex;
+      gap: var(--lg);
+      flex-wrap: wrap;
+    }
+
+    .shadow-item {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .shadow-box {
+      width: 120px;
+      height: 80px;
+      border-radius: var(--r-xl);
+      background: var(--surface);
+    }
+
+    .shadow-name { font-size: 12px; font-weight: 600; color: var(--on-surface-var); }
+    .shadow-code { font-size: 10px; color: var(--outline); font-family: 'Courier New', monospace; line-height: 1.6; }
+
+    /* ─── MOTION ─────────────────────────── */
+    .motion-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: var(--md);
+    }
+
+    .motion-card {
+      background: var(--surface-low);
+      border-radius: var(--r-xl);
+      padding: var(--md);
+      border: 1px solid var(--outline-var);
+    }
+
+    .motion-card-label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--secondary);
+      margin-bottom: var(--sm);
+    }
+
+    .mono {
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      color: var(--on-surface-var);
+      line-height: 2;
+    }
+
+    .mono .comment { color: var(--outline-var); }
+
+    /* ─── COMPONENTS ─────────────────────── */
+    .comp-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: var(--md);
+    }
+
+    .comp-card {
+      background: var(--surface-low);
+      border-radius: var(--r-xl);
+      padding: var(--md);
+      border: 1px solid var(--outline-var);
+    }
+
+    .comp-label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--secondary);
+      margin-bottom: var(--sm);
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 28px;
+      border-radius: var(--r-full);
+      border: none;
+      font-family: var(--font);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition:
+        transform 300ms var(--ease),
+        background-color 300ms var(--ease),
+        box-shadow 300ms var(--ease);
+      white-space: nowrap;
+    }
+
+    .btn:hover  { transform: scale(1.02); }
+    .btn:active { transform: scale(0.98); }
+    .btn:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+
+    .btn-primary {
+      background: var(--primary);
+      color: var(--on-primary);
+      box-shadow: var(--sh-btn);
+    }
+    .btn-primary:hover { background: var(--secondary); }
+
+    .btn-cta {
+      background: var(--secondary);
+      color: var(--on-secondary);
+      box-shadow: var(--sh-btn);
+    }
+    .btn-cta:hover { background: var(--primary); }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--primary);
+      border: 1.5px solid var(--outline-var);
+    }
+    .btn-outline:hover { border-color: var(--primary); background: var(--primary-ctn); }
+
+    .btn-ghost {
+      background: var(--secondary-ctn);
+      color: var(--secondary);
+      font-size: 11px;
+      padding: 8px 20px;
+    }
+    .btn-ghost:hover { background: var(--surface-dim); }
+
+    .btn-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    /* Product card component */
+    .product-card {
+      background: var(--surface);
+      border-radius: var(--r-xl);
+      overflow: hidden;
+      box-shadow: var(--sh-soft);
+      transition:
+        transform 400ms var(--ease),
+        box-shadow 400ms var(--ease);
+    }
+
+    .product-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--sh-lift);
+    }
+
+    .card-img {
+      height: 220px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .card-img-fill {
+      position: absolute;
+      inset: 0;
+      transition: transform 700ms var(--ease);
+    }
+
+    .product-card:hover .card-img-fill { transform: scale(1.06); }
+
+    .card-img-label {
+      position: relative;
+      z-index: 1;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--outline);
+    }
+
+    .card-wish {
+      position: absolute;
+      top: 12px; right: 12px;
+      z-index: 2;
+      width: 34px; height: 34px;
+      background: rgba(255,248,244,0.72);
+      backdrop-filter: blur(8px);
+      border: none; border-radius: var(--r-full);
+      cursor: pointer; font-size: 14px;
+      color: var(--primary);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0;
+      transition: opacity 300ms var(--ease);
+    }
+
+    .product-card:hover .card-wish { opacity: 1; }
+    .card-wish:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+    .card-body  { padding: 14px 16px 16px; }
+    .card-cat   { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--secondary); }
+    .card-name  { font-size: 15px; font-weight: 600; color: var(--on-surface); margin-top: 3px; margin-bottom: 3px; }
+    .card-price { font-size: 15px; color: var(--on-surface-var); }
+
+    /* Navigation demo */
+    .nav-demo {
+      background: rgba(255,248,244,0.85);
+      backdrop-filter: blur(12px);
+      border-radius: var(--r-xl);
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: var(--sh-ambient);
+      border: 1px solid rgba(199,199,190,0.22);
+    }
+
+    .nav-demo-logo {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      color: var(--on-surface);
+    }
+
+    .nav-demo-links {
+      display: flex;
+      gap: 22px;
+      list-style: none;
+    }
+
+    .nav-demo-links a {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--on-surface-var);
+      text-decoration: none;
+    }
+
+    .nav-demo-links a.active {
+      color: var(--primary);
+      border-bottom: 2px solid var(--primary);
+      padding-bottom: 2px;
+    }
+
+    .nav-demo-icons {
+      display: flex;
+      gap: 14px;
+      font-size: 16px;
+      color: var(--primary);
+    }
+
+    /* Size selector */
+    .size-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .size-btn {
+      padding: 8px 20px;
+      border-radius: var(--r-full);
+      border: 1.5px solid var(--outline-var);
+      background: transparent;
+      font-family: var(--font);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--on-surface-var);
+      cursor: pointer;
+      transition:
+        border-color 300ms var(--ease),
+        color 300ms var(--ease),
+        background 300ms var(--ease);
+    }
+
+    .size-btn:hover:not(.na) { border-color: var(--primary); color: var(--primary); }
+    .size-btn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+    .size-btn.sel {
+      border-color: var(--primary);
+      border-width: 2px;
+      color: var(--primary);
+      background: var(--primary-ctn);
+    }
+
+    .size-btn.na { opacity: 0.32; cursor: not-allowed; }
+
+    /* Filter sidebar */
+    .filter-group {
+      border-bottom: 1px solid rgba(199,199,190,0.4);
+      padding: 12px 0;
+    }
+
+    .filter-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--on-surface);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .filter-head::after {
+      content: '+';
+      font-size: 16px;
+      color: var(--secondary);
+      font-weight: 300;
+    }
+
+    .filter-opts {
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .filter-opt {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      color: var(--on-surface-var);
+      cursor: pointer;
+    }
+
+    .filter-opt input[type="checkbox"] {
+      width: 15px;
+      height: 15px;
+      accent-color: var(--primary);
+    }
+
+    .color-dots {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .color-dot {
+      width: 24px;
+      height: 24px;
+      border-radius: var(--r-full);
+      border: 1px solid rgba(35,26,17,0.1);
+      cursor: pointer;
+      transition: transform 300ms var(--ease);
+    }
+
+    .color-dot:hover {
+      transform: scale(1.18);
+      outline: 2px solid var(--primary);
+      outline-offset: 2px;
+    }
+
+    .color-dot:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+
+    /* Quick-add */
+    .qa-wrap { position: relative; }
+
+    .qa-img {
+      border-radius: var(--r-xl);
+      height: 160px;
+      overflow: hidden;
+      display: flex;
+      align-items: flex-end;
+      padding: 12px;
+    }
+
+    .qa-btn {
+      width: 100%;
+      background: rgba(255,248,244,0.92);
+      color: var(--primary);
+      border: none;
+      cursor: pointer;
+      font-family: var(--font);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 10px;
+      border-radius: var(--r-full);
+      transform: translateY(8px);
+      opacity: 0;
+      transition: transform 300ms var(--ease), opacity 300ms var(--ease);
+    }
+
+    .qa-wrap:hover .qa-btn { transform: translateY(0); opacity: 1; }
+    .qa-btn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+    .comp-note {
+      font-size: 11px;
+      color: var(--outline);
+      margin-top: 10px;
+      line-height: 1.5;
+      font-family: 'Courier New', monospace;
+    }
+
+    /* ─── LAYOUT PREVIEWS ────────────────── */
+    .layout-section {
+      margin-bottom: var(--lg);
+    }
+
+    .layout-frame {
+      border-radius: var(--r-xl);
+      overflow: hidden;
+      border: 1px solid var(--outline-var);
+      box-shadow: var(--sh-soft);
+    }
+
+    .frame-bar {
+      background: var(--on-surface);
+      color: rgba(255,248,244,0.6);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 8px 16px;
+    }
+
+    .layout-heading {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 12px;
+    }
+
+    /* Bento grid */
+    .bento {
+      display: grid;
+      grid-template-columns: 7fr 5fr;
+      gap: 16px;
+      padding: var(--md);
+      background: var(--surface);
+    }
+
+    .bento-card {
+      border-radius: var(--r-lg);
+      min-height: 200px;
+      padding: 20px;
+      display: flex;
+      align-items: flex-end;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .bento-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(35,26,17,0.4) 0%, transparent 60%);
+    }
+
+    .bento-info {
+      position: relative;
+      z-index: 1;
+      color: white;
+    }
+
+    .bento-name { font-size: 17px; font-weight: 600; margin-bottom: 4px; }
+    .bento-meta { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.75; }
+
+    .bento-right { display: flex; flex-direction: column; gap: 16px; }
+    .bento-right .bento-card { min-height: 88px; }
+
+    /* Arrivals grid */
+    .arrivals {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      padding: var(--md);
+      background: var(--surface-low);
+    }
+
+    .av-item { display: flex; flex-direction: column; gap: 10px; }
+    .av-item:nth-child(even) { margin-top: 28px; }
+    .av-img  { border-radius: var(--r-xl); aspect-ratio: 3/4; }
+    .av-cat  { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--secondary); }
+    .av-name { font-size: 13px; font-weight: 600; color: var(--on-surface); margin-top: -4px; }
+    .av-price{ font-size: 13px; color: var(--on-surface-var); }
+
+    /* Shop layout */
+    .shop {
+      display: flex;
+      gap: var(--md);
+      padding: var(--md);
+      background: var(--surface);
+    }
+
+    .shop-sidebar { width: 180px; flex-shrink: 0; }
+    .sidebar-title { font-size: 18px; font-weight: 600; color: var(--on-surface-var); margin-bottom: var(--sm); }
+
+    .shop-grid {
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      align-items: start;
+    }
+
+    .shop-card {
+      border-radius: var(--r-xl);
+      box-shadow: var(--sh-soft);
+    }
+
+    /* PDP */
+    .pdp {
+      display: flex;
+      gap: var(--md);
+      padding: var(--md);
+      background: var(--surface);
+    }
+
+    .pdp-gal { flex: 3; }
+
+    .pdp-gal-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .pdp-img { border-radius: var(--r-lg); }
+    .pdp-img.wide { grid-column: span 2; height: 200px; }
+    .pdp-img.half { height: 140px; }
+    .pdp-img.half.offset { margin-top: 24px; }
+
+    .pdp-panel { flex: 2; display: flex; flex-direction: column; gap: 18px; }
+    .pdp-eyebrow { font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--on-surface-var); }
+    .pdp-title   { font-size: 26px; font-weight: 700; letter-spacing: -0.02em; color: var(--on-surface); line-height: 1.2; }
+    .pdp-price   { font-size: 20px; font-weight: 600; color: var(--secondary); }
+    .pdp-divider { height: 1px; background: var(--outline-var); opacity: 0.5; }
+    .pdp-sl      { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--on-surface-var); margin-bottom: 10px; }
+
+    details.pdp-acc { border-bottom: 1px solid var(--outline-var); padding: 10px 0; cursor: pointer; }
+    details.pdp-acc summary {
+      font-size: 14px; font-weight: 600; color: var(--on-surface);
+      list-style: none; display: flex; justify-content: space-between; align-items: center;
+    }
+    .pdp-acc-body { font-size: 12px; color: var(--on-surface-var); line-height: 1.6; padding-top: 10px; }
+
+    /* ─── DIALS ──────────────────────────── */
+    .dials { display: flex; gap: var(--lg); flex-wrap: wrap; }
+    .dial  { min-width: 190px; }
+
+    .dial-name {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--secondary);
+      margin-bottom: 8px;
+    }
+
+    .dial-track {
+      height: 6px;
+      background: var(--outline-var);
+      border-radius: var(--r-full);
+      position: relative;
+      margin-bottom: 6px;
+    }
+
+    .dial-fill {
+      height: 100%;
+      border-radius: var(--r-full);
+      background: var(--primary);
+    }
+
+    .dial-thumb {
+      position: absolute;
+      top: 50%; transform: translateY(-50%);
+      width: 14px; height: 14px;
+      border-radius: var(--r-full);
+      background: var(--primary);
+      border: 2px solid var(--surface);
+      box-shadow: 0 2px 8px rgba(95,94,91,0.3);
+    }
+
+    .dial-desc { font-size: 12px; color: var(--on-surface-var); }
+
+    /* ─── FOOTER ─────────────────────────── */
+    footer {
+      text-align: center;
+      border-top: 1px solid var(--outline-var);
+      padding: var(--xl) 40px var(--lg);
+      color: var(--on-surface-var);
+      font-size: 13px;
+    }
+
+    footer p + p { margin-top: 6px; color: var(--outline); }
+  </style>
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════
+       THE RISK: Spec opens with a live brand
+       preview — the reader experiences Oren
+       before reading a single token name.
+  ═══════════════════════════════════════ -->
+  <div class="brand-preview">
+
+    <nav class="preview-nav" aria-label="Oren site navigation preview">
+      <span class="preview-logo">Oren</span>
+      <ul class="preview-nav-links" role="list">
+        <li><a href="#" tabindex="-1">Home</a></li>
+        <li><a href="#" class="active" tabindex="-1">Shop</a></li>
+        <li><a href="#" tabindex="-1">New Arrivals</a></li>
+        <li><a href="#" tabindex="-1">Collections</a></li>
+        <li><a href="#" tabindex="-1">About</a></li>
+      </ul>
+      <div class="preview-nav-icons" aria-hidden="true">
+        <button tabindex="-1" aria-label="Shopping bag">🛍</button>
+        <button tabindex="-1" aria-label="Wishlist">♡</button>
+        <button tabindex="-1" aria-label="Account">◎</button>
+      </div>
+    </nav>
+
+    <div class="preview-hero" aria-hidden="true">
+      <span class="preview-chip">Curation</span>
+      <h1 class="preview-hero-title">Oren</h1>
+      <p class="preview-tagline">Soft elegance for everyday living</p>
+      <button class="btn btn-primary" tabindex="-1">Shop Collection</button>
+      <div class="preview-scroll" aria-hidden="true">
+        <span>Scroll</span>
+        <div class="preview-scroll-line"></div>
+      </div>
+    </div>
+
+    <div class="preview-strip" aria-hidden="true">
+      <div class="preview-strip-label">
+        <h3>New Arrivals</h3>
+        <p>Thoughtfully designed for the modern muse</p>
+      </div>
+      <div class="preview-product-row">
+        <div class="pcard">
+          <div class="pcard-img">
+            <div class="pcard-img-inner grad-sage"></div>
+            <button class="pcard-wish" tabindex="-1" aria-label="Wishlist">♡</button>
+          </div>
+          <span class="pcard-cat">Knitwear</span>
+          <span class="pcard-name">Sage Ribbed Dress</span>
+          <span class="pcard-price">$185</span>
+        </div>
+        <div class="pcard">
+          <div class="pcard-img">
+            <div class="pcard-img-inner grad-ivory"></div>
+            <button class="pcard-wish" tabindex="-1" aria-label="Wishlist">♡</button>
+          </div>
+          <span class="pcard-cat">Tailoring</span>
+          <span class="pcard-name">Cream Wide-Leg Linen</span>
+          <span class="pcard-price">$230</span>
+        </div>
+        <div class="pcard">
+          <div class="pcard-img">
+            <div class="pcard-img-inner grad-clay"></div>
+            <button class="pcard-wish" tabindex="-1" aria-label="Wishlist">♡</button>
+          </div>
+          <span class="pcard-cat">Silk</span>
+          <span class="pcard-name">Clay Wrap Blouse</span>
+          <span class="pcard-price">$210</span>
+        </div>
+        <div class="pcard">
+          <div class="pcard-img">
+            <div class="pcard-img-inner grad-stone"></div>
+            <button class="pcard-wish" tabindex="-1" aria-label="Wishlist">♡</button>
+          </div>
+          <span class="pcard-cat">Outerwear</span>
+          <span class="pcard-name">Ivory Oversized Jacket</span>
+          <span class="pcard-price">$320</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="preview-caption">
+      Live preview · Stitch project 2621556029010588670 · Oren Soft Minimal Boutique · Experience before specification
+    </div>
+
+  </div><!-- /brand-preview -->
+
+  <!-- ═══════════════════════════════════════
+       SPEC DOCUMENT
+  ═══════════════════════════════════════ -->
+  <main class="spec">
+
+    <header class="spec-header">
+      <p class="spec-eyebrow">Design System · Stitch Project 2621556029010588670</p>
+      <h2 class="spec-title">Oren — Design Direction</h2>
+      <p class="spec-desc">The visual system for the Oren ecommerce experience. Every token below is sourced directly from the Stitch project — implement exactly as specified, no interpretation.</p>
+    </header>
+
+    <!-- ── DIALS ─────────────────────────── -->
+    <section class="sec" aria-labelledby="sec-dials">
+      <div class="sec-head">
+        <span class="sec-tag">Brand Positioning</span>
+        <h3 class="sec-title" id="sec-dials">Design Dials</h3>
+      </div>
+      <div class="dials">
+        <div class="dial">
+          <div class="dial-name">Design Variance</div>
+          <div class="dial-track">
+            <div class="dial-fill" style="width:75%;"></div>
+            <div class="dial-thumb" style="left:calc(75% - 7px);"></div>
+          </div>
+          <div class="dial-desc">7.5 / 10 — Asymmetric bento layouts, staggered grids, varied card heights</div>
+        </div>
+        <div class="dial">
+          <div class="dial-name">Motion Intensity</div>
+          <div class="dial-track">
+            <div class="dial-fill" style="width:55%;"></div>
+            <div class="dial-thumb" style="left:calc(55% - 7px);"></div>
+          </div>
+          <div class="dial-desc">5.5 / 10 — Slow scroll reveals, purposeful image zoom, restrained hover lifts</div>
+        </div>
+        <div class="dial">
+          <div class="dial-name">Visual Density</div>
+          <div class="dial-track">
+            <div class="dial-fill" style="width:35%;"></div>
+            <div class="dial-thumb" style="left:calc(35% - 7px);"></div>
+          </div>
+          <div class="dial-desc">3.5 / 10 — Generous whitespace, editorial breathing room throughout</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── COLOR ─────────────────────────── -->
+    <section class="sec" aria-labelledby="sec-color">
+      <div class="sec-head">
+        <span class="sec-tag">Color System</span>
+        <h3 class="sec-title" id="sec-color">Design Tokens</h3>
+      </div>
+
+      <div class="palette-group">
+        <p class="palette-group-label">Surfaces — warm ivory base, never pure white</p>
+        <div class="palette-row">
+          <div class="swatch">
+            <div class="swatch-box" style="background:#fff8f4;"></div>
+            <span class="swatch-name">Surface / Background</span>
+            <span class="swatch-hex">#fff8f4</span>
+            <span class="swatch-role">Page base</span>
+          </div>
+          <div class="swatch">
+            <div class="swatch-box" style="background:#fff1e7;"></div>
+            <span class="swatch-name">Surface Container Low</span>
+            <span class="swatch-hex">#fff1e7</span>
+            <span class="swatch-role">Alternate sections</span>
+          </div>
+          <div class="swatch">
+            <div class="swatch-box" style="background:#fdebdc;"></div>
+            <span class="swatch-name">Surface Container</span>
+            <span class="swatch-hex">#fdebdc</span>
+            <span class="swatch-role">Cards, chips, placeholders</span>
+          </div>
+          <div class="swatch">
+            <div class="swatch-box" style="background:#f1dfd1;"></div>
+            <span class="swatch-name">Surface Variant</span>
+            <span class="swatch-hex">#f1dfd1</span>
+            <span class="swatch-role">Image bg, input fill</span>
+          </div>
+          <div class="swatch">
+            <div class="swatch-box" style="background:#eadecd;"></div>
+            <span class="swatch-name">Secondary Container</span>
+            <span class="swatch-hex">#eadecd</span>
+            <span class="swatch-role">Selected state, scroll thumb</span>
+          </div>
+          <div class="swatch">
+            <div class="swatch-box" style="background:#e8d7c9;"></div>
+            <span class="swatch-name">Surface Dim</span>
+            <span class="swatch-hex">#e8d7c9</span>
+            <span class="swatch-role">Overlay tint</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="palette-group">
+        <p class="palette-group-label">Text &amp; Structure</p>
+        <div class="palette-row">
+          <div class="swatch">
+            <div class="swatch-box" style="background:#231a11;"></div>
+            <span class="swatch-name">On-Surface</span>
+            <span class="swatch-hex">#231a11</span>
+            <span class="swatch-role">Body, headings</span>
+          </div>
+          <div class="swatch">
+            <div class="swatch-box" style="background:#474741;"></div>
+            <span class="swatch-name">On-Surface Variant</span>
+            <span class="swatch-hex">#474741</span>
+            <span class="swatch-role">Secondary text, price</span>
+          </div>
+          <div class="swatch">
+            <div class="swatch-box" style="background:#787770;"></div>
+            <span class="swatch-name">Outline</span>
+            <span class="swatch-hex">#787770</span>
+            <span class="swatch-role">Dividers, labels</span>
+          </div>
+          <div class="swatch">
+            <div class="swatch-box" style="background:#c8c7be;"></div>
+            <span class="swatch-name">Outline Variant</span>
+            <span class="swatch-hex">#c8c7be</span>
+            <span class="swatch-role">Subtle borders</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="palette-group">
+        <p class="palette-group-label">Brand Accents — warm brown family, never cool or neutral grey</p>
+        <div class="palette-row">
+          <div class="swatch">
+            <div class="swatch-box" style="background:#5f5e5b;"></div>
+            <span class="swatch-name">Primary</span>
+            <span class="swatch-hex">#5f5e5b</span>
+            <span class="swatch-role">Hero CTA, active nav, icons</span>
+          </div>
+          <div class="swatch">
+            <div class="swatch-box" style="background:#665d50;"></div>
+            <span class="swatch-name">Secondary</span>
+            <span class="swatch-hex">#665d50</span>
+            <span class="swatch-role">Add-to-bag, category labels</span>
+          </div>
+          <div class="swatch">
+            <div class="swatch-box" style="background:#725855;"></div>
+            <span class="swatch-name">Tertiary</span>
+            <span class="swatch-hex">#725855</span>
+            <span class="swatch-role">Muted blush accent</span>
+          </div>
+          <div class="swatch">
+            <div class="swatch-box" style="background:#faf7f2;"></div>
+            <span class="swatch-name">Primary Container</span>
+            <span class="swatch-hex">#faf7f2</span>
+            <span class="swatch-role">Selected size button bg</span>
+          </div>
+          <div class="swatch">
+            <div class="swatch-box" style="background:#ba1a1a;"></div>
+            <span class="swatch-name">Error</span>
+            <span class="swatch-hex">#ba1a1a</span>
+            <span class="swatch-role">Form validation</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── TYPOGRAPHY ─────────────────────── -->
+    <section class="sec" aria-labelledby="sec-type">
+      <div class="sec-head">
+        <span class="sec-tag">Typography</span>
+        <h3 class="sec-title" id="sec-type">Nunito Sans Scale</h3>
+      </div>
+
+      <div class="type-hero" aria-hidden="true">
+        <div class="type-hero-display">The Ethereal Silk Wrap</div>
+        <div class="type-hero-sub">Crafted for the modern muse — 48px, weight 700, tracking -0.04em</div>
+      </div>
+
+      <div class="type-scale">
+        <div class="type-row">
+          <div class="type-meta">
+            <span class="type-meta-label">Display LG</span>
+            <span class="type-meta-spec">48px · 700 · -0.04em · lh 1.1</span>
+          </div>
+          <div class="t-display">Soft elegance</div>
+        </div>
+        <div class="type-row">
+          <div class="type-meta">
+            <span class="type-meta-label">Headline MD</span>
+            <span class="type-meta-spec">24px · 600 · -0.01em · lh 1.3</span>
+          </div>
+          <div class="t-headline">The Silk Edit</div>
+        </div>
+        <div class="type-row">
+          <div class="type-meta">
+            <span class="type-meta-label">Body LG</span>
+            <span class="type-meta-spec">18px · 400 · lh 1.6</span>
+          </div>
+          <div class="t-body-lg">Crafted from 100% heavyweight silk in an exclusive Oren weave.</div>
+        </div>
+        <div class="type-row">
+          <div class="type-meta">
+            <span class="type-meta-label">Body MD</span>
+            <span class="type-meta-spec">16px · 400 · lh 1.5</span>
+          </div>
+          <div class="t-body-md">Timeless silhouettes designed for the modern woman, in natural fibers.</div>
+        </div>
+        <div class="type-row">
+          <div class="type-meta">
+            <span class="type-meta-label">Label SM</span>
+            <span class="type-meta-spec">12px · 600 · 0.08em · uppercase</span>
+          </div>
+          <div class="t-label">New Arrival · Limited Edition</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── SPACING ────────────────────────── -->
+    <section class="sec" aria-labelledby="sec-space">
+      <div class="sec-head">
+        <span class="sec-tag">Spacing</span>
+        <h3 class="sec-title" id="sec-space">Space Scale</h3>
+      </div>
+      <div class="spacing-list">
+        <div class="spacing-row"><div class="spacing-bar" style="width:8px;"></div><span class="spacing-text"><strong>xs — 8px</strong> Icon padding, chip gap, small internal spacing</span></div>
+        <div class="spacing-row"><div class="spacing-bar" style="width:16px;"></div><span class="spacing-text"><strong>sm — 16px</strong> Component margins, field padding</span></div>
+        <div class="spacing-row"><div class="spacing-bar" style="width:24px;"></div><span class="spacing-text"><strong>md — 24px</strong> Card padding, primary grid gap</span></div>
+        <div class="spacing-row"><div class="spacing-bar" style="width:48px;"></div><span class="spacing-text"><strong>lg — 48px</strong> Section gap, sidebar spacing, grid gap on wider views</span></div>
+        <div class="spacing-row"><div class="spacing-bar" style="width:80px;"></div><span class="spacing-text"><strong>xl — 80px</strong> Section vertical padding, major page rhythm</span></div>
+        <div class="spacing-row"><div class="spacing-bar" style="width:64px;"></div><span class="spacing-text"><strong>margin-desktop — 64px</strong> Page horizontal gutter at desktop</span></div>
+        <div class="spacing-row"><div class="spacing-bar" style="width:20px;"></div><span class="spacing-text"><strong>margin-mobile — 20px</strong> Page horizontal gutter at mobile</span></div>
+      </div>
+    </section>
+
+    <!-- ── SHAPE ──────────────────────────── -->
+    <section class="sec" aria-labelledby="sec-shape">
+      <div class="sec-head">
+        <span class="sec-tag">Shape</span>
+        <h3 class="sec-title" id="sec-shape">Border Radius</h3>
+      </div>
+      <div class="shape-row">
+        <div class="shape-item">
+          <div class="shape-box" style="border-radius:4px;"></div>
+          <span class="shape-label">Default</span><span class="shape-val">4px · checkboxes, small tags</span>
+        </div>
+        <div class="shape-item">
+          <div class="shape-box" style="border-radius:8px;"></div>
+          <span class="shape-label">LG</span><span class="shape-val">8px · nested containers</span>
+        </div>
+        <div class="shape-item">
+          <div class="shape-box" style="border-radius:12px;"></div>
+          <span class="shape-label">XL</span><span class="shape-val">12px · bento cards, feature panels</span>
+        </div>
+        <div class="shape-item">
+          <div class="shape-box" style="border-radius:16px;"></div>
+          <span class="shape-label">2XL</span><span class="shape-val">16px · product cards (always)</span>
+        </div>
+        <div class="shape-item">
+          <div class="shape-box" style="border-radius:9999px;width:160px;"></div>
+          <span class="shape-label">Full</span><span class="shape-val">9999px · buttons, chips, badges, dots</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── ELEVATION ──────────────────────── -->
+    <section class="sec" aria-labelledby="sec-elev">
+      <div class="sec-head">
+        <span class="sec-tag">Elevation</span>
+        <h3 class="sec-title" id="sec-elev">Shadow System</h3>
+      </div>
+      <div class="shadow-row">
+        <div class="shadow-item">
+          <div class="shadow-box" style="box-shadow:0 8px 40px rgba(74,63,53,0.04);"></div>
+          <span class="shadow-name">Ambient</span>
+          <span class="shadow-code">0 8px 40px rgba(74,63,53,0.04)<br>nav bar, page bg lift</span>
+        </div>
+        <div class="shadow-item">
+          <div class="shadow-box" style="box-shadow:0 10px 30px -10px rgba(74,63,53,0.08);"></div>
+          <span class="shadow-name">Soft</span>
+          <span class="shadow-code">0 10px 30px -10px rgba(74,63,53,0.08)<br>product cards (default)</span>
+        </div>
+        <div class="shadow-item">
+          <div class="shadow-box" style="box-shadow:0 18px 44px -12px rgba(74,63,53,0.15);"></div>
+          <span class="shadow-name">Lift</span>
+          <span class="shadow-code">0 18px 44px -12px rgba(74,63,53,0.15)<br>product cards (hover)</span>
+        </div>
+        <div class="shadow-item">
+          <div class="shadow-box" style="box-shadow:0 4px 16px rgba(95,94,91,0.22);"></div>
+          <span class="shadow-name">Button</span>
+          <span class="shadow-code">0 4px 16px rgba(95,94,91,0.22)<br>primary CTA buttons</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── MOTION ─────────────────────────── -->
+    <section class="sec" aria-labelledby="sec-motion">
+      <div class="sec-head">
+        <span class="sec-tag">Motion</span>
+        <h3 class="sec-title" id="sec-motion">Animation Tokens</h3>
+      </div>
+      <div class="motion-grid">
+        <div class="motion-card">
+          <p class="motion-card-label">Easing — all transitions</p>
+          <div class="mono">cubic-bezier(0.4, 0, 0.2, 1)<br><span class="comment">/* Standard for every state change */</span></div>
+        </div>
+        <div class="motion-card">
+          <p class="motion-card-label">Durations</p>
+          <div class="mono">
+            200ms <span class="comment">— button hover</span>
+            300ms <span class="comment">— nav links, filters, quick-add reveal</span>
+            400ms <span class="comment">— product card lift</span>
+            700ms <span class="comment">— image zoom on group hover</span>
+            1000ms<span class="comment">— scroll reveal (.slow-reveal)</span>
+          </div>
+        </div>
+        <div class="motion-card">
+          <p class="motion-card-label">Scroll Reveal (.slow-reveal)</p>
+          <div class="mono">
+            opacity: 0 → 1<br>
+            translateY: 20px → 0<br>
+            transition: all 1s ease-out<br>
+            stagger: 100–300ms per item<br><span class="comment">/* IntersectionObserver, not CSS scroll */</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── COMPONENTS ─────────────────────── -->
+    <section class="sec" aria-labelledby="sec-comp">
+      <div class="sec-head">
+        <span class="sec-tag">Components</span>
+        <h3 class="sec-title" id="sec-comp">Component Library</h3>
+      </div>
+      <div class="comp-grid">
+
+        <div class="comp-card">
+          <p class="comp-label">Buttons — all border-radius: 9999px</p>
+          <div class="btn-stack">
+            <button class="btn btn-primary">Shop Collection</button>
+            <button class="btn btn-cta">Add to Shopping Bag</button>
+            <button class="btn btn-outline">View All Categories</button>
+            <button class="btn btn-ghost">Apply Filters</button>
+          </div>
+        </div>
+
+        <div class="comp-card">
+          <p class="comp-label">Product Card — 16px radius, warm shadow</p>
+          <div class="product-card">
+            <div class="card-img">
+              <div class="card-img-fill grad-sage"></div>
+              <span class="card-img-label">Editorial Image</span>
+              <button class="card-wish" aria-label="Add to wishlist">♡</button>
+            </div>
+            <div class="card-body">
+              <div class="card-cat">Knitwear</div>
+              <div class="card-name">Sage Ribbed Dress</div>
+              <div class="card-price">$185.00</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="comp-card">
+          <p class="comp-label">Navigation — backdrop-blur + surface/82%</p>
+          <div class="nav-demo" role="navigation" aria-label="Demo navigation">
+            <span class="nav-demo-logo">Oren</span>
+            <ul class="nav-demo-links" role="list">
+              <li><a href="#" tabindex="-1">Home</a></li>
+              <li><a href="#" class="active" tabindex="-1">Shop</a></li>
+              <li><a href="#" tabindex="-1">New</a></li>
+              <li><a href="#" tabindex="-1">About</a></li>
+            </ul>
+            <div class="nav-demo-icons" aria-hidden="true">🛍 ♡ ◎</div>
+          </div>
+        </div>
+
+        <div class="comp-card">
+          <p class="comp-label">Size Selector + Add to Bag</p>
+          <p style="font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--on-surface-var);margin-bottom:10px;">Select Size</p>
+          <div class="size-group" style="margin-bottom:16px;" role="group" aria-label="Select size">
+            <button class="size-btn">XS</button>
+            <button class="size-btn sel" aria-pressed="true">S</button>
+            <button class="size-btn">M</button>
+            <button class="size-btn">L</button>
+            <button class="size-btn na" disabled aria-disabled="true">XL</button>
+          </div>
+          <button class="btn btn-cta" style="width:100%;padding:14px 28px;">Add to Shopping Bag</button>
+        </div>
+
+        <div class="comp-card">
+          <p class="comp-label">Filter Sidebar — accordion, sticky w-64</p>
+          <div class="filter-group">
+            <div class="filter-head" aria-expanded="true">Category</div>
+            <div class="filter-opts">
+              <label class="filter-opt"><input type="checkbox" checked> Dresses</label>
+              <label class="filter-opt"><input type="checkbox"> Knitwear</label>
+              <label class="filter-opt"><input type="checkbox"> Tailoring</label>
+            </div>
+          </div>
+          <div class="filter-group">
+            <div class="filter-head">Material</div>
+            <div class="filter-opts">
+              <label class="filter-opt"><input type="checkbox"> Silk</label>
+              <label class="filter-opt"><input type="checkbox"> Cashmere</label>
+            </div>
+          </div>
+          <div class="filter-group" style="border:none;">
+            <div class="filter-head">Color</div>
+            <div class="color-dots">
+              <button class="color-dot" style="background:#fdebdc;" aria-label="Sand"></button>
+              <button class="color-dot" style="background:#665d50;" aria-label="Taupe"></button>
+              <button class="color-dot" style="background:#5f5e5b;" aria-label="Charcoal"></button>
+              <button class="color-dot" style="background:#ede1d0;" aria-label="Ivory"></button>
+              <button class="color-dot" style="background:#725855;" aria-label="Blush"></button>
+            </div>
+          </div>
+          <button class="btn btn-primary" style="width:100%;margin-top:16px;">Apply Filters</button>
+        </div>
+
+        <div class="comp-card">
+          <p class="comp-label">Quick Add — hover to reveal (hover here)</p>
+          <div class="qa-wrap">
+            <div class="qa-img grad-clay">
+              <button class="qa-btn" tabindex="-1">Quick Add</button>
+            </div>
+          </div>
+          <p class="comp-note">translateY(8px → 0) + opacity(0 → 1)<br>300ms cubic-bezier(0.4,0,0.2,1) on .product-card:hover</p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ── LAYOUT PATTERNS ────────────────── -->
+    <section class="sec" aria-labelledby="sec-layouts">
+      <div class="sec-head">
+        <span class="sec-tag">Screen Patterns</span>
+        <h3 class="sec-title" id="sec-layouts">Layout System</h3>
+      </div>
+
+      <!-- Home: Hero -->
+      <div class="layout-section">
+        <p class="layout-heading">Screen 1 — Home · Hero</p>
+        <div class="layout-frame">
+          <div class="frame-bar">HERO — full-viewport · parallax editorial · centered text · pill CTA · scroll indicator</div>
+          <div style="background:linear-gradient(160deg,var(--surface-mid) 0%,var(--surface-variant) 55%,var(--surface-dim) 100%);padding:60px 48px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:18px;" aria-hidden="true">
+            <span class="preview-chip">Curation</span>
+            <div style="font-size:52px;font-weight:700;letter-spacing:-0.04em;color:var(--on-surface);line-height:1;">Oren</div>
+            <p style="font-size:17px;font-style:italic;color:var(--secondary);">Soft elegance for everyday living</p>
+            <button class="btn btn-primary" tabindex="-1">Shop Collection</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Home: Bento -->
+      <div class="layout-section">
+        <p class="layout-heading">Screen 1 — Home · Featured Collections</p>
+        <div class="layout-frame">
+          <div class="frame-bar">BENTO — 12-col grid, 7+5 split · large card left · two stacked right · all rounded-xl</div>
+          <div class="bento" aria-hidden="true">
+            <div class="bento-card" style="background:linear-gradient(135deg,#c4cfc0 0%,#a8b5a2 100%);min-height:280px;">
+              <div class="bento-info">
+                <div class="bento-name">The Silk Edit</div>
+                <div class="bento-meta">Lightweight Layers</div>
+              </div>
+            </div>
+            <div class="bento-right">
+              <div class="bento-card" style="background:linear-gradient(135deg,var(--surface-mid) 0%,var(--surface-dim) 100%);">
+                <div class="bento-info"><div class="bento-name">Lounge Essentials</div><div class="bento-meta">Home &amp; Living</div></div>
+              </div>
+              <div class="bento-card" style="background:linear-gradient(135deg,#c8a68a 0%,#b08868 100%);">
+                <div class="bento-info"><div class="bento-name">Timeless Accents</div><div class="bento-meta">Accessories</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Home: Arrivals -->
+      <div class="layout-section">
+        <p class="layout-heading">Screen 1 — Home · New Arrivals</p>
+        <div class="layout-frame">
+          <div class="frame-bar">PRODUCT GRID — 4-col desktop · 2-col mobile · even columns offset +28px (stagger)</div>
+          <div class="arrivals" aria-hidden="true">
+            <div class="av-item"><div class="av-img grad-sage"></div><span class="av-cat">Knitwear</span><span class="av-name">Sage Ribbed Dress</span><span class="av-price">$185.00</span></div>
+            <div class="av-item"><div class="av-img grad-ivory"></div><span class="av-cat">Tailoring</span><span class="av-name">Cream Wide-Leg Linen</span><span class="av-price">$230.00</span></div>
+            <div class="av-item"><div class="av-img grad-clay"></div><span class="av-cat">Silk</span><span class="av-name">Clay Wrap Blouse</span><span class="av-price">$210.00</span></div>
+            <div class="av-item"><div class="av-img grad-stone"></div><span class="av-cat">Outerwear</span><span class="av-name">Ivory Oversized Jacket</span><span class="av-price">$320.00</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Shop -->
+      <div class="layout-section">
+        <p class="layout-heading">Screen 2 — Shop the Collection</p>
+        <div class="layout-frame">
+          <div class="frame-bar">SIDEBAR + GRID — sticky filter w-64 · 3-col asymmetric · 16px card radius · quick-add on hover</div>
+          <div class="shop" aria-hidden="true">
+            <div class="shop-sidebar">
+              <div class="sidebar-title">Refine</div>
+              <div class="filter-group"><div class="filter-head">Category</div><div class="filter-opts"><label class="filter-opt"><input type="checkbox" checked tabindex="-1"> Dresses</label><label class="filter-opt"><input type="checkbox" tabindex="-1"> Knitwear</label></div></div>
+              <div class="filter-group" style="border:none;"><div class="filter-head">Color</div><div class="color-dots"><button class="color-dot" style="background:#fdebdc;" tabindex="-1"></button><button class="color-dot" style="background:#665d50;" tabindex="-1"></button><button class="color-dot" style="background:#5f5e5b;" tabindex="-1"></button><button class="color-dot" style="background:#ede1d0;" tabindex="-1"></button></div></div>
+              <button class="btn btn-primary" style="width:100%;margin-top:16px;font-size:10px;padding:10px 16px;" tabindex="-1">Apply Filters</button>
+            </div>
+            <div class="shop-grid">
+              <div class="shop-card grad-sage" style="height:180px;"></div>
+              <div class="shop-card grad-ivory" style="height:240px;"></div>
+              <div class="shop-card grad-clay" style="height:200px;"></div>
+              <div class="shop-card grad-stone" style="height:220px;margin-top:12px;"></div>
+              <div class="shop-card" style="height:160px;margin-top:12px;background:linear-gradient(135deg,var(--surface-mid) 0%,var(--surface-dim) 100%);border-radius:var(--r-xl);box-shadow:var(--sh-soft);"></div>
+              <div class="shop-card grad-sage" style="height:190px;margin-top:12px;opacity:0.7;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PDP -->
+      <div class="layout-section">
+        <p class="layout-heading">Screen 3 — Product Detail Page</p>
+        <div class="layout-frame">
+          <div class="frame-bar">PDP — left 3/5 editorial gallery · right 2/5 sticky panel · pill sizes · accordion details</div>
+          <div class="pdp" aria-hidden="true">
+            <div class="pdp-gal">
+              <div class="pdp-gal-grid">
+                <div class="pdp-img wide grad-ivory"></div>
+                <div class="pdp-img half grad-clay"></div>
+                <div class="pdp-img half offset grad-stone"></div>
+                <div class="pdp-img wide" style="height:120px;background:linear-gradient(135deg,var(--surface-mid) 0%,var(--surface-dim) 100%);border-radius:var(--r-lg);"></div>
+              </div>
+            </div>
+            <div class="pdp-panel">
+              <div>
+                <p class="pdp-eyebrow">New Arrival · Limited Edition</p>
+                <h2 class="pdp-title">The Ethereal Silk Wrap</h2>
+                <p class="pdp-price">$420.00</p>
+              </div>
+              <div class="pdp-divider"></div>
+              <div>
+                <p class="pdp-sl">Select Size</p>
+                <div class="size-group">
+                  <button class="size-btn" tabindex="-1">XS</button>
+                  <button class="size-btn sel" tabindex="-1">S</button>
+                  <button class="size-btn" tabindex="-1">M</button>
+                  <button class="size-btn" tabindex="-1">L</button>
+                  <button class="size-btn na" tabindex="-1" disabled>XL</button>
+                </div>
+              </div>
+              <button class="btn btn-cta" style="width:100%;padding:15px 28px;" tabindex="-1">Add to Shopping Bag</button>
+              <div class="pdp-divider"></div>
+              <details class="pdp-acc" open>
+                <summary>Product Description <span>+</span></summary>
+                <p class="pdp-acc-body">Crafted from 100% heavyweight silk in an exclusive Oren weave. Fluid bias-cut draping, adjustable silk waist tie. Lined in silk georgette.</p>
+              </details>
+              <details class="pdp-acc">
+                <summary>Styling Notes <span>+</span></summary>
+                <p class="pdp-acc-body">Pair with sand leather mules and a minimal tote. Layer over ribbed slip shorts.</p>
+              </details>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ── TEXTURE ─────────────────────────── -->
+    <section class="sec" aria-labelledby="sec-texture">
+      <div class="sec-head">
+        <span class="sec-tag">Texture</span>
+        <h3 class="sec-title" id="sec-texture">Film Grain Overlay</h3>
+      </div>
+      <div class="comp-card" style="max-width:560px;position:relative;overflow:hidden;">
+        <div style="position:absolute;inset:0;opacity:0.06;pointer-events:none;background-image:url(&quot;data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E&quot;);"></div>
+        <p class="comp-label">Film grain — body::before, position: fixed, opacity: 0.03</p>
+        <div style="height:100px;background:linear-gradient(135deg,var(--surface-mid) 0%,var(--surface-variant) 100%);border-radius:var(--r-lg);"></div>
+        <div class="mono" style="margin-top:12px;">
+          position: fixed; inset: 0; z-index: 9000<br>
+          opacity: 0.03; pointer-events: none<br>
+          background: SVG feTurbulence fractalNoise<br>
+          baseFrequency: 0.65; numOctaves: 3
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Oren Design Direction · Stitch Project 2621556029010588670 · Oren Soft Minimal Boutique</p>
+    <p>Nunito Sans · Warm Ivory #fff8f4 · Primary #5f5e5b · 16px card radius · 9999px pill buttons · Film grain 3%</p>
+  </footer>
+
+</body>
+</html>
