@@ -22,8 +22,8 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "FE Ecommerce",
-  description: "Online food and grocery shopping",
+  title: 'Oren',
+  description: "Premium women's fashion",
 };
 
 export default function RootLayout({
@@ -35,7 +35,7 @@ export default function RootLayout({
     <html lang="en" className={nunito.variable}>
       <body className={`${nunito.variable} ${geistMono.variable} antialiased font-sans`}>
         <Providers>
-          <div className="min-h-screen bg-slate-50">
+          <div className="min-h-screen bg-ivory">
             <Header />
             {children}
             <Footer />

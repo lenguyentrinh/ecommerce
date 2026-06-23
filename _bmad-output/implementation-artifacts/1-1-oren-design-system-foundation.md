@@ -1,6 +1,6 @@
 # Story 1.1: Oren Design System Foundation
 
-Status: ready-for-dev
+Status: done
 
 ## Story
 
@@ -42,56 +42,56 @@ Then desktop (≥1024px): 12-column grid with 64px outer margins, 24px gap; tabl
 
 ## Tasks / Subtasks
 
-- [ ] **Task 1: Expand `globals.css` with Oren color and token system** (AC1, AC5)
-  - [ ] Replace generic `:root` variables with full Oren palette as CSS custom properties
-  - [ ] Expand `@theme inline` block with `--color-*` tokens for all palette entries
-  - [ ] Add semantic color tokens (success, alert, error, error-strong)
-  - [ ] Add `--radius-sm/md/lg/xl/full` tokens
-  - [ ] Add `--spacing-xs/sm/md/lg/xl` tokens
-  - [ ] Add `--shadow-ambient` and `--shadow-hover` CSS variables
-  - [ ] Remove `@media (prefers-color-scheme: dark)` block entirely
+- [x] **Task 1: Expand `globals.css` with Oren color and token system** (AC1, AC5)
+  - [x] Replace generic `:root` variables with full Oren palette as CSS custom properties
+  - [x] Expand `@theme inline` block with `--color-*` tokens for all palette entries
+  - [x] Add semantic color tokens (success, alert, error, error-strong)
+  - [x] Add `--radius-sm/md/lg/xl/full` tokens
+  - [x] Add `--spacing-xs/sm/md/lg/xl` tokens
+  - [x] Add `--shadow-ambient` and `--shadow-hover` CSS variables
+  - [x] Remove `@media (prefers-color-scheme: dark)` block entirely
 
-- [ ] **Task 2: Update body canvas styles in `globals.css`** (AC2)
-  - [ ] Set `body` background to `#faf7f2` (Soft Ivory), color to `#4a3f35` (Deep Muted Brown)
-  - [ ] Add `body::before` film-grain overlay: fixed, inset-0, pointer-events-none, z-index 9999, opacity 2.5%, SVG turbulence noise background-image
-  - [ ] Add `.bg-gradient-warm` utility class (Warm Beige → Soft Ivory radial gradient)
-  - [ ] Update `html, body` transition default to `transition-colors duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]`
+- [x] **Task 2: Update body canvas styles in `globals.css`** (AC2)
+  - [x] Set `body` background to `#faf7f2` (Soft Ivory), color to `#4a3f35` (Deep Muted Brown)
+  - [x] Add `body::before` film-grain overlay: fixed, inset-0, pointer-events-none, z-index 9999, opacity 2.5%, SVG turbulence noise background-image
+  - [x] Add `.bg-gradient-warm` utility class (Warm Beige → Soft Ivory radial gradient)
+  - [x] Update `html, body` transition default to `transition-colors duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]`
 
-- [ ] **Task 3: Add type-scale utility classes in `globals.css`** (AC3)
-  - [ ] Add `.text-display-lg` class (48px desktop / 32px mobile, 700, +0.04em / +0.02em)
-  - [ ] Add `.text-headline-md` class (24px, 600, +0.03em)
-  - [ ] Add `.text-body-lg` class (18px, 400, line-height 1.6)
-  - [ ] Add `.text-body-md` class (16px, 400, line-height 1.5)
-  - [ ] Add `.text-label-sm` class (12px, 600, uppercase, +0.08em tracking)
+- [x] **Task 3: Add type-scale utility classes in `globals.css`** (AC3)
+  - [x] Add `.text-display-lg` class (48px desktop / 32px mobile, 700, +0.04em / +0.02em)
+  - [x] Add `.text-headline-md` class (24px, 600, +0.03em)
+  - [x] Add `.text-body-lg` class (18px, 400, line-height 1.6)
+  - [x] Add `.text-body-md` class (16px, 400, line-height 1.5)
+  - [x] Add `.text-label-sm` class (12px, 600, uppercase, +0.08em tracking)
 
-- [ ] **Task 4: Update `layout.tsx` metadata and body wrapper** (AC2)
-  - [ ] Change `metadata.title` to `"Oren"` and `description` to `"Premium women's fashion"`
-  - [ ] Update the body wrapper div: replace `bg-slate-50` with `bg-[#faf7f2]` (or Tailwind alias once tokens are applied)
-  - [ ] Preserve all existing font loading, Provider wrapper, Header, Footer — do NOT change them
+- [x] **Task 4: Update `layout.tsx` metadata and body wrapper** (AC2)
+  - [x] Change `metadata.title` to `"Oren"` and `description` to `"Premium women's fashion"`
+  - [x] Update the body wrapper div: replace `bg-slate-50` with `bg-ivory`
+  - [x] Preserve all existing font loading, Provider wrapper, Header, Footer — do NOT change them
 
-- [ ] **Task 5: Create `Button.tsx`** (AC4)
-  - [ ] Implement `variant="primary"` and `variant="secondary"` prop API
-  - [ ] Support `className`, `onClick`, `disabled`, `type`, `children` props
-  - [ ] Primary: pill shape (rounded-full), Deep Muted Brown background, Ivory text, hover scale 1.02, 300ms easing
-  - [ ] Secondary: pill shape, transparent fill, Sand/Blush border, Deep Muted Brown text, blush fill + Soft Clay border on hover
-  - [ ] Disabled state: reduced opacity, cursor-not-allowed, no hover effects
-  - [ ] Export as `export default function Button`
+- [x] **Task 5: Create `Button.tsx`** (AC4)
+  - [x] Implement `variant="primary"` and `variant="secondary"` prop API
+  - [x] Support `className`, `onClick`, `disabled`, `type`, `children` props
+  - [x] Primary: pill shape (rounded-full), Deep Muted Brown background, Ivory text, hover scale 1.02, 300ms easing
+  - [x] Secondary: pill shape, transparent fill, Sand/Blush border, Deep Muted Brown text, blush fill + Soft Clay border on hover
+  - [x] Disabled state: reduced opacity, cursor-not-allowed, no hover effects
+  - [x] Export as `export default function Button`
 
-- [ ] **Task 6: Create `InputField.tsx`** (AC4)
-  - [ ] Props: `label?`, `placeholder?`, `type?`, `error?`, `className?` + standard input HTML attrs via spread
-  - [ ] Styling: 16px radius, `bg-[#e8dccb]` (Warm Beige) fill, no border by default, `border-[#c9b2a6]` (Soft Clay) on focus, Warm Gray placeholder text
-  - [ ] Error state: error message in `#b8998a` below field
-  - [ ] Do NOT delete `TextInput.tsx` — it is used by existing login/signup pages; `InputField.tsx` is a NEW companion component
+- [x] **Task 6: Create `InputField.tsx`** (AC4)
+  - [x] Props: `label?`, `placeholder?`, `type?`, `error?`, `className?` + standard input HTML attrs via spread
+  - [x] Styling: 16px radius, `bg-warm-beige` fill, no border by default, `border-clay` on focus, Warm Gray placeholder text
+  - [x] Error state: error message in `text-error` below field
+  - [x] `TextInput.tsx` left untouched — `InputField.tsx` is a new companion component
 
-- [ ] **Task 7: Create `Chip.tsx`** (AC4)
-  - [ ] Props: `label`, `selected?`, `onClick?`, `className?`
-  - [ ] Styling: pill shape, uppercase, 12px/600/+0.08em tracking (Label SM), 300ms easing
-  - [ ] Unselected: neutral fill; Selected: Muted Blush `#e7c6c1` fill, Soft Clay `#c9b2a6` border
+- [x] **Task 7: Create `Chip.tsx`** (AC4)
+  - [x] Props: `label`, `selected?`, `onClick?`, `className?`
+  - [x] Styling: pill shape, uppercase, 12px/600/+0.08em tracking (Label SM), 300ms easing
+  - [x] Unselected: neutral fill; Selected: Muted Blush `#e7c6c1` fill, Soft Clay `#c9b2a6` border
 
-- [ ] **Task 8: Write tests** 
-  - [ ] `Button.spec.tsx` — renders with both variants, disabled state, onClick
-  - [ ] `InputField.spec.tsx` — renders label, error message, focus behavior
-  - [ ] `Chip.spec.tsx` — renders label, selected/unselected visual classes
+- [x] **Task 8: Write tests** 
+  - [x] `Button.spec.tsx` — renders with both variants, disabled state, onClick
+  - [x] `InputField.spec.tsx` — renders label, error message, focus behavior
+  - [x] `Chip.spec.tsx` — renders label, selected/unselected visual classes
 
 ## Dev Notes
 
@@ -278,11 +278,20 @@ Use `React.forwardRef` to allow RHF's `register` spread to work correctly.
 
 ### Agent Model Used
 
-(to be filled by dev agent)
+claude-sonnet-4-6
 
 ### Debug Log References
 
+- Jest config used wrong key `setupFilesAfterFramework` → corrected to `setupFilesAfterEnv`
+- npm cannot manage pnpm-installed node_modules; switched to `pnpm add`
+- Jest and @testing-library/* not in original package.json; installed as devDependencies
+
 ### Completion Notes List
+
+- Jest infrastructure bootstrapped (jest.config.ts, jest.setup.ts) since it was absent from the project
+- `frontend/package.json` now has `test` and `test:watch` scripts
+- All 17 tests pass (6 Button, 6 InputField, 5 Chip)
+- `TextInput.tsx` untouched as required
 
 ### File List
 
