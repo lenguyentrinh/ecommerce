@@ -1,0 +1,84 @@
+# generated: 2026-06-23
+# last_updated: 2026-06-23
+# project: ecommerce
+# project_key: NOKEY
+# tracking_system: file-system
+# story_location: _bmad-output/implementation-artifacts
+
+# STATUS DEFINITIONS:
+# ==================
+# Epic Status:
+#   - backlog: Epic not yet started
+#   - in-progress: Epic actively being worked on
+#   - done: All stories in epic completed
+#
+# Epic Status Transitions:
+#   - backlog → in-progress: Automatically when first story is created (via create-story)
+#   - in-progress → done: Manually when all stories reach 'done' status
+#
+# Story Status:
+#   - backlog: Story only exists in epic file
+#   - ready-for-dev: Story file created in stories folder
+#   - in-progress: Developer actively working on implementation
+#   - review: Ready for code review (via Dev's code-review workflow)
+#   - done: Story completed
+#
+# Retrospective Status:
+#   - optional: Can be completed but not required
+#   - done: Retrospective has been completed
+#
+# WORKFLOW NOTES:
+# ===============
+# - Epic transitions to 'in-progress' automatically when first story is created
+# - Stories can be worked in parallel if team capacity allows
+# - Developer typically creates next story after previous one is 'done' to incorporate learnings
+# - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
+
+generated: 2026-06-23
+last_updated: 2026-06-23
+project: ecommerce
+project_key: NOKEY
+tracking_system: file-system
+story_location: _bmad-output/implementation-artifacts
+
+development_status:
+  # ── Epic 1: Design System & User Authentication ──────────────────────────
+  epic-1: backlog
+  1-1-oren-design-system-foundation: backlog
+  1-2-user-role-extension-and-rate-limiting: backlog
+  1-3-user-registration-and-email-verification-pages: backlog
+  1-4-user-login-and-frontend-auth-state: backlog
+  1-5-account-profile-and-shipping-address-management: backlog
+  epic-1-retrospective: optional
+
+  # ── Epic 2: Product Catalog & Discovery ──────────────────────────────────
+  epic-2: backlog
+  2-1-product-entity-api-and-seed-data: backlog
+  2-2-home-page-and-category-pages: backlog
+  2-3-product-detail-page: backlog
+  2-4-search-bar-and-filter-sort-ui: backlog
+  epic-2-retrospective: optional
+
+  # ── Epic 3: Shopping Cart ─────────────────────────────────────────────────
+  epic-3: backlog
+  3-1-cart-backend-entity-api-and-inventory-reserve: backlog
+  3-2-cart-ui-add-to-cart-and-cart-page: backlog
+  3-3-cart-persistence-and-out-of-stock-sync: backlog
+  epic-3-retrospective: optional
+
+  # ── Epic 4: Checkout & Order Lifecycle ───────────────────────────────────
+  epic-4: backlog
+  4-1-order-and-payment-backend-entities-stripe-and-mail-setup: backlog
+  4-2-checkout-flow-ui-multi-step-form: backlog
+  4-3-order-confirmation-page-and-confirmation-email: backlog
+  4-4-order-history-and-order-detail-pages: backlog
+  epic-4-retrospective: optional
+
+  # ── Epic 5: Admin Operations ──────────────────────────────────────────────
+  epic-5: backlog
+  5-1-admin-route-group-and-dashboard: backlog
+  5-2-admin-product-management-list-create-and-edit: backlog
+  5-3-admin-product-soft-delete-and-image-storage: backlog
+  5-4-admin-order-management-list-detail-and-status-updates: backlog
+  5-5-low-stock-alerts-cicd-and-rate-limiting-finalisation: backlog
+  epic-5-retrospective: optional
