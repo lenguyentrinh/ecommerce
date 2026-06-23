@@ -6,6 +6,7 @@ import {
   Unique,
 } from 'typeorm';
 import { IsEmail, IsNotEmpty, MinLength } from 'class-validator';
+import { UserRole } from './user-role.enum';
 
 @Entity('users')
 export class User {
@@ -31,6 +32,9 @@ export class User {
 
   @Column({ nullable: true })
   phoneNumber: string;
+
+  @Column({ type: 'enum', enum: UserRole, default: UserRole.CUSTOMER })
+  role: UserRole;
 
   @Column({ default: false })
   emailVerified: boolean;

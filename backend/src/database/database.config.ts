@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -18,7 +19,9 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
           password: config.get<string>('DB_PASSWORD') ?? '',
           database: config.get('DB_NAME', 'ecommerce'),
           autoLoadEntities: true,
-          synchronize: true,
+          synchronize: false,
+          migrations: [join(__dirname, 'migrations', '*.{ts,js}')],
+          migrationsRun: false,
         };
       },
     }),
