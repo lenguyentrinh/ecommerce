@@ -1,6 +1,7 @@
 # Story 1.1: Oren Design System Foundation
 
 Status: done
+Review Status: approved
 
 ## Story
 
@@ -303,3 +304,31 @@ claude-sonnet-4-6
 - `frontend/components/Button.spec.tsx` (new)
 - `frontend/components/InputField.spec.tsx` (new)
 - `frontend/components/Chip.spec.tsx` (new)
+
+### Review Findings
+
+**Reviewed: 2026-06-23 | Reviewer: bmad-code-review**
+
+#### Decision Needed
+
+- [x] [Review][Decision] AC6 responsive grid entirely absent — implemented: `.container-oren`, `.grid-oren`, `.section-gap` utilities added to globals.css with full breakpoint coverage
+- [x] [Review][Decision] `.bg-gradient-warm` uses radial gradient — accepted as-is; radial ellipse at top retained for premium feel
+
+#### Patches
+
+- [x] [Review][Patch] Color tokens declared in `:root` instead of `@theme inline` — fixed: consolidated into single `@theme inline` block; all utility classes now generated correctly [globals.css]
+- [x] [Review][Patch] `body::before` z-index 9999 conflicts with toast/modal layers — fixed: lowered to `z-index: 1` [globals.css]
+- [x] [Review][Patch] Duplicate `-raw` `:root` block — fixed: removed unused `--color-*-raw` variables [globals.css]
+- [x] [Review][Patch] Mobile `.text-display-lg` letter-spacing override contradicts spec — fixed: removed unspecified `letter-spacing` from mobile media query [globals.css]
+- [x] [Review][Patch] Duplicate `testMatch` in jest.config.ts — dismissed: false positive; actual file has a single `testMatch` entry
+- [x] [Review][Patch] `ts-jest@29` / `jest@30` peer-dependency mismatch — dismissed: ts-jest 29.4.11 declares `jest: "^29.0.0 || ^30.0.0"` — fully compatible
+- [x] [Review][Patch] `InputField` label not associated with input — fixed: added `id` (from `inputId` prop or `rest.id`) + `htmlFor` on label [InputField.tsx]
+- [x] [Review][Patch] `InputField` error span missing `role="alert"` — fixed: added `role="alert"` to error span [InputField.tsx]
+- [x] [Review][Patch] `Chip` missing `aria-pressed` attribute — fixed: added `aria-pressed={selected}` [Chip.tsx]
+
+#### Deferred
+
+- [x] [Review][Defer] Header/Footer color mismatch with new warm palette [Header.tsx, Footer.tsx] — deferred, out of scope for Story 1.1 per story notes
+- [x] [Review][Defer] `--color-success/alert/error` low contrast between semantic tokens — deferred, color palette is defined in UX design artifacts; not a code issue
+- [x] [Review][Defer] `body` background-color transition may flash on initial paint [globals.css] — deferred, cosmetic, low priority
+- [x] [Review][Defer] jest.config.ts missing CSS module transform — currently latent; will fail if tests ever import CSS files [jest.config.ts] — deferred, pre-existing
