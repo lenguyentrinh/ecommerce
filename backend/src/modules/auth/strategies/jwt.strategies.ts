@@ -5,10 +5,12 @@ import type { JwtFromRequestFunction } from 'passport-jwt';
 import { Strategy } from 'passport-jwt';
 import { UserService } from 'src/modules/users/user.service';
 import { ConfigService } from '@nestjs/config';
+import { UserRole } from '../../users/entities/user-role.enum';
 
 interface JwtPayload {
   sub: number;
   email: string;
+  role: UserRole;
 }
 
 const jwtFromHeader: JwtFromRequestFunction = (req: Request | undefined) => {

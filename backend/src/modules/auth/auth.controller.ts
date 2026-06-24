@@ -8,6 +8,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { Throttle } from '@nestjs/throttler';
 import type { Request, Response } from 'express';
 import { AuthService } from './auth.service';
 import type { User } from '../users/entities/user.entity';
@@ -19,6 +20,7 @@ import SendOtpDto from './dto/send-otp.dto';
 import ResetPasswordDto from './dto/reset-password.dto';
 import VerifyOtpDto from './dto/verify-otp.dto';
 
+@Throttle({ default: { limit: 10, ttl: 60000 } })
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
