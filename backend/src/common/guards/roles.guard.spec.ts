@@ -2,7 +2,7 @@
 
 import { RolesGuard } from './roles.guard';
 import { Reflector } from '@nestjs/core';
-import { ExecutionContext } from '@nestjs/common';
+import { ExecutionContext, UnauthorizedException } from '@nestjs/common';
 import { UserRole } from '../../modules/users/entities/user-role.enum';
 
 describe('RolesGuard', () => {
@@ -57,11 +57,27 @@ describe('RolesGuard', () => {
     );
   });
 
-  it('blocks when user is not authenticated (no user on request)', () => {
+  it('throws UnauthorizedException when user is not authenticated (no user on request)', () => {
     jest
       .spyOn(reflector, 'getAllAndOverride')
       .mockReturnValue([UserRole.ADMIN]);
-    expect(guard.canActivate(mockExecutionContext(undefined))).toBe(false);
+    expect(() => guard.canActivate(mockExecutionContext(undefined))).toThrow(
+      UnauthorizedException,
+    );
+  });
+
+  it('blocks when user is present but role is null or undefined', () => {
+    jest
+      .spyOn(reflector, 'getAllAndOverride')
+      .mockReturnValue([UserRole.ADMIN]);
+    const contextWithNullRole = {
+      getHandler: jest.fn(),
+      getClass: jest.fn(),
+      switchToHttp: () => ({
+        getRequest: () => ({ user: { role: null } }),
+      }),
+    } as unknown as ExecutionContext;
+    expect(guard.canActivate(contextWithNullRole)).toBe(false);
   });
 
   it('passes when user has one of multiple allowed roles', () => {

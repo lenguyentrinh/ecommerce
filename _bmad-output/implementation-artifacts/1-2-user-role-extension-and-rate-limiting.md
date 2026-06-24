@@ -4,8 +4,8 @@
 baseline_commit: ecc6f4ac8a40e0bcb161685c025ec48e7133708f
 ---
 
-Status: in-progress
-Review Status: not started
+Status: done
+Review Status: complete
 
 ## Story
 
@@ -42,54 +42,66 @@ Then the global throttle is 60 requests per 60-second window per IP; `AuthContro
 
 ## Tasks / Subtasks
 
-- [ ] **Task 1: Create UserRole enum and update User entity** (AC1, AC2, AC3)
-  - [ ] Create `backend/src/modules/users/entities/user-role.enum.ts` with `enum UserRole { CUSTOMER = 'customer', ADMIN = 'admin' }`
-  - [ ] Add `@Column({ type: 'enum', enum: UserRole, default: UserRole.CUSTOMER }) role: UserRole;` to `User` entity (after `phoneNumber` field)
-  - [ ] Import `UserRole` in `user.entity.ts`
+- [x] **Task 1: Create UserRole enum and update User entity** (AC1, AC2, AC3)
+  - [x] Create `backend/src/modules/users/entities/user-role.enum.ts` with `enum UserRole { CUSTOMER = 'customer', ADMIN = 'admin' }`
+  - [x] Add `@Column({ type: 'enum', enum: UserRole, default: UserRole.CUSTOMER }) role: UserRole;` to `User` entity (after `phoneNumber` field)
+  - [x] Import `UserRole` in `user.entity.ts`
 
-- [ ] **Task 2: Set up TypeORM CLI data source and migration scripts** (AC1)
-  - [ ] Create `backend/src/database/data-source.ts` — standalone `DataSource` for TypeORM CLI (see Dev Notes for exact content)
-  - [ ] Add migration scripts to `backend/package.json` (see Dev Notes for exact scripts)
-  - [ ] Create `backend/src/database/migrations/` directory (empty — CLI will populate it)
+- [x] **Task 2: Set up TypeORM CLI data source and migration scripts** (AC1)
+  - [x] Create `backend/src/database/data-source.ts` — standalone `DataSource` for TypeORM CLI (see Dev Notes for exact content)
+  - [x] Add migration scripts to `backend/package.json` (see Dev Notes for exact scripts)
+  - [x] Create `backend/src/database/migrations/` directory (empty — CLI will populate it)
 
-- [ ] **Task 3: Generate and verify migration** (AC1)
-  - [ ] Run `npm run migration:generate -- src/database/migrations/AddRoleToUsers` from `backend/` — this generates the migration file
-  - [ ] Verify the generated migration adds: `role ENUM('customer','admin') NOT NULL DEFAULT 'customer'`
-  - [ ] Run `npm run migration:run` to apply the migration to the local DB
+- [x] **Task 3: Generate and verify migration** (AC1)
+  - [x] Run `npm run migration:generate -- src/database/migrations/AddRoleToUsers` from `backend/` — this generates the migration file
+  - [x] Verify the generated migration adds: `role ENUM('customer','admin') NOT NULL DEFAULT 'customer'`
+  - [x] Run `npm run migration:run` to apply the migration to the local DB
 
-- [ ] **Task 4: Switch `synchronize: false`** (AC1)
-  - [ ] In `database.config.ts`: change `synchronize: true` → `synchronize: false`
-  - [ ] Add `migrations: [__dirname + '/migrations/*.{ts,js}']` and `migrationsRun: false` to TypeORM config (see Dev Notes)
-  - [ ] Verify app still starts cleanly after this change
+- [x] **Task 4: Switch `synchronize: false`** (AC1)
+  - [x] In `database.config.ts`: change `synchronize: true` → `synchronize: false`
+  - [x] Add `migrations: [__dirname + '/migrations/*.{ts,js}']` and `migrationsRun: false` to TypeORM config (see Dev Notes)
+  - [x] Verify app still starts cleanly after this change
 
-- [ ] **Task 5: Update JWT payload to include role** (AC2)
-  - [ ] In `auth.service.ts` `login()`: change `const payload = { sub: user.id, email: user.email }` → `const payload = { sub: user.id, email: user.email, role: user.role }`
-  - [ ] Import `UserRole` if needed for type annotation
+- [x] **Task 5: Update JWT payload to include role** (AC2)
+  - [x] In `auth.service.ts` `login()`: change `const payload = { sub: user.id, email: user.email }` → `const payload = { sub: user.id, email: user.email, role: user.role }`
+  - [x] Import `UserRole` if needed for type annotation
 
-- [ ] **Task 6: Update JwtPayload interface** (AC3)
-  - [ ] In `jwt.strategies.ts`: add `role: UserRole` to the `JwtPayload` interface
-  - [ ] Import `UserRole` enum
+- [x] **Task 6: Update JwtPayload interface** (AC3)
+  - [x] In `jwt.strategies.ts`: add `role: UserRole` to the `JwtPayload` interface
+  - [x] Import `UserRole` enum
 
-- [ ] **Task 7: Create @Roles() decorator** (AC4)
-  - [ ] Create `backend/src/common/decorators/roles.decorator.ts` (see Dev Notes for exact content)
+- [x] **Task 7: Create @Roles() decorator** (AC4)
+  - [x] Create `backend/src/common/decorators/roles.decorator.ts` (see Dev Notes for exact content)
 
-- [ ] **Task 8: Create RolesGuard** (AC4)
-  - [ ] Create `backend/src/common/guards/roles.guard.ts` (see Dev Notes for exact content)
+- [x] **Task 8: Create RolesGuard** (AC4)
+  - [x] Create `backend/src/common/guards/roles.guard.ts` (see Dev Notes for exact content)
 
-- [ ] **Task 9: Register RolesGuard globally in AppModule** (AC4)
-  - [ ] Import `RolesGuard` and `APP_GUARD` from `@nestjs/core` in `app.module.ts`
-  - [ ] Add to `providers`: `{ provide: APP_GUARD, useClass: RolesGuard }`
+- [x] **Task 9: Register RolesGuard globally in AppModule** (AC4)
+  - [x] Import `RolesGuard` and `APP_GUARD` from `@nestjs/core` in `app.module.ts`
+  - [x] Add to `providers`: `{ provide: APP_GUARD, useClass: RolesGuard }`
 
-- [ ] **Task 10: Install and configure @nestjs/throttler** (AC5)
-  - [ ] Run `pnpm add @nestjs/throttler` from `backend/` (project uses pnpm — NOT npm install)
-  - [ ] Import `ThrottlerModule` and `ThrottlerGuard` in `app.module.ts`
-  - [ ] Add `ThrottlerModule.forRoot({ throttlers: [{ name: 'default', ttl: 60000, limit: 60 }] })` to imports
-  - [ ] Add `{ provide: APP_GUARD, useClass: ThrottlerGuard }` to providers (before RolesGuard)
-  - [ ] Add `@Throttle({ default: { limit: 10, ttl: 60000 } })` decorator to `AuthController` class (see Dev Notes)
+- [x] **Task 10: Install and configure @nestjs/throttler** (AC5)
+  - [x] Run `pnpm add @nestjs/throttler` from `backend/` (project uses pnpm — NOT npm install)
+  - [x] Import `ThrottlerModule` and `ThrottlerGuard` in `app.module.ts`
+  - [x] Add `ThrottlerModule.forRoot({ throttlers: [{ name: 'default', ttl: 60000, limit: 60 }] })` to imports
+  - [x] Add `{ provide: APP_GUARD, useClass: ThrottlerGuard }` to providers (before RolesGuard)
+  - [x] Add `@Throttle({ default: { limit: 10, ttl: 60000 } })` decorator to `AuthController` class (see Dev Notes)
 
-- [ ] **Task 11: Write unit tests** (all ACs)
-  - [ ] `backend/src/common/guards/roles.guard.spec.ts` — test 403 for wrong role, pass for correct role, pass when no @Roles set
-  - [ ] Update `backend/src/modules/auth/auth.service.spec.ts` (or create it) — verify `login()` JWT payload includes `role`
+- [x] **Task 11: Write unit tests** (all ACs)
+  - [x] `backend/src/common/guards/roles.guard.spec.ts` — test 403 for wrong role, pass for correct role, pass when no @Roles set
+  - [x] Update `backend/src/modules/auth/auth.service.spec.ts` (or create it) — verify `login()` JWT payload includes `role`
+
+### Review Findings
+
+- [x] [Review][Decision] ThrottlerGuard proxy trust — deferred; deployment infrastructure not yet decided. If behind a proxy: swap to `ThrottlerBehindProxyGuard` + `app.set('trust proxy', 1)` in `main.ts`
+- [x] [Review][Patch] RolesGuard returns 403 instead of 401 for unauthenticated requests on @Roles-protected routes — throws `UnauthorizedException` when `!user` [`backend/src/common/guards/roles.guard.ts:21`]
+- [x] [Review][Patch] Stray frontend package.json change out of story scope — reverted `--turbopack` → `--webpack` [`frontend/package.json:7`]
+- [x] [Review][Patch] Missing RolesGuard test: added coverage for `user` present but `user.role` is `null` [`backend/src/common/guards/roles.guard.spec.ts`]
+- [x] [Review][Defer] `/me` response omits `role` field — explicitly marked optional in dev notes; revisit when frontend needs role-gating [`backend/src/modules/auth/auth.controller.ts:52-61`] — deferred, pre-existing
+- [x] [Review][Defer] `resetPassword` does not validate reset token — critical pre-existing security bug in `auth.service.ts`, not introduced by this story [`backend/src/modules/auth/auth.service.ts`] — deferred, pre-existing
+- [x] [Review][Defer] Fresh DB migration ordering — no baseline migration creates `users` table; this migration fails on a schema-less DB [`backend/src/database/migrations/1782206839023-AddRoleToUsers.ts`] — deferred, pre-existing
+- [x] [Review][Defer] Per-account brute-force protection absent — spec requires per-IP only; account-level lockout is out of scope for Story 1.2 — deferred, pre-existing
+- [x] [Review][Defer] `migrationsRun: false` requires manual deployment step — by design per dev notes and architecture decision D1; document in deployment runbook — deferred, pre-existing
 
 ## Dev Notes
 
@@ -439,16 +451,39 @@ describe('RolesGuard', () => {
 
 ### Agent Model Used
 
-_to be filled by dev agent_
+claude-sonnet-4-6
 
 ### Debug Log References
 
-_to be filled by dev agent_
+- `migration:generate` returned "no changes found" — DB already had `role` column from `synchronize:true`. Created migration manually with idempotent `queryRunner.getTable()` column check; `migration:run` succeeded and registered migration in `migrations` table.
+- `jest.spyOn(bcrypt, 'compare')` failed with "Cannot redefine property" — bcrypt uses native bindings. Fixed with `jest.mock('bcrypt', ...)` module-level mock.
+- Jest 30 requires `--testPathPatterns` (plural), not `--testPathPattern`.
 
 ### Completion Notes List
 
-_to be filled by dev agent_
+- `UserRole` enum created; `role` column added to `User` entity with `ENUM('customer','admin') DEFAULT 'customer'`
+- TypeORM CLI infrastructure set up: `data-source.ts`, `migration:generate/run/revert/show` scripts in `package.json`
+- Migration `1782206839023-AddRoleToUsers.ts` created manually (idempotent); ran successfully and is tracked in `migrations` table
+- `synchronize: false` enforced in `database.config.ts` per architecture decision D1
+- JWT payload now includes `role`; `JwtPayload` interface updated; `validate()` unchanged (returns full entity — no `/me` regression)
+- `RolesGuard` + `@Roles()` decorator created in `src/common/guards/` and `src/common/decorators/`
+- Both guards registered globally via `APP_GUARD` in `AppModule` (ThrottlerGuard first, then RolesGuard)
+- `@nestjs/throttler` 6.5.0 installed; global 60 req/min, auth controller override 10 req/min
+- 11/11 tests pass (6 RolesGuard, 4 AuthService login, 1 pre-existing AppController)
 
 ### File List
 
-_to be filled by dev agent_
+- `backend/src/modules/users/entities/user-role.enum.ts` (new)
+- `backend/src/modules/users/entities/user.entity.ts` (updated — added `role` column)
+- `backend/src/database/data-source.ts` (new)
+- `backend/src/database/database.config.ts` (updated — synchronize:false, migrations path)
+- `backend/src/database/migrations/1782206839023-AddRoleToUsers.ts` (new)
+- `backend/src/modules/auth/auth.service.ts` (updated — role in JWT payload)
+- `backend/src/modules/auth/strategies/jwt.strategies.ts` (updated — JwtPayload interface)
+- `backend/src/modules/auth/auth.controller.ts` (updated — @Throttle override)
+- `backend/src/app.module.ts` (updated — ThrottlerModule, ThrottlerGuard, RolesGuard)
+- `backend/package.json` (updated — migration scripts + @nestjs/throttler dependency)
+- `backend/src/common/decorators/roles.decorator.ts` (new)
+- `backend/src/common/guards/roles.guard.ts` (new)
+- `backend/src/common/guards/roles.guard.spec.ts` (new — 6 tests)
+- `backend/src/modules/auth/auth.service.spec.ts` (new — 4 tests)
