@@ -4,7 +4,7 @@
 baseline_commit: 639d2f4
 ---
 
-Status: ready-for-dev
+Status: review
 Review Status: not started
 
 ## Story
@@ -42,37 +42,37 @@ Then the form shows inline error "An account with this email already exists." wi
 
 ## Tasks / Subtasks
 
-- [ ] **Task 1: Restyle Signup page to Oren design system** (AC1, AC2, AC3, AC5)
-  - [ ] Update `frontend/app/(auth)/signup/page.tsx` — Soft Ivory bg, centered Warm White card with ambient shadow, Headline MD title "Create Account"
-  - [ ] Update `frontend/app/(auth)/signup/SignupForm.tsx` — replace all `TextInput` with `InputField`; use `Button` component for submit
-  - [ ] Form fields (in order): Full Name (`userName`, required), Email (required), Password (required), Phone (`phoneNumber`, optional)
-  - [ ] Remove `birthDate` field (not in AC; not required by story)
-  - [ ] Keep `confirmPassword` field for UX safety
-  - [ ] Change success toast to: `showToast.success('Check your email for a 6-digit code')`
-  - [ ] On 409 (error string === `'Email already exists'`): call `setError('email', { message: 'An account with this email already exists.' })` — do NOT show toast
-  - [ ] On all other errors: `showToast.error(err as string)`
-  - [ ] Redirect uses `data.email` from form values
+- [x] **Task 1: Restyle Signup page to Oren design system** (AC1, AC2, AC3, AC5)
+  - [x] Update `frontend/app/(auth)/signup/page.tsx` — Soft Ivory bg, centered Warm White card with ambient shadow, Headline MD title "Create Account"
+  - [x] Update `frontend/app/(auth)/signup/SignupForm.tsx` — replace all `TextInput` with `InputField`; use `Button` component for submit
+  - [x] Form fields (in order): Full Name (`userName`, required), Email (required), Password (required), Phone (`phoneNumber`, optional)
+  - [x] Remove `birthDate` field (not in AC; not required by story)
+  - [x] Keep `confirmPassword` field for UX safety
+  - [x] Change success toast to: `showToast.success('Check your email for a 6-digit code')`
+  - [x] On 409 (error string === `'Email already exists'`): call `setError('email', { message: 'An account with this email already exists.' })` — do NOT show toast
+  - [x] On all other errors: `showToast.error(err as string)`
+  - [x] Redirect uses `data.email` from form values
 
-- [ ] **Task 2: Add Password Strength Indicator** (AC1)
-  - [ ] Create `frontend/app/(auth)/signup/PasswordStrengthIndicator.tsx`
-  - [ ] Accepts `password: string` prop; renders 3 horizontal bars (`h-1 rounded-full`)
-  - [ ] Strength logic: Weak = length < 8; Medium = length >= 8 + (uppercase OR number, not both+special); Strong = length >= 8 + uppercase + number + special char
-  - [ ] Bar colors: Weak → 1 bar `bg-error`, 2 bars `bg-warm-beige`; Medium → 2 bars `bg-alert`, 1 bar `bg-warm-beige`; Strong → 3 bars `bg-success`; Empty → 3 bars `bg-warm-beige`
-  - [ ] Place below Password field, above Confirm Password field
-  - [ ] In `SignupForm.tsx`: use `useWatch({ control, name: 'password' })` to get live value
+- [x] **Task 2: Add Password Strength Indicator** (AC1)
+  - [x] Create `frontend/app/(auth)/signup/PasswordStrengthIndicator.tsx`
+  - [x] Accepts `password: string` prop; renders 3 horizontal bars (`h-1 rounded-full`)
+  - [x] Strength logic: Weak = length < 8; Medium = length >= 8 + (uppercase OR number, not both+special); Strong = length >= 8 + uppercase + number + special char
+  - [x] Bar colors: Weak → 1 bar `bg-error`, 2 bars `bg-warm-beige`; Medium → 2 bars `bg-alert`, 1 bar `bg-warm-beige`; Strong → 3 bars `bg-success`; Empty → 3 bars `bg-warm-beige`
+  - [x] Place below Password field, above Confirm Password field
+  - [x] In `SignupForm.tsx`: use `useWatch({ control, name: 'password' })` to get live value
 
-- [ ] **Task 3: Restyle Verify Email page to Oren design system** (AC4)
-  - [ ] Update `frontend/app/(auth)/verify-email/page.tsx` — Soft Ivory bg, Warm White card, Headline MD title "Verify your email"
-  - [ ] Update `frontend/app/(auth)/verify-email/VerifyEmailForm.tsx` — replace `TextInput` with `InputField` for OTP code field
-  - [ ] Replace raw `<button>` elements with `Button` component
-  - [ ] Change success toast to: `showToast.success('Email verified! You can now log in.')`
-  - [ ] On OTP failure: `setError('code', { message: 'Invalid or expired code. Please try again.' })` — NOT toast
-  - [ ] Add "Resend code" link: calls `sendOtpThunk({ email })` from Redux; disables during loading; `showToast.success('Code resent. Check your inbox.')` on success
-  - [ ] Display user email from URL search param so shopper knows where to look
+- [x] **Task 3: Restyle Verify Email page to Oren design system** (AC4)
+  - [x] Update `frontend/app/(auth)/verify-email/page.tsx` — Soft Ivory bg, Warm White card, Headline MD title "Verify your email"
+  - [x] Update `frontend/app/(auth)/verify-email/VerifyEmailForm.tsx` — replace `TextInput` with `InputField` for OTP code field
+  - [x] Replace raw `<button>` elements with `Button` component
+  - [x] Change success toast to: `showToast.success('Email verified! You can now log in.')`
+  - [x] On OTP failure: `setError('code', { message: 'Invalid or expired code. Please try again.' })` — NOT toast
+  - [x] Add "Resend code" link: calls `sendOtpThunk({ email })` from Redux; disables during loading; `showToast.success('Code resent. Check your inbox.')` on success
+  - [x] Display user email from URL search param so shopper knows where to look
 
-- [ ] **Task 4: Write tests** (all ACs)
-  - [ ] `frontend/app/(auth)/signup/SignupForm.test.tsx` — renders all AC1 fields; 409 shows inline email error not toast; success redirects with correct URL
-  - [ ] `frontend/app/(auth)/verify-email/VerifyEmailForm.test.tsx` — "Resend code" link present; OTP failure shows inline error; success redirects to `/login`
+- [x] **Task 4: Write tests** (all ACs)
+  - [x] `frontend/app/(auth)/signup/SignupForm.test.tsx` — renders all AC1 fields; 409 shows inline email error not toast; success redirects with correct URL
+  - [x] `frontend/app/(auth)/verify-email/VerifyEmailForm.test.tsx` — "Resend code" link present; OTP failure shows inline error; success redirects to `/login`
 
 ## Dev Notes
 
@@ -522,16 +522,28 @@ claude-sonnet-4-6
 
 ### Debug Log References
 
-[empty]
+- Fixed `jest.spyOn(reactRedux, 'useDispatch')` → `Cannot redefine property` error on ESM modules. Solution: use `jest.mock('react-redux', ...)` at module level with factory that spreads `requireActual`.
+- Fixed resend test mock bleed-through: `clearAllMocks()` does not reset implementations; switched to `resetAllMocks()` in VerifyEmailForm tests.
+- `birthDate` was a required field in `SignupPayload` but backend marks it `@IsOptional()`. Made it optional in `frontend/services/authAPI.ts` to allow removing it from the signup form without TypeScript errors.
 
 ### Completion Notes List
 
-[empty]
+- **Task 1 (Signup page):** Rewrote `signup/page.tsx` to Oren Soft Ivory + Warm White card layout. Rewrote `SignupForm.tsx` replacing all `TextInput` with `InputField` (forwardRef, Oren-styled), replaced raw `<button>` with `Button` component, removed `birthDate` field, changed success toast to "Check your email for a 6-digit code", added 409 inline email error via `setError`, redirect uses `data.email`.
+- **Task 2 (PasswordStrengthIndicator):** Created `PasswordStrengthIndicator.tsx` with `getStrength()` logic, 3 bar display, and Oren token classes (`bg-error`/`bg-alert`/`bg-success`/`bg-warm-beige`). Integrated into `SignupForm` via `useWatch`.
+- **Task 3 (Verify email page):** Rewrote `verify-email/page.tsx` to Oren layout with `Suspense`. Rewrote `VerifyEmailForm.tsx` replacing `TextInput` with `InputField`, raw buttons with `Button`, success toast to "Email verified! You can now log in.", OTP failure to inline `setError`, added "Resend code" button calling `sendOtpThunk`, displays email from URL param.
+- **Task 4 (Tests):** 10 tests across 2 files. All 27 total frontend tests pass, zero regressions.
 
 ### File List
 
-[empty]
+- `frontend/app/(auth)/signup/page.tsx` (updated)
+- `frontend/app/(auth)/signup/SignupForm.tsx` (updated)
+- `frontend/app/(auth)/signup/PasswordStrengthIndicator.tsx` (new)
+- `frontend/app/(auth)/signup/SignupForm.test.tsx` (new)
+- `frontend/app/(auth)/verify-email/page.tsx` (updated)
+- `frontend/app/(auth)/verify-email/VerifyEmailForm.tsx` (updated)
+- `frontend/app/(auth)/verify-email/VerifyEmailForm.test.tsx` (new)
+- `frontend/services/authAPI.ts` (updated — `birthDate` made optional)
 
 ### Change Log
 
-[empty]
+- 2026-06-24: Implemented Story 1.3 — Oren-styled signup and verify-email pages, PasswordStrengthIndicator, inline 409/OTP error handling, resend OTP flow, 10 component tests (27 total pass).

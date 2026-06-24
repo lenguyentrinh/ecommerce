@@ -4,7 +4,7 @@ interface SignupPayload {
   userName: string;
   email: string;
   password: string;
-  birthDate: string;
+  birthDate?: string;
   phoneNumber: string;
 }
 
