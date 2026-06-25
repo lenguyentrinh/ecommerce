@@ -4,8 +4,8 @@
 baseline_commit: 639d2f4
 ---
 
-Status: review
-Review Status: not started
+Status: done
+Review Status: done
 
 ## Story
 
@@ -73,6 +73,20 @@ Then the form shows inline error "An account with this email already exists." wi
 - [x] **Task 4: Write tests** (all ACs)
   - [x] `frontend/app/(auth)/signup/SignupForm.test.tsx` — renders all AC1 fields; 409 shows inline email error not toast; success redirects with correct URL
   - [x] `frontend/app/(auth)/verify-email/VerifyEmailForm.test.tsx` — "Resend code" link present; OTP failure shows inline error; success redirects to `/login`
+
+### Review Findings
+
+- [x] [Review][Decision] Toast before router.push — accepted; toast provider is global and persists across navigation. No change needed.
+- [x] [Review][Patch] Remove birthDate entirely from SignupPayload — spec says "Remove birthDate field"; making it `?: string` is insufficient. Delete the field from the `SignupPayload` interface. [frontend/services/authAPI.ts:7]
+- [x] [Review][Patch] phoneNumber optional in form but `string` (required) in SignupPayload type — form labels it "Phone (optional)" with no required validator, but `authAPI.ts` still has `phoneNumber: string`; sending empty string may fail backend validation. Fix: `phoneNumber?: string` in `SignupPayload`. [frontend/services/authAPI.ts:7]
+- [x] [Review][Patch] No null-guard for email in VerifyEmailForm.onSubmit — `handleResend` guards with `if (!email) return` but `onSubmit` dispatches `verifyEmailThunk({ code, email: null })` without guard; user landing on /verify-email without ?email= param sends null to backend. [frontend/app/(auth)/verify-email/VerifyEmailForm.tsx:32]
+- [x] [Review][Patch] Duplicate password watcher — both `watch('password')` → passwordValue and `useWatch({ control, name: 'password' })` → passwordWatch are active; remove the redundant `watch` call, use `passwordWatch` for the confirmPassword validate callback too. [frontend/app/(auth)/signup/SignupForm.tsx:32-33]
+- [x] [Review][Patch] `<a href>` instead of Next.js `<Link>` — raw anchor tags in both page.tsx files trigger full page reload and lose in-memory Redux state; replace with `import Link from 'next/link'`. [frontend/app/(auth)/signup/page.tsx:14, frontend/app/(auth)/verify-email/page.tsx:21]
+- [x] [Review][Defer] Brittle string match 'Email already exists' — error discrimination depends on exact API string; intentional per spec but fragile if the backend error message changes. [frontend/app/(auth)/signup/SignupForm.tsx:48] — deferred, intentional per spec
+- [x] [Review][Defer] Cancel button in VerifyEmailForm not in spec — scope addition; beneficial UX but no AC backs it. [frontend/app/(auth)/verify-email/VerifyEmailForm.tsx:82] — deferred, benign addition
+- [x] [Review][Defer] PasswordStrengthIndicator has no dedicated unit tests — renders correctly but strength logic and ARIA labels are not tested in isolation; spec did not require them. — deferred, not spec-required
+- [x] [Review][Defer] key={i} array index in PasswordStrengthIndicator — static 3-element array, low risk but violates React best practice. [frontend/app/(auth)/signup/PasswordStrengthIndicator.tsx:37] — deferred, pre-existing anti-pattern
+- [x] [Review][Defer] No test for signupLoading=true submit button state — loading branch is untested. — deferred, not spec-required
 
 ## Dev Notes
 

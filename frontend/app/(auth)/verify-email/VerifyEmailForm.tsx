@@ -29,6 +29,10 @@ export default function VerifyEmailForm() {
   } = useForm<FormData>({ mode: 'onTouched' });
 
   const onSubmit = async (data: FormData) => {
+    if (!email) {
+      setError('code', { message: 'Missing email. Please sign up again.' });
+      return;
+    }
     try {
       await dispatch(verifyEmailThunk({ code: data.code, email })).unwrap();
       showToast.success('Email verified! You can now log in.');

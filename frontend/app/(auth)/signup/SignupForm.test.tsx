@@ -50,7 +50,7 @@ describe('SignupForm', () => {
     expect(screen.getByPlaceholderText('Min. 8 characters')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('Repeat password')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('+1 234 567 8900')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /create account/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /begin your journey/i })).toBeInTheDocument();
   });
 
   it('does not render a birth date field', () => {
@@ -67,7 +67,7 @@ describe('SignupForm', () => {
     await user.type(screen.getByPlaceholderText('you@example.com'), 'test@example.com');
     await user.type(screen.getByPlaceholderText('Min. 8 characters'), 'Password1!');
     await user.type(screen.getByPlaceholderText('Repeat password'), 'Password1!');
-    await user.click(screen.getByRole('button', { name: /create account/i }));
+    await user.click(screen.getByRole('button', { name: /begin your journey/i }));
 
     await waitFor(() => {
       expect(mockPush).toHaveBeenCalledWith(
@@ -88,7 +88,7 @@ describe('SignupForm', () => {
     await user.type(screen.getByPlaceholderText('you@example.com'), 'taken@example.com');
     await user.type(screen.getByPlaceholderText('Min. 8 characters'), 'Password1!');
     await user.type(screen.getByPlaceholderText('Repeat password'), 'Password1!');
-    await user.click(screen.getByRole('button', { name: /create account/i }));
+    await user.click(screen.getByRole('button', { name: /begin your journey/i }));
 
     await waitFor(() => {
       expect(screen.getByRole('alert')).toHaveTextContent(
@@ -108,7 +108,7 @@ describe('SignupForm', () => {
     await user.type(screen.getByPlaceholderText('you@example.com'), 'test@example.com');
     await user.type(screen.getByPlaceholderText('Min. 8 characters'), 'Password1!');
     await user.type(screen.getByPlaceholderText('Repeat password'), 'Password1!');
-    await user.click(screen.getByRole('button', { name: /create account/i }));
+    await user.click(screen.getByRole('button', { name: /begin your journey/i }));
 
     await waitFor(() => {
       expect(showToast.error).toHaveBeenCalledWith('Signup failed');

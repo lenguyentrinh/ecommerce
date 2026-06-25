@@ -12,15 +12,16 @@ function getStrength(password: string): Strength {
   return 'weak';
 }
 
-const BAR_COLORS: Record<Strength, string[]> = {
-  empty: ['bg-warm-beige', 'bg-warm-beige', 'bg-warm-beige'],
-  weak: ['bg-error', 'bg-warm-beige', 'bg-warm-beige'],
-  medium: ['bg-alert', 'bg-alert', 'bg-warm-beige'],
-  strong: ['bg-success', 'bg-success', 'bg-success'],
+// Stitch security-bar palette (muted, luxury) — exact hex from the canonical design.
+const FILL: Record<Strength, { width: string; color: string }> = {
+  empty: { width: '0%', color: '#f1dfd1' },
+  weak: { width: '33%', color: '#e0bfba' },
+  medium: { width: '66%', color: '#eadecd' },
+  strong: { width: '100%', color: '#c8c7be' },
 };
 
 const LABELS: Record<Strength, string> = {
-  empty: '',
+  empty: 'Security Level',
   weak: 'Weak',
   medium: 'Medium',
   strong: 'Strong',
@@ -28,20 +29,26 @@ const LABELS: Record<Strength, string> = {
 
 export default function PasswordStrengthIndicator({ password }: { password: string }) {
   const strength = getStrength(password);
-  const colors = BAR_COLORS[strength];
+  const { width, color } = FILL[strength];
+
   return (
-    <div className="flex flex-col gap-1">
-      <div className="flex gap-1" aria-label={`Password strength: ${LABELS[strength] || 'none'}`}>
-        {colors.map((color, i) => (
-          <div
-            key={i}
-            className={`h-1 flex-1 rounded-full transition-colors duration-300 ${color}`}
-          />
-        ))}
+    <div className="mt-xs">
+      <div
+        className="h-[2px] w-full overflow-hidden rounded-full bg-sand-dark"
+        role="progressbar"
+        aria-label={`Password strength: ${LABELS[strength]}`}
+      >
+        <div
+          className="h-full transition-all duration-500"
+          style={{ width, backgroundColor: color }}
+        />
       </div>
-      {strength !== 'empty' && (
-        <span className="text-label-sm text-warm-gray">{LABELS[strength]}</span>
-      )}
+      <p
+        className="mt-1 text-[11px] uppercase tracking-wider"
+        style={{ color: strength === 'empty' ? 'rgba(120, 119, 112, 0.5)' : color }}
+      >
+        {LABELS[strength]}
+      </p>
     </div>
   );
 }
