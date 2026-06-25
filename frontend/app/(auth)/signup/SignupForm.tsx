@@ -1,150 +1,204 @@
-"use client";
+'use client';
 
-import { useForm } from "react-hook-form";
-import TextInput from "@/components/inputs/TextInput";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "@/store/store";
-import { useRouter } from "next/navigation";
-import { signupThunk } from "@/store/authThunk";
-import { showToast } from "@/lib/toast";
+import { useState } from 'react';
+import { useForm, useWatch } from 'react-hook-form';
+import { useDispatch, useSelector } from 'react-redux';
+import { useRouter } from 'next/navigation';
+import { FiEye, FiEyeOff } from 'react-icons/fi';
+import Button from '@/components/Button';
+import PasswordStrengthIndicator from './PasswordStrengthIndicator';
+import { AppDispatch, RootState } from '@/store/store';
+import { signupThunk } from '@/store/authThunk';
+import { showToast } from '@/lib/toast';
 
 type FormData = {
   userName: string;
-  birthDate: string;
-  phoneNumber: string;
   email: string;
   password: string;
   confirmPassword: string;
+  phoneNumber: string;
 };
+
+const labelClass =
+  'text-[11px] font-semibold uppercase tracking-[0.15em] text-warm-gray/70';
+const inputClass =
+  'w-full h-[60px] rounded-[12px] bg-warm-beige/40 px-5 text-body-md text-brown placeholder:text-warm-gray/40 outline-none border border-transparent transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] focus:border-clay focus:shadow-[0_0_15px_rgba(231,198,193,0.7)]';
+const errorClass = 'text-[12px] text-error mt-1';
 
 export default function SignupForm() {
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
-
   const { signupLoading } = useSelector((state: RootState) => state.auth);
-  
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+
   const {
     register,
     handleSubmit,
-    watch,
+    control,
+    setError,
     formState: { errors },
-  } = useForm<FormData>({mode: "onTouched"});  
+  } = useForm<FormData>({ mode: 'onTouched' });
 
-  const passwordValue = watch("password");
-  
+  const passwordWatch = useWatch({ control, name: 'password' });
+
   const onSubmit = async (data: FormData) => {
-    const {confirmPassword, ...payload} = data;
-    try{
-      const result = await dispatch(signupThunk(payload)).unwrap()
-      showToast.success("Signup successful! Please login.");
-      router.push(`/verify-email?email=${encodeURIComponent(result?.email || "")}`);
-    } catch (err) {
-      showToast.error(err as string);
+    const { confirmPassword, ...payload } = data;
+    try {
+      await dispatch(signupThunk(payload)).unwrap();
+      showToast.success('Check your email for a 6-digit code');
+      router.push(`/verify-email?email=${encodeURIComponent(data.email)}`);
+    } catch (err: any) {
+      if (err === 'Email already exists') {
+        setError('email', { message: 'An account with this email already exists.' });
+      } else {
+        showToast.error(err as string);
+      }
     }
   };
 
-
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <TextInput
-          placeholder="userName..."
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-lg" noValidate>
+      {/* Full Name */}
+      <div className="flex flex-col gap-1">
+        <label htmlFor="userName" className={labelClass}>
+          Full Name
+        </label>
+        <input
+          id="userName"
           type="text"
-          name="userName"
-          register={register}
-          required="Please enter your username"
-          error={errors.userName?.message}
-          validate={(value) => {
-            if (value.length < 6) {
-              return "Username must be at least 6 characters";
-            }
-            if (!/^[a-zA-Z0-9]+$/.test(value)) {
-              return "Username must not contain special characters";
-            }
-            return true;
-          }}
+          placeholder="Jane Doe"
+          className={inputClass}
+          {...register('userName', { required: 'Full name is required' })}
         />
-        <TextInput
-          placeholder="Birth Date..."
-          type="date"
-          name="birthDate"
-          register={register}
-          required="Please choose your birth date"
-          error={errors.birthDate?.message}
-        />
-      </div>
-      <TextInput
-        placeholder="PhoneNumber..."
-        type="tel"
-        name="phoneNumber"
-        register={register}
-        error={errors.phoneNumber?.message}
-        required="Please enter your phone number"
-        validate={(value) => {
-          const cleaned = value.replace(/[\s\-\(\)\+]/g, '');
-          if (!/^\d+$/.test(cleaned)) {
-            return "Phone number must contain only digits";
-          }
-          if (cleaned.length < 10) {
-            return "Phone number must be at least 10 digits";
-          }
-          if (cleaned.length > 15) {
-            return "Phone number must not exceed 15 digits";
-          }
-          return true;
-        }}
-      />
-      <TextInput
-        placeholder="Email..."
-        type="email"
-        name="email"
-        register={register}
-        required="Please enter your email"
-        error={errors.email?.message}
-        validate={(value) => {
-          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-          if (!emailRegex.test(value)) {
-            return "Invalid email format";
-          }
-          return true;
-        }}
-      />
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <TextInput
-          placeholder="Password..."
-          type="password"
-          name="password"
-          register={register}
-          required="Please enter your password"
-          error={errors.password?.message}
-          validate={(value) => {
-            if (value.length < 6) {
-              return "Password must be at least 6 charater";
-            }
-            if (!/[A-Z]/.test(value)) {
-              return "Password must contain at least 1 uppercase letter";
-            }
-            return true;
-          }}
-        />
-        <TextInput
-          placeholder="Confirm Password..."
-          type="password"
-          name="confirmPassword"
-          register={register}
-          required="Please confirm your password"
-          error={errors.confirmPassword?.message}
-          validate={(value) => value === passwordValue || "Passwords not match"}
-        />
+        {errors.userName && (
+          <span role="alert" className={errorClass}>
+            {errors.userName.message}
+          </span>
+        )}
       </div>
 
-      <button
-        type="submit"
-        disabled={signupLoading}
-        className="w-full bg-green-600 hover:bg-green-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold py-2 px-4 rounded mt-4"
-      >
-        {signupLoading ? "Loading..." : "Sign Up"}
-      </button>
+      {/* Email Address */}
+      <div className="flex flex-col gap-1">
+        <label htmlFor="email" className={labelClass}>
+          Email Address
+        </label>
+        <input
+          id="email"
+          type="email"
+          placeholder="you@example.com"
+          className={inputClass}
+          {...register('email', {
+            required: 'Email is required',
+            pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: 'Invalid email format' },
+          })}
+        />
+        {errors.email && (
+          <span role="alert" className={errorClass}>
+            {errors.email.message}
+          </span>
+        )}
+      </div>
+
+      {/* Phone (Optional) */}
+      <div className="flex flex-col gap-1">
+        <label htmlFor="phoneNumber" className={labelClass}>
+          Phone (Optional)
+        </label>
+        <input
+          id="phoneNumber"
+          type="tel"
+          placeholder="+1 234 567 8900"
+          className={inputClass}
+          {...register('phoneNumber')}
+        />
+        {errors.phoneNumber && (
+          <span role="alert" className={errorClass}>
+            {errors.phoneNumber.message}
+          </span>
+        )}
+      </div>
+
+      {/* Your secret key (Password) */}
+      <div className="flex flex-col gap-1">
+        <label htmlFor="password" className={labelClass}>
+          Your secret key
+        </label>
+        <div className="relative">
+          <input
+            id="password"
+            type={showPassword ? 'text' : 'password'}
+            placeholder="Min. 8 characters"
+            className={`${inputClass} pr-12`}
+            {...register('password', {
+              required: 'Password is required',
+              minLength: { value: 8, message: 'Password must be at least 8 characters' },
+            })}
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword((v) => !v)}
+            aria-label={showPassword ? 'Hide password' : 'Show password'}
+            className="absolute right-md top-1/2 -translate-y-1/2 text-warm-gray/50 transition-colors hover:text-brown"
+          >
+            {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
+          </button>
+        </div>
+        {/* Password Strength Indicator */}
+        <PasswordStrengthIndicator password={passwordWatch ?? ''} />
+        {errors.password && (
+          <span role="alert" className={errorClass}>
+            {errors.password.message}
+          </span>
+        )}
+      </div>
+
+      {/* Confirm Password */}
+      <div className="flex flex-col gap-1">
+        <label htmlFor="confirmPassword" className={labelClass}>
+          Confirm Password
+        </label>
+        <div className="relative">
+          <input
+            id="confirmPassword"
+            type={showConfirm ? 'text' : 'password'}
+            placeholder="Repeat password"
+            className={`${inputClass} pr-12`}
+            {...register('confirmPassword', {
+              required: 'Please confirm your password',
+              validate: (v) => v === passwordWatch || 'Passwords do not match',
+            })}
+          />
+          <button
+            type="button"
+            onClick={() => setShowConfirm((v) => !v)}
+            aria-label={showConfirm ? 'Hide password' : 'Show password'}
+            className="absolute right-md top-1/2 -translate-y-1/2 text-warm-gray/50 transition-colors hover:text-brown"
+          >
+            {showConfirm ? <FiEyeOff size={20} /> : <FiEye size={20} />}
+          </button>
+        </div>
+        {errors.confirmPassword && (
+          <span role="alert" className={errorClass}>
+            {errors.confirmPassword.message}
+          </span>
+        )}
+      </div>
+
+      {/* Submit */}
+      <div className="pt-md">
+        <Button
+          type="submit"
+          disabled={signupLoading}
+          className="w-full py-4 tracking-[0.2em]"
+        >
+          {signupLoading ? 'Preparing your experience...' : 'Begin your journey'}
+        </Button>
+        <p className="mt-md text-center text-[13px] italic text-warm-gray/70">
+          Curated pieces. Soft elegance. Delivered with care.
+        </p>
+      </div>
     </form>
   );
 }

@@ -4,8 +4,7 @@ interface SignupPayload {
   userName: string;
   email: string;
   password: string;
-  birthDate: string;
-  phoneNumber: string;
+  phoneNumber?: string;
 }
 
 const signupAPI = async (data: SignupPayload) => {

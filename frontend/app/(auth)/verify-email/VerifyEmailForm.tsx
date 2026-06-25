@@ -1,66 +1,95 @@
-"use client";
+'use client';
 
-import { useForm } from "react-hook-form";
-import { useRouter, useSearchParams } from "next/navigation";
-import TextInput from "@/components/inputs/TextInput";
-import { showToast } from "@/lib/toast";
-import { useDispatch, useSelector } from "react-redux";
-import { verifyEmailThunk } from "@/store/authThunk";
-import { AppDispatch, RootState } from "@/store/store";
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useDispatch, useSelector } from 'react-redux';
+import InputField from '@/components/InputField';
+import Button from '@/components/Button';
+import { AppDispatch, RootState } from '@/store/store';
+import { verifyEmailThunk, sendOtpThunk } from '@/store/authThunk';
+import { showToast } from '@/lib/toast';
 
 interface FormData {
   code: string;
-  email: string | null;
 }
 
 export default function VerifyEmailForm() {
   const dispatch = useDispatch<AppDispatch>();
-  const email = useSearchParams().get("email");
-  const { register, handleSubmit, formState: { errors } } = useForm<FormData>({ mode: "onTouched" });
   const router = useRouter();
+  const email = useSearchParams().get('email');
   const { verifyEmailLoading } = useSelector((state: RootState) => state.auth);
+  const [resending, setResending] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors },
+  } = useForm<FormData>({ mode: 'onTouched' });
 
   const onSubmit = async (data: FormData) => {
-    data = { ...data, email: email };
+    if (!email) {
+      setError('code', { message: 'Missing email. Please sign up again.' });
+      return;
+    }
     try {
-      await dispatch(verifyEmailThunk(data)).unwrap();
-      showToast.info("Verify email is sucessfull! Please enter usename and password to login!");
-      router.push("/login");
-    } catch (err) {
-      showToast.error(err as string);
+      await dispatch(verifyEmailThunk({ code: data.code, email })).unwrap();
+      showToast.success('Email verified! You can now log in.');
+      router.push('/login');
+    } catch {
+      setError('code', { message: 'Invalid or expired code. Please try again.' });
+    }
+  };
+
+  const handleResend = async () => {
+    if (!email) return;
+    setResending(true);
+    try {
+      await dispatch(sendOtpThunk({ email })).unwrap();
+      showToast.success('Code resent. Check your inbox.');
+    } catch {
+      showToast.error('Failed to resend code. Please try again.');
+    } finally {
+      setResending(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <div className="">
-        <p className="text-center text-sm text-red-500 mb-3">
-          Please check your email <span className="font-bold">{email}</span> for the verification code.
+    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-sm">
+      {email && (
+        <p className="text-body-md text-warm-gray text-center">
+          We sent a 6-digit code to{' '}
+          <span className="text-brown font-semibold">{email}</span>
         </p>
-        <TextInput
-          placeholder="Code..."
-          type="text"
-          name="code"
-          register={register}
-          required="Please enter the code"
-          error={errors.code?.message}
-        />
-      </div>
-      <div className="flex justify-between">
-        <button
-          type="submit"
-          disabled={verifyEmailLoading}
-          className="w-50 mr-2 bg-green-600 hover:bg-green-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold py-2 px-4 rounded"
-        >
-          {verifyEmailLoading ? "Loading..." : "Verify"}
-        </button>
+      )}
+      <InputField
+        {...register('code', {
+          required: 'Please enter the verification code',
+          pattern: { value: /^\d{6}$/, message: 'Code must be 6 digits' },
+        })}
+        label="Verification Code"
+        type="text"
+        placeholder="123456"
+        inputMode="numeric"
+        maxLength={6}
+        error={errors.code?.message}
+      />
+      <Button type="submit" disabled={verifyEmailLoading} className="w-full">
+        {verifyEmailLoading ? 'Verifying...' : 'Verify Email'}
+      </Button>
+      <div className="flex items-center justify-between">
         <button
           type="button"
-          className="w-full sm:w-1/2 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-          onClick={() => router.push("/login")}
+          onClick={handleResend}
+          disabled={resending}
+          className="text-body-md text-warm-gray hover:text-brown underline transition-colors duration-300 disabled:opacity-50"
         >
-          Cancel
+          {resending ? 'Resending...' : 'Resend code'}
         </button>
+        <Button variant="secondary" type="button" onClick={() => router.push('/login')}>
+          Cancel
+        </Button>
       </div>
     </form>
   );
