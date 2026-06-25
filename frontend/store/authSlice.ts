@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { signupThunk, loginThunk, verifyEmailThunk, fetchMeThunk, logoutThunk, sendOtpThunk ,verifyOtpThunk,resetPasswordThunk} from "./authThunk";
+import { signupThunk, loginThunk, verifyEmailThunk, fetchMeThunk, logoutThunk } from "./authThunk";
 
 interface User{
   id: number;
@@ -15,6 +15,7 @@ interface AuthState {
   meLoading: boolean;
   user: User | null;
   isAuthenticated: boolean;
+  authChecked: boolean;
   sendOtpLoading: boolean;
   verifyOtpLoading: boolean;
   resetPasswordLoading: boolean;
@@ -27,6 +28,7 @@ const initialState: AuthState = {
   meLoading: false,
   user: null,
   isAuthenticated: false,
+  authChecked: false,
   sendOtpLoading: false,
   verifyOtpLoading: false,
   resetPasswordLoading: false,
@@ -82,6 +84,29 @@ const authSlice = createSlice({
       })
       .addCase(verifyEmailThunk.rejected, (state) => {
         state.verifyEmailLoading = false;
+      })
+
+      // FETCH ME (session hydration)
+      .addCase(fetchMeThunk.pending, (state) => {
+        state.meLoading = true;
+      })
+      .addCase(fetchMeThunk.fulfilled, (state, action) => {
+        state.meLoading = false;
+        state.isAuthenticated = true;
+        state.user = action.payload;
+        state.authChecked = true;
+      })
+      .addCase(fetchMeThunk.rejected, (state) => {
+        state.meLoading = false;
+        state.isAuthenticated = false;
+        state.user = null;
+        state.authChecked = true;
+      })
+
+      // LOGOUT
+      .addCase(logoutThunk.fulfilled, (state) => {
+        state.isAuthenticated = false;
+        state.user = null;
       });
   },
 });

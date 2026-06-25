@@ -29,7 +29,7 @@ export default function Header() {
   const handleLogout = async () => {
     setIsOpen(false);
     await dispatch(logoutThunk());
-    router.replace("/login");
+    router.replace("/");
   };
 
   useEffect(() => {

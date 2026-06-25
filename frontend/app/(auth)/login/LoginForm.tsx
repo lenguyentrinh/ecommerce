@@ -1,10 +1,12 @@
 "use client";
 
 import { useForm } from "react-hook-form";
-import TextInput from "@/components/inputs/TextInput";
 import { useDispatch, useSelector } from "react-redux";
+import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
+import InputField from "@/components/InputField";
+import Button from "@/components/Button";
 import { AppDispatch, RootState } from "@/store/store";
-import { useRouter } from "next/navigation";
 import { loginThunk } from "@/store/authThunk";
 import { showToast } from "@/lib/toast";
 
@@ -16,73 +18,68 @@ type FormData = {
 export default function LoginForm() {
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
+  const returnParam = useSearchParams().get("return");
+  const safeReturn =
+    returnParam && returnParam.startsWith("/") ? returnParam : "/";
   const { loginLoading } = useSelector((state: RootState) => state.auth);
 
   const {
     register,
     handleSubmit,
+    setError,
+    resetField,
     formState: { errors },
-  } = useForm<FormData>({mode: "onTouched"});
+  } = useForm<FormData>({ mode: "onTouched" });
 
   const onSubmit = async (data: FormData) => {
     try {
-      const result = await dispatch(loginThunk(data)).unwrap();
-      showToast.success(result?.message || "Login successful");
-      router.push("/");
+      await dispatch(loginThunk(data)).unwrap();
+      showToast.success("Welcome back!");
+      router.push(safeReturn);
     } catch (err) {
-      // err is the value from rejectWithValue in the thunk (already a string message)
-      showToast.error(err as string);
+      // err is the rejectWithValue string from the thunk
+      resetField("password");
+      const message =
+        err === "Email not verified"
+          ? "Please verify your email first."
+          : "Invalid email or password.";
+      setError("password", { message });
     }
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <TextInput
-        placeholder="Email..."
+    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-sm" noValidate>
+      <InputField
+        {...register("email", {
+          required: "Email is required",
+          pattern: {
+            value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+            message: "Invalid email format",
+          },
+        })}
+        label="Email"
         type="email"
-        name="email"
-        register={register}
-        required="Please enter your email"
+        placeholder="you@example.com"
         error={errors.email?.message}
-        validate={(value) => {
-          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-          if (!emailRegex.test(value)) {
-            return "Invalid email format";
-          }
-          return true;
-        }}
       />
-      <TextInput
-        placeholder="Password..."
+      <InputField
+        {...register("password", { required: "Password is required" })}
+        label="Password"
         type="password"
-        name="password"
-        register={register}
-        required="Please enter your password"
+        placeholder="Your password"
         error={errors.password?.message}
-        validate={(value)=>{
-          if(value.length < 6){
-            return "Password must be at least 6 characters";
-          }
-          if(!/[A-Z]/.test(value)){
-            return "Password must contain at least 1 uppercase letter";
-          }
-          return true;
-        }}
       />
-      <div className="text-right mt-1">
-        <a href="/forgotPassword" className="text-gray-500 hover:text-gray-700">
-          Forgot password?
-        </a>
-      </div>
-      <div className="flex justify-center">
-        <button
-          type="submit"
-          disabled={loginLoading}
-          className="w-full bg-green-600 hover:bg-green-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold py-2 px-4 rounded"
+      <div className="text-right">
+        <Link
+          href="/forgotPassword"
+          className="text-body-md text-warm-gray hover:text-brown underline transition-colors duration-300"
         >
-          {loginLoading ? "Loading..." : "Login"}
-        </button>
+          Forgot password?
+        </Link>
       </div>
+      <Button type="submit" disabled={loginLoading} className="w-full mt-xs">
+        {loginLoading ? "Signing in..." : "Sign In"}
+      </Button>
     </form>
   );
 }
