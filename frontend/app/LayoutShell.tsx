@@ -1,4 +1,4 @@
-import Footer from "@/components/layout/Footer";
+import ConditionalFooter from "./ConditionalFooter";
 import Header from "@/components/layout/Header";
 
 // Header and Footer wrap every page. The shell is a flex column so the
@@ -14,7 +14,7 @@ export default function LayoutShell({
     <div className="flex min-h-screen flex-col bg-ivory">
       <Header />
       <main className="flex flex-1 flex-col">{children}</main>
-      <Footer />
+      <ConditionalFooter />
     </div>
   );
 }

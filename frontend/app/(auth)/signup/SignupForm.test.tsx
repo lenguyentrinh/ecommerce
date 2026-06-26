@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useDispatch, useSelector } from 'react-redux';
@@ -49,7 +48,7 @@ describe('SignupForm', () => {
     expect(screen.getByPlaceholderText('you@example.com')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('Min. 8 characters')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('Repeat password')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('+1 234 567 8900')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('+1 (555) 000-0000')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /begin your journey/i })).toBeInTheDocument();
   });
 

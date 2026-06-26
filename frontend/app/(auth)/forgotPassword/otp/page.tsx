@@ -1,12 +1,31 @@
+import { Suspense } from "react";
+import Link from "next/link";
+import AuthShell from "../../AuthShell";
 import OtpForm from "./otpForm";
 
-export default function otp() {
+export default function OtpPage() {
   return (
-    <div className="bg-login flex flex-1 items-center justify-center p-4 sm:p-6">
-      <div className="bg-white p-5 sm:p-8 rounded shadow-md w-full md:w-1/2 lg:w-1/4">
-              <h1 className="font-semibold  text-center mb-3">Enter Verification Code</h1>
-              < OtpForm/>
-            </div>
-    </div>
+    <AuthShell
+      title="Enter verification code"
+      footer={
+        <>
+          Entered the wrong email?{" "}
+          <Link
+            href="/forgotPassword"
+            className="border-b border-transparent font-semibold text-clay transition-all hover:border-clay hover:text-brown"
+          >
+            Start over
+          </Link>
+        </>
+      }
+    >
+      <Suspense
+        fallback={
+          <div className="text-center text-body-md text-warm-gray">Loading...</div>
+        }
+      >
+        <OtpForm />
+      </Suspense>
+    </AuthShell>
   );
 }
