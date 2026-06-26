@@ -4,7 +4,7 @@
 baseline_commit: c773f93
 ---
 
-Status: review
+Status: done
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -420,3 +420,18 @@ claude-opus-4-8[1m]
 ### Change Log
 
 - 2026-06-25: Implemented Story 1.4 — Oren-styled login page/form, "Welcome back!" + return-URL redirect, AC3 inline 401 errors (clear password), fixed `authSlice` to handle session hydration (`fetchMeThunk`) and sign-out (`logoutThunk`) with new `authChecked` flag, added `useRequireAuth` guard hook, fixed Header sign-out redirect to `/`. 17 new tests (44 total, zero regressions).
+
+### Review Findings
+
+_Code review 2026-06-26 (adversarial: Blind Hunter, Edge Case Hunter, Acceptance Auditor). All 5 ACs verified satisfied by the Acceptance Auditor._
+
+- [x] [Review][Patch] Network/server errors mislabeled as "Invalid email or password." — FIXED: added a third branch so only `Invalid credentials` shows the credentials message; unknown rejections (network/timeout/5xx) now show "Something went wrong. Please try again." [`frontend/app/(auth)/login/LoginForm.tsx:42-53`] (+1 test)
+- [x] [Review][Patch] Open-redirect: `safeReturn` accepted protocol-relative `//evil.com` (and self-redirect `/login`) — FIXED: guard now rejects `//`, `/\`, and `/login` [`frontend/app/(auth)/login/LoginForm.tsx:22-31`] (+1 test)
+- [x] [Review][Defer] Login succeeds but `meAPI` fails → UI shows "Invalid email or password." despite a valid server session [`frontend/store/authThunk.ts`] — deferred, pre-existing (authThunk.ts out of scope for 1.4, not in diff)
+- [x] [Review][Defer] Transient `fetchMeThunk` failure (network/500) redirects an already-logged-in user to /login [`frontend/store/authSlice.ts:99-104`] — deferred, acceptable MVP behavior (treat all `/me` failures as unauthenticated); refine when distinguishing 401 vs transient errors
+- [x] [Review][Defer] `useRequireAuth` return URL drops the query string (`usePathname()` only) [`frontend/hooks/useRequireAuth.ts:28`] — deferred, no protected page with query params exists yet (first consumer is /account in Story 1.5)
+- [x] [Review][Defer] `useRequireAuth` loading-state contract (render until `authChecked`) is not enforced — no consumer in this story [`frontend/hooks/useRequireAuth.ts`] — deferred, first consumer arrives in Story 1.5
+
+**Dismissed as noise (5):** `loginThunk.fulfilled` "not handled" (false positive — verified it sets `isAuthenticated`/`user` at `authSlice.ts:67-71`); login-form password-complexity validation removed (intentional — server authenticates); `<Suspense fallback={null}>` (correct Next.js `useSearchParams` pattern); `useRequireAuth` lacking a `hasRedirected` ref (`router.replace` is idempotent); `max-w-[28rem]` vs `max-w-md` (identical 448px).
+
+**Scope note:** the diff also includes layout/`Footer` changes (`LayoutShell.tsx`, Footer rebrand to "Oren", `min-h-screen`→`flex flex-1` sweep across auth pages) not named in any 1.4 task/AC — benign and on-brand, but flagged for awareness as scope expansion.

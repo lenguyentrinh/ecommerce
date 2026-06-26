@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-06-23
-last_updated: 2026-06-25
+last_updated: 2026-06-26
 project: ecommerce
 
 
@@ -49,7 +49,7 @@ development_status:
   1-1-oren-design-system-foundation: done
   1-2-user-role-extension-and-rate-limiting: done
   1-3-user-registration-and-email-verification-pages: done
-  1-4-user-login-and-frontend-auth-state: review
+  1-4-user-login-and-frontend-auth-state: done
   1-5-account-profile-and-shipping-address-management: ready-for-dev
   epic-1-retrospective: optional
 

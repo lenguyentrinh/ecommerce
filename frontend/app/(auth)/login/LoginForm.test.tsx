@@ -99,6 +99,39 @@ describe('LoginForm', () => {
     });
   });
 
+  it('ignores a protocol-relative return URL (open-redirect guard)', async () => {
+    mockReturnParam = '//evil.com';
+    mockUnwrap.mockResolvedValue({ message: 'Login successful' });
+    const user = userEvent.setup();
+    render(<LoginForm />);
+
+    await user.type(screen.getByPlaceholderText('you@example.com'), 'jane@example.com');
+    await user.type(screen.getByPlaceholderText('Your password'), 'Password1');
+    await user.click(screen.getByRole('button', { name: /sign in/i }));
+
+    await waitFor(() => {
+      expect(mockPush).toHaveBeenCalledWith('/');
+    });
+  });
+
+  it('shows a generic message inline on an unexpected (network/server) error', async () => {
+    mockUnwrap.mockRejectedValue('Login failed');
+    const user = userEvent.setup();
+    render(<LoginForm />);
+
+    await user.type(screen.getByPlaceholderText('you@example.com'), 'jane@example.com');
+    const passwordInput = screen.getByPlaceholderText('Your password') as HTMLInputElement;
+    await user.type(passwordInput, 'Password1');
+    await user.click(screen.getByRole('button', { name: /sign in/i }));
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong. Please try again.');
+    });
+    expect(passwordInput.value).toBe('');
+    expect(showToast.error).not.toHaveBeenCalled();
+    expect(mockPush).not.toHaveBeenCalled();
+  });
+
   it('shows "Invalid email or password." inline and clears password on Invalid credentials', async () => {
     mockUnwrap.mockRejectedValue('Invalid credentials');
     const user = userEvent.setup();

@@ -19,8 +19,16 @@ export default function LoginForm() {
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
   const returnParam = useSearchParams().get("return");
-  const safeReturn =
-    returnParam && returnParam.startsWith("/") ? returnParam : "/";
+  // Only allow same-origin, single-slash paths. Reject protocol-relative
+  // (`//evil.com`), backslash (`/\evil.com`) and self-redirects to `/login`.
+  const isSafeReturn =
+    !!returnParam &&
+    returnParam.startsWith("/") &&
+    !returnParam.startsWith("//") &&
+    !returnParam.startsWith("/\\") &&
+    returnParam !== "/login" &&
+    !returnParam.startsWith("/login?");
+  const safeReturn = isSafeReturn ? returnParam : "/";
   const { loginLoading } = useSelector((state: RootState) => state.auth);
 
   const {
@@ -39,10 +47,15 @@ export default function LoginForm() {
     } catch (err) {
       // err is the rejectWithValue string from the thunk
       resetField("password");
-      const message =
-        err === "Email not verified"
-          ? "Please verify your email first."
-          : "Invalid email or password.";
+      let message: string;
+      if (err === "Email not verified") {
+        message = "Please verify your email first.";
+      } else if (err === "Invalid credentials") {
+        message = "Invalid email or password.";
+      } else {
+        // network failure, timeout, 5xx, or any unexpected rejection
+        message = "Something went wrong. Please try again.";
+      }
       setError("password", { message });
     }
   };
