@@ -25,6 +25,7 @@ interface MeResponse {
   id: number;
   email: string;
   userName: string;
+  phoneNumber: string | null;
   role: string;
 }
 

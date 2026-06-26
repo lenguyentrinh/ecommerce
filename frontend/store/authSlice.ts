@@ -1,10 +1,11 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { signupThunk, loginThunk, verifyEmailThunk, fetchMeThunk, logoutThunk } from "./authThunk";
+import { signupThunk, loginThunk, verifyEmailThunk, fetchMeThunk, logoutThunk, updateProfileThunk } from "./authThunk";
 
 interface User{
   id: number;
   email: string;
   userName: string;
+  phoneNumber: string | null;
   role: string;
 }
 
@@ -101,6 +102,11 @@ const authSlice = createSlice({
         state.isAuthenticated = false;
         state.user = null;
         state.authChecked = true;
+      })
+
+      // UPDATE PROFILE (refresh the displayed user + Header name)
+      .addCase(updateProfileThunk.fulfilled, (state, action) => {
+        state.user = action.payload;
       })
 
       // LOGOUT
