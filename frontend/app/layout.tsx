@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import Footer from "@/components/layout/Footer";
-import Header from "@/components/layout/Header";
+import LayoutShell from "./LayoutShell";
 import Providers from "./providers";
 import "./globals.css";
 
@@ -35,11 +34,7 @@ export default function RootLayout({
     <html lang="en" className={nunito.variable}>
       <body className={`${nunito.variable} ${geistMono.variable} antialiased font-sans`}>
         <Providers>
-          <div className="min-h-screen bg-ivory">
-            <Header />
-            {children}
-            <Footer />
-          </div>
+          <LayoutShell>{children}</LayoutShell>
         </Providers>
       </body>
     </html>
