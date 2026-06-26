@@ -20,6 +20,16 @@ const geistMono = localFont({
   display: "swap",
 });
 
+// Editorial serif for brand wordmarks (e.g. the "Oren" auth anchor).
+// Self-hosted for the same proxy reason as Nunito above.
+const playfair = localFont({
+  src: "./fonts/PlayfairDisplay-Italic-variable.ttf",
+  variable: "--font-playfair",
+  weight: "400 900",
+  style: "italic",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: 'Oren',
   description: "Premium women's fashion",
@@ -32,7 +42,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={nunito.variable}>
-      <body className={`${nunito.variable} ${geistMono.variable} antialiased font-sans`}>
+      <body className={`${nunito.variable} ${geistMono.variable} ${playfair.variable} antialiased font-sans`}>
         <Providers>
           <LayoutShell>{children}</LayoutShell>
         </Providers>

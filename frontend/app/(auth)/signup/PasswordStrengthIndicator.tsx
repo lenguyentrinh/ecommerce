@@ -45,7 +45,7 @@ export default function PasswordStrengthIndicator({ password }: { password: stri
       </div>
       <p
         className="mt-1 text-[11px] uppercase tracking-wider"
-        style={{ color: strength === 'empty' ? 'rgba(120, 119, 112, 0.5)' : color }}
+        style={{ color: strength === 'empty' ? 'rgba(96, 95, 87, 0.5)' : color }}
       >
         {LABELS[strength]}
       </p>

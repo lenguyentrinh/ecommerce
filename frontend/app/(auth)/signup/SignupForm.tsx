@@ -4,8 +4,8 @@ import { useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/navigation';
-import { FiEye, FiEyeOff } from 'react-icons/fi';
-import Button from '@/components/Button';
+import { FiEye, FiEyeOff, FiArrowRight } from 'react-icons/fi';
+import InputField from '@/components/InputField';
 import PasswordStrengthIndicator from './PasswordStrengthIndicator';
 import { AppDispatch, RootState } from '@/store/store';
 import { signupThunk } from '@/store/authThunk';
@@ -19,11 +19,8 @@ type FormData = {
   phoneNumber: string;
 };
 
-const labelClass =
-  'text-[11px] font-semibold uppercase tracking-[0.15em] text-warm-gray/70';
-const inputClass =
-  'w-full h-[60px] rounded-[12px] bg-warm-beige/40 px-5 text-body-md text-brown placeholder:text-warm-gray/40 outline-none border border-transparent transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] focus:border-clay focus:shadow-[0_0_15px_rgba(231,198,193,0.7)]';
-const errorClass = 'text-[12px] text-error mt-1';
+const eyeToggleClass =
+  'absolute right-4 top-1/2 -translate-y-1/2 text-warm-gray/50 transition-colors hover:text-brown';
 
 export default function SignupForm() {
   const dispatch = useDispatch<AppDispatch>();
@@ -59,144 +56,127 @@ export default function SignupForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-lg" noValidate>
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-md" noValidate>
       {/* Full Name */}
-      <div className="flex flex-col gap-1">
-        <label htmlFor="userName" className={labelClass}>
-          Full Name
-        </label>
-        <input
-          id="userName"
-          type="text"
-          placeholder="Jane Doe"
-          className={inputClass}
-          {...register('userName', { required: 'Full name is required' })}
-        />
-        {errors.userName && (
-          <span role="alert" className={errorClass}>
-            {errors.userName.message}
-          </span>
-        )}
-      </div>
+      <InputField
+        id="userName"
+        variant="glass"
+        label="Full Name"
+        type="text"
+        placeholder="Jane Doe"
+        error={errors.userName?.message}
+        {...register('userName', { required: 'Full name is required' })}
+      />
 
       {/* Email Address */}
-      <div className="flex flex-col gap-1">
-        <label htmlFor="email" className={labelClass}>
-          Email Address
-        </label>
-        <input
-          id="email"
-          type="email"
-          placeholder="you@example.com"
-          className={inputClass}
-          {...register('email', {
-            required: 'Email is required',
-            pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: 'Invalid email format' },
+      <InputField
+        id="email"
+        variant="glass"
+        label="Email Address"
+        type="email"
+        placeholder="you@example.com"
+        error={errors.email?.message}
+        {...register('email', {
+          required: 'Email is required',
+          pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: 'Invalid email format' },
+        })}
+      />
+
+      {/* Password + Confirm (two columns) */}
+      <div className="grid grid-cols-1 gap-md md:grid-cols-2">
+        <InputField
+          id="password"
+          variant="glass"
+          label="Password"
+          type={showPassword ? 'text' : 'password'}
+          placeholder="Min. 8 characters"
+          error={errors.password?.message}
+          trailing={
+            <button
+              type="button"
+              onClick={() => setShowPassword((v) => !v)}
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+              className={eyeToggleClass}
+            >
+              {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
+            </button>
+          }
+          {...register('password', {
+            required: 'Password is required',
+            minLength: { value: 8, message: 'Password must be at least 8 characters' },
           })}
         />
-        {errors.email && (
-          <span role="alert" className={errorClass}>
-            {errors.email.message}
-          </span>
-        )}
+
+        <InputField
+          id="confirmPassword"
+          variant="glass"
+          label="Confirm"
+          type={showConfirm ? 'text' : 'password'}
+          placeholder="Repeat password"
+          error={errors.confirmPassword?.message}
+          trailing={
+            <button
+              type="button"
+              onClick={() => setShowConfirm((v) => !v)}
+              aria-label={showConfirm ? 'Hide password' : 'Show password'}
+              className={eyeToggleClass}
+            >
+              {showConfirm ? <FiEyeOff size={20} /> : <FiEye size={20} />}
+            </button>
+          }
+          {...register('confirmPassword', {
+            required: 'Please confirm your password',
+            validate: (v) => v === passwordWatch || 'Passwords do not match',
+          })}
+        />
+      </div>
+
+      {/* Password strength (full width, below the password row) */}
+      <div className="px-2">
+        <PasswordStrengthIndicator password={passwordWatch ?? ''} />
       </div>
 
       {/* Phone (Optional) */}
-      <div className="flex flex-col gap-1">
-        <label htmlFor="phoneNumber" className={labelClass}>
-          Phone (Optional)
-        </label>
-        <input
-          id="phoneNumber"
-          type="tel"
-          placeholder="+1 234 567 8900"
-          className={inputClass}
-          {...register('phoneNumber')}
-        />
-        {errors.phoneNumber && (
-          <span role="alert" className={errorClass}>
-            {errors.phoneNumber.message}
-          </span>
-        )}
-      </div>
+      <InputField
+        id="phoneNumber"
+        variant="glass"
+        label={
+          <>
+            Phone Number{' '}
+            <span className="font-normal normal-case italic opacity-40">(Optional)</span>
+          </>
+        }
+        type="tel"
+        placeholder="+1 (555) 000-0000"
+        error={errors.phoneNumber?.message}
+        {...register('phoneNumber')}
+      />
 
-      {/* Your secret key (Password) */}
-      <div className="flex flex-col gap-1">
-        <label htmlFor="password" className={labelClass}>
-          Your secret key
-        </label>
-        <div className="relative">
-          <input
-            id="password"
-            type={showPassword ? 'text' : 'password'}
-            placeholder="Min. 8 characters"
-            className={`${inputClass} pr-12`}
-            {...register('password', {
-              required: 'Password is required',
-              minLength: { value: 8, message: 'Password must be at least 8 characters' },
-            })}
-          />
-          <button
-            type="button"
-            onClick={() => setShowPassword((v) => !v)}
-            aria-label={showPassword ? 'Hide password' : 'Show password'}
-            className="absolute right-md top-1/2 -translate-y-1/2 text-warm-gray/50 transition-colors hover:text-brown"
-          >
-            {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
-          </button>
-        </div>
-        {/* Password Strength Indicator */}
-        <PasswordStrengthIndicator password={passwordWatch ?? ''} />
-        {errors.password && (
-          <span role="alert" className={errorClass}>
-            {errors.password.message}
-          </span>
-        )}
-      </div>
-
-      {/* Confirm Password */}
-      <div className="flex flex-col gap-1">
-        <label htmlFor="confirmPassword" className={labelClass}>
-          Confirm Password
-        </label>
-        <div className="relative">
-          <input
-            id="confirmPassword"
-            type={showConfirm ? 'text' : 'password'}
-            placeholder="Repeat password"
-            className={`${inputClass} pr-12`}
-            {...register('confirmPassword', {
-              required: 'Please confirm your password',
-              validate: (v) => v === passwordWatch || 'Passwords do not match',
-            })}
-          />
-          <button
-            type="button"
-            onClick={() => setShowConfirm((v) => !v)}
-            aria-label={showConfirm ? 'Hide password' : 'Show password'}
-            className="absolute right-md top-1/2 -translate-y-1/2 text-warm-gray/50 transition-colors hover:text-brown"
-          >
-            {showConfirm ? <FiEyeOff size={20} /> : <FiEye size={20} />}
-          </button>
-        </div>
-        {errors.confirmPassword && (
-          <span role="alert" className={errorClass}>
-            {errors.confirmPassword.message}
-          </span>
-        )}
-      </div>
-
-      {/* Submit */}
-      <div className="pt-md">
-        <Button
+      {/* CTA */}
+      <div className="pt-4">
+        <button
           type="submit"
           disabled={signupLoading}
-          className="w-full py-4 tracking-[0.2em]"
+          className="btn-vivid group flex w-full items-center justify-center gap-sm rounded-full py-4 text-headline-md text-white transition-all duration-300 hover:scale-[1.01] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {signupLoading ? 'Preparing your experience...' : 'Begin your journey'}
-        </Button>
-        <p className="mt-md text-center text-[13px] italic text-warm-gray/70">
-          Curated pieces. Soft elegance. Delivered with care.
+          {signupLoading ? 'Preparing your experience...' : 'Begin Your Journey'}
+          {!signupLoading && (
+            <FiArrowRight
+              size={22}
+              className="transition-transform duration-500 group-hover:translate-x-2"
+            />
+          )}
+        </button>
+        <p className="pt-2 text-center text-[11px] text-warm-gray/50">
+          By joining, you agree to our{' '}
+          <a href="#" className="underline transition-colors hover:text-brown">
+            Ethics
+          </a>{' '}
+          &amp;{' '}
+          <a href="#" className="underline transition-colors hover:text-brown">
+            Privacy
+          </a>
+          .
         </p>
       </div>
     </form>
