@@ -35,8 +35,6 @@ const addresses = [
     lastName: 'Vance',
     street: '1 Editorial Lane',
     city: 'Milano',
-    postalCode: '20100',
-    country: 'Italy',
     isDefault: true,
   },
   {
@@ -45,8 +43,6 @@ const addresses = [
     lastName: 'Vance',
     street: '2 Archive Street',
     city: 'Roma',
-    postalCode: '00100',
-    country: 'Italy',
     isDefault: false,
   },
 ];

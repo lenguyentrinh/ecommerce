@@ -15,7 +15,7 @@ Status: ready-for-dev
 
 > ⚠️ **As-built reconciliation (2026-06-26).** The frontend half shipped and diverged from this original plan. The **split files are the reconciled source of truth** — read them, not the task breakdown below (which predates reconciliation):
 > - **frontend** file → status `review`, fully reconciled (two-column dashboard; address form reduced to `{ firstName, lastName, street, city }` + `isDefault`; edit + set-default added; max-2 add-card gate **not** implemented — open).
-> - **backend** file → reconciled to that contract (nullable `postal_code`/`country`, new `is_default` column, edit + set-default endpoints).
+> - **backend** file → built to that contract (new `is_default` column, edit + set-default endpoints). **`postal_code`/`country` removed entirely** (decision by Nguyen Trinh during dev, 2026-06-26) — account address is `{ firstName, lastName, street, city, isDefault }`.
 > - ✅ **Resolved 2026-06-26 (correct-course → Option B):** account form stays slim (no Postal Code / Country / State); checkout (Story 4.2) collects Postal Code, Country = fixed single-market constant, State dropped. Story 4.1's order address is snapshotted from the checkout form. See `sprint-change-proposal-2026-06-26-address-field-set.md` §6. (ACs + field-set Dev Note updated; detailed Tasks left as original breakdown.)
 
 ## Story

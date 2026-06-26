@@ -3,9 +3,11 @@ import {
   PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
+  OneToMany,
 } from 'typeorm';
 import { IsEmail, IsNotEmpty, MinLength } from 'class-validator';
 import { UserRole } from './user-role.enum';
+import { Address } from './address.entity';
 
 @Entity('users')
 export class User {
@@ -29,8 +31,8 @@ export class User {
   @Column({ nullable: true })
   birthDate!: string;
 
-  @Column({ nullable: true })
-  phoneNumber!: string;;
+  @Column({ type: 'varchar', nullable: true })
+  phoneNumber!: string | null;
 
   @Column({ type: 'enum', enum: UserRole, default: UserRole.CUSTOMER })
   role!: UserRole;
@@ -52,4 +54,7 @@ export class User {
 
   @CreateDateColumn({ type: 'timestamp' })
   createAt!: Date;
+
+  @OneToMany(() => Address, (address) => address.user)
+  addresses!: Address[];
 }

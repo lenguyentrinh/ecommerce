@@ -65,13 +65,13 @@ The backend split story implements these — call them **unprefixed** via the sh
 
 - `PATCH /users/profile` → body `{ userName?, phoneNumber? }` (NEVER send `email`) → returns sanitized user `{ id, userName, email, phoneNumber, role }`.
 - `GET /users/addresses` → returns `{ data: Address[] }` → read `res.data.data`.
-- `POST /users/addresses` → body `{ firstName, lastName, street, city, isDefault? }` → returns the created `Address`. *(Postal Code removed from the account form per the 2026-06-26 override — see Change Log; checkout collects it.)*
+- `POST /users/addresses` → body `{ firstName, lastName, street, city, isDefault? }` → returns the created `Address`. *(Postal Code & Country removed entirely from the account address — see Change Log; checkout collects Postal Code.)*
 - `PATCH /users/addresses/:id` → body same shape as POST → returns the updated `Address`. *(added — edit support)*
 - `PATCH /users/addresses/:id/default` → returns `{ data: Address[] }` (full list with the new default set). *(added — set-default)*
 - `DELETE /users/addresses/:id` → returns `{ message: 'Address removed' }`.
 - A 3rd address returns `409` with message `Maximum 2 addresses reached` — surface via `showToast.error`.
 
-**`Address` type (as built):** `{ id, firstName, lastName, street, city, postalCode?, country?, isDefault }`. The original contract's `fullName / line1 / state` were implemented as `firstName + lastName / street / (none)`; **Country and Postal Code were removed from the form** in the 2026-06-26 UI pass and are now optional on the type for backward-compatibility. `AddressPayload = Omit<Address, 'id' | 'isDefault'> & { isDefault? }`.
+**`Address` type (as built):** `{ id, firstName, lastName, street, city, isDefault }`. The original contract's `fullName / line1 / state` were implemented as `firstName + lastName / street / (none)`. **`postalCode` and `country` were removed entirely** (decision by Nguyen Trinh during the backend-dev session, 2026-06-26) — dropped from the `Address` type, the `AddressPreview` card display, and the test fixtures (not just from the form). `AddressPayload = Omit<Address, 'id' | 'isDefault'> & { isDefault? }`.
 
 > ✅ **Resolved 2026-06-26 (correct-course → Option B, then same-day override):** the account form stays `{ firstName, lastName, street, city }` + `isDefault` — Postal Code/Country/State are **not** collected here. Checkout (Epic 4 / Story 4.2) owns Postal Code; Country is a fixed single-market constant. Backend keeps `postal_code`/`country` nullable. See `planning-artifacts/sprint-change-proposal-2026-06-26-address-field-set.md` §6.
 
@@ -286,6 +286,7 @@ claude-opus-4-8[1m] (Felix — frontend dev agent)
 
 ### Change Log
 
+- 2026-06-26 — **`postalCode`/`country` removed end-to-end** (decision by Nguyen Trinh during the backend-dev session). Dropped from `frontend/services/usersAPI.ts` `Address` type, the `AddressPreview` card display, and `AddressPreview.test.tsx` fixtures (backend entity/migration/DTO/service updated in the backend story). Account address is now `{ firstName, lastName, street, city, isDefault }`. Full frontend suite re-run: 14 suites / 64 tests green.
 - 2026-06-26 — Implemented Story 1.5 frontend half (Tasks 6–11): `/account` page with Profile + Shipping Address + Order History sections, `usersAPI` service, `updateProfileThunk`, zod `accountSchemas`, Header repoint, my-account removal. 9 new tests; full suite 55/55 green. Status → review (backend half pending).
 - 2026-06-26 — **As-built reconciliation** of this story file to the shipped implementation. Deviations from the original spec:
   - **AC1:** single-column "three cards" → two-column Stitch settings dashboard (sidebar rail in `app/account/layout.tsx` + `AccountWelcome` + `ProfileSection` ‖ `AccountAside` + `AddressPreview`). Auth gate moved from page into layout. Order History card dropped.

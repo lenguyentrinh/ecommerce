@@ -105,10 +105,7 @@ export default function AddressPreview() {
               </p>
               <address className="mt-xs space-y-0.5 not-italic text-[14px] leading-tight text-warm-gray">
                 <span className="block">{a.street}</span>
-                <span className="block">
-                  {[a.postalCode, a.city].filter(Boolean).join(' ')}
-                </span>
-                {a.country && <span className="block">{a.country}</span>}
+                <span className="block">{a.city}</span>
               </address>
             </div>
 
