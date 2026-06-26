@@ -1,44 +1,79 @@
 import Link from "next/link";
 
-const footerLinks = [
-  { label: "Home", href: "/" },
-  { label: "Product", href: "/product" },
-  { label: "About Me", href: "/about-me" },
+const columns = [
+  {
+    heading: "Shop",
+    links: [
+      { label: "Home", href: "/" },
+      { label: "Products", href: "/product" },
+      { label: "About", href: "/about-me" },
+    ],
+  },
+  {
+    heading: "Support",
+    links: [
+      { label: "Contact", href: "mailto:support@oren.store" },
+      { label: "Shipping", href: "#" },
+      { label: "Returns", href: "#" },
+    ],
+  },
+  {
+    heading: "Legal",
+    links: [
+      { label: "Privacy", href: "#" },
+      { label: "Terms", href: "#" },
+    ],
+  },
+  {
+    heading: "Follow",
+    links: [
+      { label: "Instagram", href: "#" },
+      { label: "Pinterest", href: "#" },
+    ],
+  },
 ];
 
 export default function Footer() {
   return (
-    <footer className="mt-xl border-t border-hairline bg-surface">
-      <div className="mx-auto flex max-w-6xl flex-col gap-md px-4 py-lg md:flex-row md:items-start md:justify-between">
-        <div className="flex flex-col gap-xs">
-          <Link
-            href="/"
-            className="text-headline-md text-brown tracking-[0.04em]"
-          >
-            Oren
-          </Link>
-          <p className="text-body-md text-warm-gray">
-            Premium women&apos;s fashion.
-          </p>
+    <footer className="bg-brown text-ivory">
+      <div className="mx-auto max-w-[1280px] px-md py-xl md:px-lg">
+        <div className="flex flex-col gap-xl md:flex-row md:justify-between">
+          {/* Brand */}
+          <div className="flex max-w-[320px] flex-col gap-md">
+            <Link href="/" className="text-display-lg tracking-tight text-ivory">
+              Oren
+            </Link>
+            <p className="text-body-md leading-relaxed text-ivory/60">
+              A destination for curated aesthetics and timeless editorial vision. Elevating the
+              everyday through intentional design.
+            </p>
+          </div>
+
+          {/* Link columns */}
+          <div className="grid grid-cols-2 gap-lg md:grid-cols-4 md:gap-xl">
+            {columns.map((col) => (
+              <nav key={col.heading} className="flex flex-col gap-sm">
+                <span className="text-label-sm uppercase tracking-widest text-ivory/40">
+                  {col.heading}
+                </span>
+                {col.links.map((link) => (
+                  <Link
+                    key={link.label}
+                    href={link.href}
+                    className="text-body-md text-ivory/80 transition-colors duration-300 hover:text-ivory"
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </nav>
+            ))}
+          </div>
         </div>
 
-        <nav className="flex flex-col gap-xs md:items-end">
-          {footerLinks.map((item) => (
-            <Link
-              key={item.label}
-              href={item.href}
-              className="text-body-md text-warm-gray transition-colors duration-300 hover:text-brown"
-            >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
-      </div>
-
-      <div className="border-t border-hairline">
-        <div className="mx-auto flex max-w-6xl flex-col gap-xs px-4 py-sm text-label-sm text-warm-gray md:flex-row md:items-center md:justify-between">
-          <p>© {new Date().getFullYear()} Oren. All rights reserved.</p>
-          <p>Contact: support@oren.store</p>
+        <div className="mt-xl border-t border-ivory/10 pt-lg">
+          <p className="text-label-sm uppercase tracking-[0.18em] text-ivory/50">
+            © {new Date().getFullYear()} Oren. All rights reserved.
+          </p>
         </div>
       </div>
     </footer>

@@ -1,6 +1,6 @@
 import React from 'react';
 
-type Variant = 'default' | 'glass';
+type Variant = 'default' | 'glass' | 'luxury' | 'editorial';
 
 interface InputFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: React.ReactNode;
@@ -29,6 +29,23 @@ const STYLES: Record<Variant, { wrapper: string; label: string; input: string; e
     input:
       'input-glass w-full rounded-2xl border border-transparent px-5 py-4 text-body-md text-brown placeholder:text-warm-gray/40 outline-none',
     error: 'ml-2 mt-1 block text-[12px] text-error-strong',
+  },
+  // Frosted "sand" treatment for the account settings screen (Stitch .input-luxury).
+  luxury: {
+    wrapper: 'flex flex-col gap-1',
+    label:
+      'text-label-sm uppercase tracking-[0.08em] text-warm-gray block',
+    input:
+      'input-luxury w-full rounded-xl px-4 py-2.5 text-body-md text-brown placeholder:text-warm-gray/50 outline-none',
+    error: 'text-label-sm text-error-strong',
+  },
+  // Underline editorial treatment (Stitch "Multi-Tone Pastel" account screens).
+  editorial: {
+    wrapper: 'flex flex-col gap-xs',
+    label: 'text-[10px] font-bold uppercase tracking-[0.2em] text-brown',
+    input:
+      'w-full border-0 border-b-2 border-brown/20 bg-transparent py-2 text-body-md font-bold text-brown outline-none transition-colors focus:border-brown placeholder:font-normal placeholder:text-warm-gray/50',
+    error: 'text-[12px] text-error-strong',
   },
 };
 

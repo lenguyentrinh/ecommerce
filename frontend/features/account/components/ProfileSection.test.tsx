@@ -42,7 +42,7 @@ describe('ProfileSection', () => {
 
   it('renders the email as read-only and never editable (AC2)', () => {
     render(<ProfileSection />);
-    const email = screen.getByLabelText('Email') as HTMLInputElement;
+    const email = screen.getByLabelText('Email Address') as HTMLInputElement;
     expect(email).toHaveValue('jane@example.com');
     expect(email).toBeDisabled();
   });

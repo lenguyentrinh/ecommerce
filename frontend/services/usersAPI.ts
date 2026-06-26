@@ -9,15 +9,16 @@ interface ProfilePayload {
 
 interface Address {
   id: number;
-  fullName: string;
-  line1: string;
+  firstName: string;
+  lastName: string;
+  street: string;
   city: string;
-  state: string;
   postalCode: string;
   country: string;
+  isDefault: boolean;
 }
 
-type AddressPayload = Omit<Address, "id">;
+type AddressPayload = Omit<Address, "id" | "isDefault"> & { isDefault?: boolean };
 
 interface ActionResponse {
   message: string;
@@ -42,11 +43,30 @@ const createAddressAPI = async (data: AddressPayload) => {
   return res.data as Address;
 };
 
+// PATCH /users/addresses/:id → the updated Address.
+const editAddressAPI = async (id: number, data: AddressPayload) => {
+  const res = await api.patch("/users/addresses/" + id, data);
+  return res.data as Address;
+};
+
+// PATCH /users/addresses/:id/default → the full list with the new default set.
+const setDefaultAddressAPI = async (id: number) => {
+  const res = await api.patch("/users/addresses/" + id + "/default");
+  return res.data.data as Address[];
+};
+
 // DELETE /users/addresses/:id → { message }.
 const deleteAddressAPI = async (id: number) => {
   const res = await api.delete("/users/addresses/" + id);
   return res.data as ActionResponse;
 };
 
-export { updateProfileAPI, getAddressesAPI, createAddressAPI, deleteAddressAPI };
+export {
+  updateProfileAPI,
+  getAddressesAPI,
+  createAddressAPI,
+  editAddressAPI,
+  setDefaultAddressAPI,
+  deleteAddressAPI,
+};
 export type { ProfilePayload, Address, AddressPayload };

@@ -222,3 +222,95 @@ body::before {
   background: linear-gradient(135deg, #4a3f35 0%, #392f25 100%);
   box-shadow: 0 10px 20px -5px rgba(74, 63, 53, 0.3);
 }
+
+/* ── Account settings surfaces (Stitch "Account & Address") ───────────── */
+
+/* Deep, soft ambient float — the Stitch luxury-shadow */
+.luxury-shadow {
+  box-shadow: 0 20px 50px -12px rgba(74, 63, 53, 0.08);
+}
+
+/* Frosted settings card: translucent warm-white over ivory + subtle blur */
+.account-card {
+  background: rgba(255, 248, 244, 0.6);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(241, 223, 209, 0.5);
+  box-shadow: 0 20px 50px -12px rgba(74, 63, 53, 0.08);
+}
+
+/* Frosted "sand" input used on the account screen (Stitch .input-luxury) */
+.input-luxury {
+  background-color: #fdebdc;
+  border: 1px solid transparent;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.input-luxury:hover {
+  background-color: #f1dfd1;
+}
+.input-luxury:focus {
+  background-color: #fff8f4;
+  border-color: #c9b2a6;
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(201, 178, 166, 0.15);
+}
+
+/* Solid-fill fallback when the OS asks for reduced transparency */
+@media (prefers-reduced-transparency: reduce) {
+  .account-card {
+    background: #fff8f4;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+/* Calm entrance for the settings cards — motivated by content hierarchy */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes account-rise {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  .account-rise {
+    animation: account-rise 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+}
+
+/* ── Account "Multi-Tone Pastel" editorial screens (Stitch) ───────────── */
+
+/* Multi-tone pastel mesh — the canonical Stitch account background */
+.account-mesh {
+  background:
+    radial-gradient(at 0% 0%, #d8e2dc 0px, transparent 50%),
+    radial-gradient(at 50% 0%, #f8edeb 0px, transparent 50%),
+    radial-gradient(at 100% 0%, #fae1dd 0px, transparent 50%),
+    radial-gradient(at 0% 50%, #ded6ce 0px, transparent 50%),
+    radial-gradient(at 100% 50%, #fec5bb 0px, transparent 50%),
+    radial-gradient(at 50% 100%, #f5ebe0 0px, transparent 50%),
+    #f8edeb;
+}
+
+/* Frosted glass panel floating over the pastel mesh */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.soft-shadow {
+  box-shadow: 0 20px 40px rgba(74, 63, 53, 0.04);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .glass-panel {
+    background: #fff8f4;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}

@@ -4,15 +4,22 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useSelector, useDispatch } from 'react-redux';
 import InputField from '@/components/InputField';
-import Button from '@/components/Button';
 import { AppDispatch, RootState } from '@/store/store';
 import { updateProfileThunk } from '@/store/authThunk';
 import { showToast } from '@/lib/toast';
 import { profileSchema, type ProfileValues } from '@/lib/validation/accountSchemas';
 
+// The auth model stores a single `userName`; the Stitch profile form edits it
+// as First + Last name. Split on load, re-join on save (non-breaking).
+function splitName(name?: string | null) {
+  const parts = (name ?? '').trim().split(/\s+/).filter(Boolean);
+  return { firstName: parts[0] ?? '', lastName: parts.slice(1).join(' ') };
+}
+
 export default function ProfileSection() {
   const dispatch = useDispatch<AppDispatch>();
   const user = useSelector((state: RootState) => state.auth.user);
+  const { firstName, lastName } = splitName(user?.userName);
 
   const {
     register,
@@ -21,15 +28,13 @@ export default function ProfileSection() {
   } = useForm<ProfileValues>({
     mode: 'onTouched',
     resolver: zodResolver(profileSchema),
-    defaultValues: {
-      userName: user?.userName ?? '',
-      phoneNumber: user?.phoneNumber ?? '',
-    },
+    defaultValues: { firstName, lastName, phoneNumber: user?.phoneNumber ?? '' },
   });
 
   const onSubmit = async (data: ProfileValues) => {
+    const userName = [data.firstName, data.lastName].filter(Boolean).join(' ').trim();
     try {
-      await dispatch(updateProfileThunk(data)).unwrap();
+      await dispatch(updateProfileThunk({ userName, phoneNumber: data.phoneNumber })).unwrap();
       showToast.success('Profile updated');
     } catch (err) {
       showToast.error(err as string);
@@ -37,43 +42,67 @@ export default function ProfileSection() {
   };
 
   return (
-    <section className="bg-surface rounded-xl shadow-ambient p-md">
-      <h2 className="text-headline-md text-brown tracking-[0.03em] mb-md">Profile</h2>
+    <div className="account-rise mb-xl">
+      <header className="mb-xl">
+        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-brown">
+          Personal Details
+        </p>
+        <h1 className="mt-xs text-display-lg text-brown">Profile</h1>
+      </header>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-sm" noValidate>
-        <InputField
-          id="userName"
-          required
-          label="Name"
-          type="text"
-          placeholder="Jane Doe"
-          error={errors.userName?.message}
-          {...register('userName')}
-        />
+      <div className="glass-panel soft-shadow rounded-xl p-lg md:p-xl">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-lg" noValidate>
+          <div className="grid grid-cols-1 gap-lg md:grid-cols-2">
+            <InputField
+              id="firstName"
+              variant="editorial"
+              required
+              label="First Name"
+              type="text"
+              error={errors.firstName?.message}
+              {...register('firstName')}
+            />
+            <InputField
+              id="lastName"
+              variant="editorial"
+              label="Last Name"
+              type="text"
+              error={errors.lastName?.message}
+              {...register('lastName')}
+            />
+          </div>
 
-        {/* Email is immutable — read-only, never submitted */}
-        <InputField
-          id="email"
-          label="Email"
-          type="email"
-          value={user?.email ?? ''}
-          readOnly
-          disabled
-        />
+          {/* Email is immutable — read-only, never submitted */}
+          <InputField
+            id="email"
+            variant="editorial"
+            label="Email Address"
+            type="email"
+            value={user?.email ?? ''}
+            readOnly
+            disabled
+          />
 
-        <InputField
-          id="phoneNumber"
-          label="Phone Number"
-          type="tel"
-          placeholder="+1 (555) 000-0000"
-          error={errors.phoneNumber?.message}
-          {...register('phoneNumber')}
-        />
+          <InputField
+            id="phoneNumber"
+            variant="editorial"
+            label="Phone Number"
+            type="tel"
+            error={errors.phoneNumber?.message}
+            {...register('phoneNumber')}
+          />
 
-        <Button type="submit" disabled={isSubmitting} className="w-full mt-xs">
-          {isSubmitting ? 'Saving...' : 'Save Changes'}
-        </Button>
-      </form>
-    </section>
+          <div className="flex justify-end border-t border-brown/10 pt-xl">
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="rounded-full bg-brown px-xl py-md text-label-sm uppercase tracking-widest text-white shadow-lg transition-transform hover:scale-105 active:scale-[0.98] disabled:opacity-60"
+            >
+              {isSubmitting ? 'Saving...' : 'Save Changes'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   );
 }
