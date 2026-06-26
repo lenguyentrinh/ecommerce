@@ -4,7 +4,7 @@ import VerifyEmailForm from './VerifyEmailForm';
 
 export default function VerifyEmailPage() {
   return (
-    <div className="min-h-screen bg-ivory flex items-center justify-center p-sm">
+    <div className="flex flex-1 bg-ivory items-center justify-center p-sm">
       <div className="w-full md:w-1/2 lg:w-1/4 bg-ivory rounded-xl shadow-ambient p-md">
         <h1 className="text-headline-md text-brown text-center mb-md tracking-[0.03em]">
           Verify your email

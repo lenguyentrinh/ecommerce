@@ -2,8 +2,8 @@ import SignupForm from './SignupForm';
 
 export default function SignupPage() {
   return (
-    <div className="min-h-screen bg-ivory flex items-center justify-center p-sm">
-      <div className="w-full max-w-md bg-surface rounded-xl shadow-ambient p-md">
+    <div className="flex flex-1 bg-ivory items-center justify-center p-sm">
+      <div className="w-full max-w-[28rem] bg-surface rounded-xl shadow-ambient p-md">
         <h1 className="text-headline-md text-brown text-center mb-md tracking-[0.03em]">
           Create Account
         </h1>
