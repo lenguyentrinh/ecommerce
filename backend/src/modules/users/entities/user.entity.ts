@@ -3,7 +3,6 @@ import {
   PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
-  Unique,
 } from 'typeorm';
 import { IsEmail, IsNotEmpty, MinLength } from 'class-validator';
 import { UserRole } from './user-role.enum';
@@ -11,46 +10,46 @@ import { UserRole } from './user-role.enum';
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number;
 
   @Column()
   @IsNotEmpty({ message: 'User name should not be empty!' })
-  userName: string;
+  userName!: string;
 
   @Column({ unique: true })
   @IsNotEmpty({ message: 'Email should not be empty!' })
   @IsEmail({}, { message: 'Invalid email format' })
-  email: string;
+  email!: string;
 
   @Column()
   @IsNotEmpty({ message: 'Password should not be empty!' })
   @MinLength(6, { message: 'Password must be at least 6 characters long' })
-  password: string;
+  password!: string;
 
   @Column({ nullable: true })
-  birthDate: string;
+  birthDate!: string;
 
   @Column({ nullable: true })
-  phoneNumber: string;
+  phoneNumber!: string;;
 
   @Column({ type: 'enum', enum: UserRole, default: UserRole.CUSTOMER })
-  role: UserRole;
+  role!: UserRole;
 
   @Column({ default: false })
-  emailVerified: boolean;
+  emailVerified!: boolean;
 
   @Column({ nullable: true })
-  emailOtpCode: string;
+  emailOtpCode!: string;
 
   @Column({ type: 'timestamp', nullable: true })
-  emailOtpExpires: Date | null;
+  emailOtpExpires!: Date | null;
 
   @Column({ nullable: true })
-  resetPasswordToken: string;
+  resetPasswordToken!: string;
 
   @Column({ type: 'timestamp', nullable: true })
-  resetPasswordExpired: Date | null;
+  resetPasswordExpired!: Date | null;
 
   @CreateDateColumn({ type: 'timestamp' })
-  createAt: Date;
+  createAt!: Date;
 }
