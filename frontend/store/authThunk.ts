@@ -2,8 +2,9 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { signupAPI, SignupPayload, loginAPI, LoginPayload,
          verifyEmailPayload, verifyEmailAPI, meAPI, logoutAPI, sendOtpPayload,
          sendOtpAPI, verifyOtpPayload, verifyOtpAPI,
-         resetPasswordPayload, resetPasswordAPI } 
+         resetPasswordPayload, resetPasswordAPI }
         from "@/services/authAPI";
+import { updateProfileAPI, ProfilePayload } from "@/services/usersAPI";
 
 export const signupThunk = createAsyncThunk(
   "auth/signup",
@@ -40,6 +41,17 @@ export const fetchMeThunk = createAsyncThunk(
       return user;
     } catch (err: any) {
       return rejectWithValue(err.response?.data?.message || "Unauthorized");
+    }
+  }
+);
+
+export const updateProfileThunk = createAsyncThunk(
+  "auth/update-profile",
+  async (data: ProfilePayload, { rejectWithValue }) => {
+    try {
+      return await updateProfileAPI(data);
+    } catch (err: any) {
+      return rejectWithValue(err.response?.data?.message || "Profile update failed");
     }
   }
 );

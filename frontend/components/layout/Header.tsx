@@ -14,7 +14,7 @@ const navItems = [
 ];
 
 const accountOptions = [
-  { label: "My Account", href: "/my-account" },
+  { label: "My Account", href: "/account" },
   { label: "Logout", href: "/logout" }
 ];
 
