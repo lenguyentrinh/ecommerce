@@ -1,11 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { FiEye, FiEyeOff, FiArrowRight } from "react-icons/fi";
 import InputField from "@/components/InputField";
-import Button from "@/components/Button";
 import { AppDispatch, RootState } from "@/store/store";
 import { loginThunk } from "@/store/authThunk";
 import { showToast } from "@/lib/toast";
@@ -30,6 +31,8 @@ export default function LoginForm() {
     !returnParam.startsWith("/login?");
   const safeReturn = isSafeReturn ? returnParam : "/";
   const { loginLoading } = useSelector((state: RootState) => state.auth);
+
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
@@ -61,8 +64,14 @@ export default function LoginForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-sm" noValidate>
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-md" noValidate>
       <InputField
+        id="email"
+        variant="glass"
+        label="Email"
+        type="email"
+        placeholder="you@example.com"
+        error={errors.email?.message}
         {...register("email", {
           required: "Email is required",
           pattern: {
@@ -70,29 +79,52 @@ export default function LoginForm() {
             message: "Invalid email format",
           },
         })}
-        label="Email"
-        type="email"
-        placeholder="you@example.com"
-        error={errors.email?.message}
       />
+
       <InputField
-        {...register("password", { required: "Password is required" })}
+        id="password"
+        variant="glass"
         label="Password"
-        type="password"
+        type={showPassword ? "text" : "password"}
         placeholder="Your password"
         error={errors.password?.message}
+        trailing={
+          <button
+            type="button"
+            onClick={() => setShowPassword((v) => !v)}
+            aria-label={showPassword ? "Hide password" : "Show password"}
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-warm-gray/50 transition-colors hover:text-brown"
+          >
+            {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
+          </button>
+        }
+        {...register("password", { required: "Password is required" })}
       />
+
       <div className="text-right">
         <Link
           href="/forgotPassword"
-          className="text-body-md text-warm-gray hover:text-brown underline transition-colors duration-300"
+          className="text-body-md text-warm-gray underline transition-colors duration-300 hover:text-brown"
         >
           Forgot password?
         </Link>
       </div>
-      <Button type="submit" disabled={loginLoading} className="w-full mt-xs">
-        {loginLoading ? "Signing in..." : "Sign In"}
-      </Button>
+
+      <div className="pt-4">
+        <button
+          type="submit"
+          disabled={loginLoading}
+          className="btn-vivid group flex w-full items-center justify-center gap-sm rounded-full py-4 text-headline-md text-white transition-all duration-300 hover:scale-[1.01] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {loginLoading ? "Signing in..." : "Sign In"}
+          {!loginLoading && (
+            <FiArrowRight
+              size={22}
+              className="transition-transform duration-500 group-hover:translate-x-2"
+            />
+          )}
+        </button>
+      </div>
     </form>
   );
 }
