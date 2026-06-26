@@ -13,8 +13,8 @@ interface Address {
   lastName: string;
   street: string;
   city: string;
-  postalCode: string;
-  country: string;
+  postalCode?: string;
+  country?: string;
   isDefault: boolean;
 }
 
