@@ -21,20 +21,20 @@ const STYLES: Record<Variant, { wrapper: string; label: string; input: string; e
     label: 'text-label-sm text-brown',
     input:
       'w-full rounded-[16px] bg-warm-beige px-4 py-2.5 text-body-md text-brown placeholder:text-warm-gray outline-none border border-transparent transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] focus:border-clay focus-visible:outline-none',
-    error: 'text-label-sm text-error',
+    error: 'text-label-sm text-error-strong',
   },
   glass: {
-    wrapper: 'space-y-2',
-    label: 'ml-2 text-[11px] font-semibold uppercase tracking-[0.15em] text-warm-gray/70',
+    wrapper: '',
+    label: 'ml-2 mb-2 block text-[11px] font-semibold uppercase tracking-[0.15em] text-warm-gray/70',
     input:
       'input-glass w-full rounded-2xl border border-transparent px-5 py-4 text-body-md text-brown placeholder:text-warm-gray/40 outline-none',
-    error: 'ml-2 text-[12px] text-error mt-1',
+    error: 'ml-2 mt-1 block text-[12px] text-error-strong',
   },
 };
 
 const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
   function InputField(
-    { label, error, inputId, variant = 'default', trailing, className = '', labelClassName = '', ...rest },
+    { label, error, inputId, variant = 'default', trailing, className = '', labelClassName = '', required, ...rest },
     ref,
   ) {
     const id = inputId ?? rest.id;
@@ -44,6 +44,8 @@ const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
       <input
         ref={ref}
         id={id}
+        required={required}
+        aria-required={required}
         className={`${styles.input} ${trailing ? 'pr-12' : ''} ${className}`}
         {...rest}
       />
@@ -54,6 +56,7 @@ const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
         {label && (
           <label htmlFor={id} className={`${styles.label} ${labelClassName}`}>
             {label}
+            {required && <span className="text-error-strong"> *</span>}
           </label>
         )}
         {trailing ? (

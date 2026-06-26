@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -10,11 +11,7 @@ import InputField from "@/components/InputField";
 import { AppDispatch, RootState } from "@/store/store";
 import { loginThunk } from "@/store/authThunk";
 import { showToast } from "@/lib/toast";
-
-type FormData = {
-  email: string;
-  password: string;
-};
+import { loginSchema, type LoginValues } from "@/lib/validation/authSchemas";
 
 export default function LoginForm() {
   const dispatch = useDispatch<AppDispatch>();
@@ -40,9 +37,9 @@ export default function LoginForm() {
     setError,
     resetField,
     formState: { errors },
-  } = useForm<FormData>({ mode: "onTouched" });
+  } = useForm<LoginValues>({ mode: "onTouched", resolver: zodResolver(loginSchema) });
 
-  const onSubmit = async (data: FormData) => {
+  const onSubmit = async (data: LoginValues) => {
     try {
       await dispatch(loginThunk(data)).unwrap();
       showToast.success("Welcome back!");
@@ -64,26 +61,22 @@ export default function LoginForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-md" noValidate>
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-2.5" noValidate>
       <InputField
         id="email"
         variant="glass"
+        required
         label="Email"
         type="email"
         placeholder="you@example.com"
         error={errors.email?.message}
-        {...register("email", {
-          required: "Email is required",
-          pattern: {
-            value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-            message: "Invalid email format",
-          },
-        })}
+        {...register("email")}
       />
 
       <InputField
         id="password"
         variant="glass"
+        required
         label="Password"
         type={showPassword ? "text" : "password"}
         placeholder="Your password"
@@ -98,7 +91,7 @@ export default function LoginForm() {
             {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
           </button>
         }
-        {...register("password", { required: "Password is required" })}
+        {...register("password")}
       />
 
       <div className="text-right">

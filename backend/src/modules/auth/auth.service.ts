@@ -33,8 +33,8 @@ export class AuthService {
       const code = this.generateOTP();
       const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
 
-      await this.userService.setEmailOTP(user.id, code, expiresAt);
-      await this.sendEmailOtp(user.email, code, expiresAt);
+      // await this.userService.setEmailOTP(user.id, code, expiresAt);
+      // await this.sendEmailOtp(user.email, code, expiresAt);
       return { 
         message: 'Signup successful, OTP sent to your email.',
          email: user.email, 

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/navigation';
 import { FiEye, FiEyeOff, FiArrowRight } from 'react-icons/fi';
@@ -10,14 +11,7 @@ import PasswordStrengthIndicator from './PasswordStrengthIndicator';
 import { AppDispatch, RootState } from '@/store/store';
 import { signupThunk } from '@/store/authThunk';
 import { showToast } from '@/lib/toast';
-
-type FormData = {
-  userName: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-  phoneNumber: string;
-};
+import { signupSchema, type SignupValues } from '@/lib/validation/authSchemas';
 
 const eyeToggleClass =
   'absolute right-4 top-1/2 -translate-y-1/2 text-warm-gray/50 transition-colors hover:text-brown';
@@ -36,11 +30,11 @@ export default function SignupForm() {
     control,
     setError,
     formState: { errors },
-  } = useForm<FormData>({ mode: 'onTouched' });
+  } = useForm<SignupValues>({ mode: 'onTouched', resolver: zodResolver(signupSchema) });
 
   const passwordWatch = useWatch({ control, name: 'password' });
 
-  const onSubmit = async (data: FormData) => {
+  const onSubmit = async (data: SignupValues) => {
     const { confirmPassword, ...payload } = data;
     try {
       await dispatch(signupThunk(payload)).unwrap();
@@ -56,37 +50,37 @@ export default function SignupForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-md" noValidate>
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-2.5" noValidate>
       {/* Full Name */}
       <InputField
         id="userName"
         variant="glass"
+        required
         label="Full Name"
         type="text"
         placeholder="Jane Doe"
         error={errors.userName?.message}
-        {...register('userName', { required: 'Full name is required' })}
+        {...register('userName')}
       />
 
       {/* Email Address */}
       <InputField
         id="email"
         variant="glass"
+        required
         label="Email Address"
         type="email"
         placeholder="you@example.com"
         error={errors.email?.message}
-        {...register('email', {
-          required: 'Email is required',
-          pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: 'Invalid email format' },
-        })}
+        {...register('email')}
       />
 
       {/* Password + Confirm (two columns) */}
-      <div className="grid grid-cols-1 gap-md md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-x-md gap-y-2.5 md:grid-cols-2">
         <InputField
           id="password"
           variant="glass"
+          required
           label="Password"
           type={showPassword ? 'text' : 'password'}
           placeholder="Min. 8 characters"
@@ -101,15 +95,13 @@ export default function SignupForm() {
               {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
             </button>
           }
-          {...register('password', {
-            required: 'Password is required',
-            minLength: { value: 8, message: 'Password must be at least 8 characters' },
-          })}
+          {...register('password')}
         />
 
         <InputField
           id="confirmPassword"
           variant="glass"
+          required
           label="Confirm"
           type={showConfirm ? 'text' : 'password'}
           placeholder="Repeat password"
@@ -124,10 +116,7 @@ export default function SignupForm() {
               {showConfirm ? <FiEyeOff size={20} /> : <FiEye size={20} />}
             </button>
           }
-          {...register('confirmPassword', {
-            required: 'Please confirm your password',
-            validate: (v) => v === passwordWatch || 'Passwords do not match',
-          })}
+          {...register('confirmPassword')}
         />
       </div>
 

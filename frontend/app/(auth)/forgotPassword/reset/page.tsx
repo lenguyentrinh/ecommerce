@@ -1,12 +1,31 @@
+import { Suspense } from "react";
+import Link from "next/link";
+import AuthShell from "../../AuthShell";
 import ResetPasswordForm from "./ResetPasswordForm";
 
-export default function reset() {
+export default function ResetPage() {
   return (
-    <div className="bg-login flex flex-1 items-center justify-center p-4 sm:p-6">
-      <div className="bg-white p-5 sm:p-8 rounded shadow-md w-full md:w-1/2 lg:w-1/4">
-              <h1 className="font-semibold  text-center mb-3">Reset your password</h1>
-              <ResetPasswordForm/>
-            </div>
-    </div>
+    <AuthShell
+      title="Reset your password"
+      footer={
+        <>
+          Remember it now?{" "}
+          <Link
+            href="/login"
+            className="border-b border-transparent font-semibold text-clay transition-all hover:border-clay hover:text-brown"
+          >
+            Sign In
+          </Link>
+        </>
+      }
+    >
+      <Suspense
+        fallback={
+          <div className="text-center text-body-md text-warm-gray">Loading...</div>
+        }
+      >
+        <ResetPasswordForm />
+      </Suspense>
+    </AuthShell>
   );
 }

@@ -14,10 +14,10 @@ function getStrength(password: string): Strength {
 
 // Stitch security-bar palette (muted, luxury) — exact hex from the canonical design.
 const FILL: Record<Strength, { width: string; color: string }> = {
-  empty: { width: '0%', color: '#f1dfd1' },
-  weak: { width: '33%', color: '#e0bfba' },
-  medium: { width: '66%', color: '#eadecd' },
-  strong: { width: '100%', color: '#c8c7be' },
+  empty: { width: '0%', color: '#c00707' },
+  weak: { width: '33%', color: '#ff2200e5' },
+  medium: { width: '66%', color: '#e99e2e' },
+  strong: { width: '100%', color: 'rgba(37, 197, 19, 0.72)' },
 };
 
 const LABELS: Record<Strength, string> = {
