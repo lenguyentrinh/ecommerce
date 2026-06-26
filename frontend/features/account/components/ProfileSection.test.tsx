@@ -40,11 +40,25 @@ describe('ProfileSection', () => {
     );
   });
 
-  it('renders the email as read-only and never editable (AC2)', () => {
+  it('renders the email as read-only text and never editable (AC2)', () => {
     render(<ProfileSection />);
-    const email = screen.getByLabelText('Email Address') as HTMLInputElement;
-    expect(email).toHaveValue('jane@example.com');
-    expect(email).toBeDisabled();
+    expect(screen.getByText('jane@example.com')).toBeInTheDocument();
+    // The email is display-only: there is no editable email input.
+    expect(screen.queryByRole('textbox', { name: /email/i })).not.toBeInTheDocument();
+  });
+
+  it('keeps fields read-only until Edit Info is clicked', async () => {
+    const user = userEvent.setup();
+    render(<ProfileSection />);
+
+    const name = screen.getByLabelText(/legal name/i) as HTMLInputElement;
+    expect(name).toHaveAttribute('readonly');
+    expect(screen.queryByRole('button', { name: /save changes/i })).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /edit info/i }));
+
+    expect(name).not.toHaveAttribute('readonly');
+    expect(screen.getByRole('button', { name: /save changes/i })).toBeInTheDocument();
   });
 
   it('dispatches updateProfileThunk and toasts "Profile updated" on save (AC2)', async () => {
@@ -52,6 +66,7 @@ describe('ProfileSection', () => {
     const user = userEvent.setup();
     render(<ProfileSection />);
 
+    await user.click(screen.getByRole('button', { name: /edit info/i }));
     await user.click(screen.getByRole('button', { name: /save changes/i }));
 
     await waitFor(() => {

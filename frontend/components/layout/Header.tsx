@@ -59,7 +59,7 @@ export default function Header() {
         <div className="flex items-center gap-lg">
           <Link
             href="/"
-            className="text-2xl font-bold tracking-tight text-brown transition-transform duration-300 hover:scale-[1.02] md:text-3xl"
+            className="text-2xl font-bold uppercase tracking-tight text-brown transition-transform duration-300 hover:scale-[1.02] md:text-3xl"
           >
             Oren
           </Link>

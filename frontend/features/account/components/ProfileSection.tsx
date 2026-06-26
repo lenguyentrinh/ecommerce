@@ -1,98 +1,119 @@
 'use client';
 
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useSelector, useDispatch } from 'react-redux';
 import InputField from '@/components/InputField';
+import EmailField from './EmailField';
 import { AppDispatch, RootState } from '@/store/store';
 import { updateProfileThunk } from '@/store/authThunk';
 import { showToast } from '@/lib/toast';
 import { profileSchema, type ProfileValues } from '@/lib/validation/accountSchemas';
 
-// The auth model stores a single `userName`; the Stitch profile form edits it
-// as First + Last name. Split on load, re-join on save (non-breaking).
-function splitName(name?: string | null) {
-  const parts = (name ?? '').trim().split(/\s+/).filter(Boolean);
-  return { firstName: parts[0] ?? '', lastName: parts.slice(1).join(' ') };
-}
-
+// Stitch "PERSONAL DETAILS" card: read-only by default, EDIT INFO unlocks the
+// fields. Email is immutable. The single "Legal Name" maps 1:1 to `userName`.
 export default function ProfileSection() {
   const dispatch = useDispatch<AppDispatch>();
   const user = useSelector((state: RootState) => state.auth.user);
-  const { firstName, lastName } = splitName(user?.userName);
+  const [editing, setEditing] = useState(false);
+
+  const defaults = (): ProfileValues => ({
+    userName: user?.userName ?? '',
+    phoneNumber: user?.phoneNumber ?? '',
+  });
 
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors, isSubmitting },
   } = useForm<ProfileValues>({
     mode: 'onTouched',
     resolver: zodResolver(profileSchema),
-    defaultValues: { firstName, lastName, phoneNumber: user?.phoneNumber ?? '' },
+    defaultValues: defaults(),
   });
 
+  const startEdit = () => {
+    reset(defaults());
+    setEditing(true);
+  };
+  const cancelEdit = () => {
+    reset(defaults());
+    setEditing(false);
+  };
+
   const onSubmit = async (data: ProfileValues) => {
-    const userName = [data.firstName, data.lastName].filter(Boolean).join(' ').trim();
     try {
-      await dispatch(updateProfileThunk({ userName, phoneNumber: data.phoneNumber })).unwrap();
+      await dispatch(
+        updateProfileThunk({ userName: data.userName, phoneNumber: data.phoneNumber }),
+      ).unwrap();
       showToast.success('Profile updated');
+      setEditing(false);
     } catch (err) {
       showToast.error(err as string);
     }
   };
 
   return (
-    <div className="account-rise mb-xl">
-      <header className="mb-xl">
-        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-brown">
+    <section className="account-rise glass-panel soft-shadow rounded-xl p-md md:p-lg">
+      <div className="mb-md flex items-baseline justify-between">
+        <h2 className="text-[20px] font-semibold uppercase tracking-[0.05em] text-brown">
           Personal Details
-        </p>
-        <h1 className="mt-xs text-display-lg text-brown">Profile</h1>
-      </header>
+        </h2>
+        {!editing && (
+          <button
+            type="button"
+            onClick={startEdit}
+            className="border-b border-transparent pb-0.5 text-[10px] font-bold uppercase tracking-[0.2em] text-warm-gray transition-colors hover:border-brown hover:text-brown"
+          >
+            Edit Info
+          </button>
+        )}
+      </div>
 
-      <div className="glass-panel soft-shadow rounded-xl p-lg md:p-xl">
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-lg" noValidate>
-          <div className="grid grid-cols-1 gap-lg md:grid-cols-2">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-md" noValidate>
+        <div className="grid grid-cols-1 gap-md md:grid-cols-2">
+          <InputField
+            id="userName"
+            variant="editorial"
+            required
+            label="Legal Name"
+            type="text"
+            readOnly={!editing}
+            aria-readonly={!editing}
+            error={errors.userName?.message}
+            {...register('userName')}
+          />
+
+          {/* Email is immutable: read-only display, truncated with a tooltip
+              when the address is too long to fit. */}
+          <EmailField id="email" label="Email Address" email={user?.email ?? ''} />
+
+          {/* Phone spans the full row so the grid never leaves an empty cell */}
+          <div className="md:col-span-2">
             <InputField
-              id="firstName"
+              id="phoneNumber"
               variant="editorial"
-              required
-              label="First Name"
-              type="text"
-              error={errors.firstName?.message}
-              {...register('firstName')}
-            />
-            <InputField
-              id="lastName"
-              variant="editorial"
-              label="Last Name"
-              type="text"
-              error={errors.lastName?.message}
-              {...register('lastName')}
+              label="Phone Number"
+              type="tel"
+              readOnly={!editing}
+              aria-readonly={!editing}
+              error={errors.phoneNumber?.message}
+              {...register('phoneNumber')}
             />
           </div>
+        </div>
 
-          {/* Email is immutable — read-only, never submitted */}
-          <InputField
-            id="email"
-            variant="editorial"
-            label="Email Address"
-            type="email"
-            value={user?.email ?? ''}
-            readOnly
-            disabled
-          />
-
-          <InputField
-            id="phoneNumber"
-            variant="editorial"
-            label="Phone Number"
-            type="tel"
-            error={errors.phoneNumber?.message}
-            {...register('phoneNumber')}
-          />
-
-          <div className="flex justify-end border-t border-brown/10 pt-xl">
+        {editing && (
+          <div className="flex justify-end gap-md border-t border-brown/10 pt-md">
+            <button
+              type="button"
+              onClick={cancelEdit}
+              className="px-lg py-md text-label-sm uppercase tracking-widest text-brown hover:underline"
+            >
+              Cancel
+            </button>
             <button
               type="submit"
               disabled={isSubmitting}
@@ -101,8 +122,8 @@ export default function ProfileSection() {
               {isSubmitting ? 'Saving...' : 'Save Changes'}
             </button>
           </div>
-        </form>
-      </div>
-    </div>
+        )}
+      </form>
+    </section>
   );
 }

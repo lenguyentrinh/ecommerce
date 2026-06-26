@@ -35,16 +35,18 @@ describe('AccountLayout', () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it('renders the editorial sidebar nav and children when authenticated (AC1)', () => {
+  it('renders the account nav (desktop rail + mobile bar) and children when authenticated (AC1)', () => {
     (useRequireAuth as jest.Mock).mockReturnValue({ isAuthenticated: true, authChecked: true });
     render(
       <AccountLayout>
         <div>child</div>
       </AccountLayout>,
     );
-    expect(screen.getByRole('link', { name: 'Profile' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Addresses' })).toBeInTheDocument();
-    expect(screen.getByText('Security')).toBeInTheDocument();
+    // Nav is rendered twice (desktop rail + mobile bar); CSS hides one per breakpoint.
+    expect(screen.getAllByRole('link', { name: 'Profile' }).length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Security').length).toBeGreaterThan(0);
+    // Addresses live on the account page now (no separate nav link).
+    expect(screen.queryByRole('link', { name: 'Addresses' })).not.toBeInTheDocument();
     expect(screen.getByText('child')).toBeInTheDocument();
   });
 });

@@ -44,7 +44,9 @@ So that I can review my order, enter my details, and pay with confidence.
 
 **Given** the shopper is on Step 1 (Shipping Address)
 **When** they interact with the form
-**Then** if logged in with saved addresses: they see a "Select saved address" option plus "Add new address"; if no saved addresses: the form shows fields (Full Name, Address Line 1, City, State, Postal Code, Country); "Continue" validates all fields before advancing; inline errors use Oren error color `#b8998a`
+**Then** if logged in with saved addresses: they see a "Select saved address" option (which **pre-fills** First/Last Name, Street, City — saved addresses are partial) plus "Add new address"; the checkout form **always collects Postal Code** here (required to ship), with `Country` a fixed single-market value (server-set, not an input) and `State` omitted for the MVP; the form fields are (First Name, Last Name, Street Address, City, **Postal Code**); "Continue" validates all fields before advancing; inline errors use Oren error color `#b8998a`
+<!-- Resolution: sprint-change-proposal-2026-06-26-address-field-set.md, OVERRIDDEN same day -> Option B. The account address form (Story 1.5) does NOT collect Postal Code; checkout owns it. Saved address = convenience pre-fill only. Order.shippingAddress JSON (Story 4.1) is built from the completed checkout form, so Story 4.1's create body must carry the full address (or the chosen address id PLUS the checkout-collected Postal Code), not shippingAddressId alone. -->
+
 
 **Given** the shopper is on Step 2 (Delivery Method)
 **When** it renders

@@ -13,6 +13,11 @@ Status: ready-for-dev
 > **backend** (Bruno) → `1-5-account-profile-and-shipping-address-management-backend.md` (Tasks 1–5).
 > **Sequence: backend first**, then integrate the frontend against the working unprefixed `/users/...` endpoints.
 
+> ⚠️ **As-built reconciliation (2026-06-26).** The frontend half shipped and diverged from this original plan. The **split files are the reconciled source of truth** — read them, not the task breakdown below (which predates reconciliation):
+> - **frontend** file → status `review`, fully reconciled (two-column dashboard; address form reduced to `{ firstName, lastName, street, city }` + `isDefault`; edit + set-default added; max-2 add-card gate **not** implemented — open).
+> - **backend** file → built to that contract (new `is_default` column, edit + set-default endpoints). **`postal_code`/`country` removed entirely** (decision by Nguyen Trinh during dev, 2026-06-26) — account address is `{ firstName, lastName, street, city, isDefault }`.
+> - ✅ **Resolved 2026-06-26 (correct-course → Option B):** account form stays slim (no Postal Code / Country / State); checkout (Story 4.2) collects Postal Code, Country = fixed single-market constant, State dropped. Story 4.1's order address is snapshotted from the checkout form. See `sprint-change-proposal-2026-06-26-address-field-set.md` §6. (ACs + field-set Dev Note updated; detailed Tasks left as original breakdown.)
+
 ## Story
 
 As a shopper,
@@ -21,30 +26,35 @@ So that checkout is faster and my personal details are always current.
 
 ## Acceptance Criteria
 
-**AC1 — Account page renders three sections (auth-gated)**
-Given a logged-in shopper navigates to `/account`,
-When the page renders,
-Then three sections are visible: **Profile** (name editable, email read-only, phone editable), **Shipping Addresses** (list, up to 2), **Order History** link (to `/orders`); each section is a Warm White (`bg-surface`) card with ambient shadow (`shadow-ambient`); Nunito Sans typography and the Oren palette are used throughout.
+*(ACs amended 2026-06-26 to match the shipped implementation — see the reconciliation banner and the split files.)*
+
+**AC1 — Account page renders the Settings dashboard (auth-gated)** *(amended)*
+A logged-in shopper at `/account` sees a two-column settings dashboard: a sidebar rail (Profile active · Security "Coming soon"; auth gate in `app/account/layout.tsx`), a "Welcome back" header, a Personal Details card beside an editorial aside, and a full-width Saved Shipping Addresses grid. Oren editorial tokens (`glass-panel`/`soft-shadow`/`account-mesh`). The standalone Order History card was dropped (Epic 4 route).
 
 **AC2 — Profile update**
 Given the shopper edits their name and/or phone and clicks "Save Changes",
 When `PATCH /users/profile` completes successfully,
 Then the displayed values update immediately (Redux `user` is refreshed); a toast "Profile updated" appears; the email field is always read-only and is never sent as an editable value.
 
-**AC3 — Add shipping address (under the limit)**
-Given the shopper has fewer than 2 saved addresses,
-When they submit the address form via `POST /users/addresses`,
-Then the new address appears in the list immediately; a toast "Address saved" appears; once 2 addresses exist, the "Add address" affordance is hidden and replaced with the note "Maximum 2 addresses reached".
+**AC3 — Add / edit shipping address (via in-page modal)** *(amended)*
+Given the shopper opens the add card or a card's Edit action,
+When they submit via `POST /users/addresses` (add) or `PATCH /users/addresses/:id` (edit),
+Then the list refreshes and a toast "Address saved" / "Address updated" appears. Fields: First Name, Last Name, Street Address, City + "Set as default". ⚠️ **Known deviation:** the max-2 add-affordance gate is **not** implemented (add card always shows); the 3rd-address `409` is the real gate.
 
 **AC4 — Remove shipping address**
-Given the shopper clicks "Remove" on a saved address,
+Given the shopper clicks the trash icon on a saved address,
 When `DELETE /users/addresses/:id` completes,
-Then the address is removed from the list immediately; a toast "Address removed" appears; if the list drops below 2, the "Add address" affordance reappears.
+Then the address is removed immediately (optimistic); a toast "Address removed" appears.
 
 **AC5 — Unauthenticated access is redirected and returns**
 Given an unauthenticated user navigates to `/account`,
 When the page loads,
-Then they are redirected to `/login?return=/account` (via `useRequireAuth`); after a successful login they land back on `/account`.
+Then they are redirected to `/login?return=/account` (via `useRequireAuth`, in `app/account/layout.tsx`); after a successful login they land back on `/account`.
+
+**AC6 — Set default shipping address** *(added)*
+Given a non-default address shows "Set as default",
+When `PATCH /users/addresses/:id/default` completes,
+Then the DEFAULT badge moves to it (others cleared), the returned list replaces local state, and a toast "Default address updated" appears.
 
 ## Tasks / Subtasks
 
@@ -134,9 +144,14 @@ The epic AC text says `PATCH /api/users/profile`, `POST /api/users/addresses`, e
 
 **Mandate:** Implement the controller as `@Controller('users')` (→ `/users/profile`, `/users/addresses`) and call it from the frontend as `/users/...`. **Do NOT add `app.setGlobalPrefix('api')`** in this story — doing so would silently break every existing `/auth/*` call across the app (login, signup, verify, me, logout). Reconciling the architecture's intended `/api` prefix is a separate, cross-cutting task (flagged below). Keeping the system working end-to-end takes priority over matching the literal AC string.
 
-### Address entity field set — align to Epic 4 checkout (Story 4.2)
+### Address entity field set — ⚠️ diverges from Epic 4 checkout (open decision)
 
-The epic does NOT enumerate address fields, and the UX `EXPERIENCE.md` explicitly defers account/checkout flows. The canonical field set comes from **Epic 4, Story 4.2 (Checkout Step 1 — Shipping Address)**: *Full Name, Address Line 1, City, State, Postal Code, Country*. Use exactly these so a saved address can be referenced at checkout via `shippingAddressId` (Epic 4, Story 4.1 order creation expects `shippingAddressId`). Do not invent extra fields (no `line2`, no per-address phone) — keep it identical to the checkout form to avoid a schema mismatch later.
+**Original plan:** align to **Epic 4, Story 4.2** — *Full Name, Address Line 1, City, State, Postal Code, Country* — for checkout reuse via `shippingAddressId`.
+
+**What shipped (2026-06-26):** the form was reduced to `{ firstName, lastName, street, city }` + `isDefault`; **Postal Code, Country and State are no longer collected.** The backend story was reconciled to this (nullable `postal_code`/`country`, `state` dropped). A partial address **cannot fulfil an Epic 4 order**, so this is an open cross-cutting decision.
+
+> ✅ **Resolved 2026-06-26 (Option B):** account form stays slim; checkout collects Postal Code; Country = fixed single-market constant; State dropped. Build with nullable `postal_code`/`country`. See `sprint-change-proposal-2026-06-26-address-field-set.md` §6.
+
 [Source: planning-artifacts/epics/epic-4-checkout-order-lifecycle.md#Story 4.2 / #Story 4.1]
 
 ### User column is `phoneNumber` (not `phone`)
@@ -255,7 +270,7 @@ On `/account` this yields exactly `/login?return=%2Faccount` (AC5), and `LoginFo
 - Do **not** add `app.setGlobalPrefix('api')` (would break all existing `/auth/*` calls — separate task).
 - Do **not** modify `authThunk.ts`'s existing thunks, `services/api.ts`, `providers.tsx` `AuthBootstrap`, `useRequireAuth.ts`, `InputField`/`Button`/`Chip` — reuse as-is.
 - `/orders` page itself is **Epic 4** — only the link is in scope here.
-- No new address-edit endpoint (`PATCH /users/addresses/:id`) — AC only covers add + remove. Edit = delete + re-add for MVP.
+- ~~No new address-edit endpoint~~ **Superseded (2026-06-26):** address edit (`PATCH /users/addresses/:id`) and set-default (`PATCH /users/addresses/:id/default`) are now in scope and (frontend) implemented; backend reconciled. See the split files.
 
 ### Project Structure Notes
 
@@ -286,3 +301,5 @@ On `/account` this yields exactly `/login?return=%2Faccount` (AC5), and `LoginFo
 ### File List
 
 ### Change Log
+
+- 2026-06-26 — **As-built reconciliation** of the overview to the shipped frontend + reconciled backend. ACs amended (dashboard layout; add/edit modal; set-default added; max-2 gate flagged as not-implemented). Address field set reduced to `{ firstName, lastName, street, city }` + `isDefault`; edit + set-default endpoints added. ⚠️ Reduced field set conflicts with Epic 4 / Story 4.2 checkout — flagged for `correct-course`. Detailed Task breakdowns left as original; the split files are the reconciled source of truth.
