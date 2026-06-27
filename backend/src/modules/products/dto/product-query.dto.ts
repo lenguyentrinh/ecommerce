@@ -16,12 +16,21 @@ export enum ProductSort {
   POPULARITY = 'popularity',
 }
 
+/** Trim strings and collapse empty/whitespace-only values to `undefined`. */
+const trimToUndefined = ({ value }: { value: unknown }): unknown => {
+  if (typeof value !== 'string') return value;
+  const trimmed = value.trim();
+  return trimmed === '' ? undefined : trimmed;
+};
+
 export class ProductQueryDto {
   @IsOptional()
+  @Transform(trimToUndefined)
   @IsString()
   category?: string;
 
   @IsOptional()
+  @Transform(trimToUndefined)
   @IsString()
   search?: string;
 

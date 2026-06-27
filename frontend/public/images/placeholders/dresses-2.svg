@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="1000" viewBox="0 0 800 1000" role="img" aria-label="Dress product placeholder">
+  <rect width="800" height="1000" fill="#ded2c4"/>
+  <path d="M340 200 L460 200 L490 280 L450 320 L470 760 L330 760 L350 320 L310 280 Z" fill="#bfa595"/>
+  <text x="400" y="880" font-family="sans-serif" font-size="34" fill="#787770" text-anchor="middle" letter-spacing="6">DRESSES</text>
+</svg>

@@ -37,7 +37,7 @@ export class Product {
   category!: string;
 
   /**
-   * Storage object keys only (e.g. "fashion-1.svg") — NEVER full URLs.
+   * Storage object keys only (e.g. "dresses-1.svg") — NEVER full URLs.
    * Public URLs are generated at read time in ProductsService.
    */
   @Column({ type: 'json' })
