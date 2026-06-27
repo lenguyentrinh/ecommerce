@@ -4,6 +4,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import jwtConfig from './config/jwt.config';
 import { AuthModule } from './modules/auth/auth.module';
+import { ProductsModule } from './modules/products/products.module';
 import { DatabaseModule } from './database/database.config';
 import { RolesGuard } from './common/guards/roles.guard';
 
@@ -16,6 +17,7 @@ import { RolesGuard } from './common/guards/roles.guard';
     }),
     DatabaseModule,
     AuthModule,
+    ProductsModule,
     ThrottlerModule.forRoot({
       throttlers: [{ name: 'default', ttl: 60000, limit: 60 }],
     }),
