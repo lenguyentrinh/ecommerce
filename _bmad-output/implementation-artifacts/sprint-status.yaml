@@ -56,7 +56,7 @@ development_status:
   # ── Epic 2: Product Catalog & Discovery ──────────────────────────────────
   epic-2: in-progress
   2-1-product-entity-api-and-seed-data: review
-  2-2-home-page-and-category-pages: ready-for-dev
+  2-2-home-page-and-category-pages: done
   2-3-product-detail-page: backlog
   2-4-search-bar-and-filter-sort-ui: backlog
   epic-2-retrospective: optional
