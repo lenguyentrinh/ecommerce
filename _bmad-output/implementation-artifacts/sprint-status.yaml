@@ -54,8 +54,8 @@ development_status:
   epic-1-retrospective: optional
 
   # ── Epic 2: Product Catalog & Discovery ──────────────────────────────────
-  epic-2: backlog
-  2-1-product-entity-api-and-seed-data: backlog
+  epic-2: in-progress
+  2-1-product-entity-api-and-seed-data: review
   2-2-home-page-and-category-pages: backlog
   2-3-product-detail-page: backlog
   2-4-search-bar-and-filter-sort-ui: backlog
