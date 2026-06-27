@@ -5,8 +5,9 @@ import {
   getCategories,
   getProducts,
 } from '@/features/product/services/productApi';
-import ProductCard from '@/components/ui/ProductCard';
 import type { Product } from '@/types/product';
+import FeaturedCurations from '@/components/home/FeaturedCurations';
+import NewArrivals from '@/components/home/NewArrivals';
 
 // ISR: cache the rendered page and revalidate periodically. The fetches below
 // are wrapped in try/catch so `next build` succeeds even if the backend is
@@ -14,11 +15,11 @@ import type { Product } from '@/types/product';
 export const revalidate = 60;
 
 export const metadata: Metadata = {
-  title: 'Oren — Soft Minimal Luxury Fashion',
+  title: 'Oren',
   description:
     'Discover Oren — a curated collection of premium women’s fashion. Editorial, calm, and quietly luxurious.',
   openGraph: {
-    title: 'Oren — Soft Minimal Luxury Fashion',
+    title: 'Oren',
     description:
       'Discover Oren — a curated collection of premium women’s fashion.',
     type: 'website',
@@ -26,48 +27,66 @@ export const metadata: Metadata = {
 };
 
 export default async function HomePage() {
-  let products: Product[] = [];
+  let featured: Product[] = [];
+  let newArrivals: Product[] = [];
   let categories: string[] = [];
 
   try {
-    const [productsRes, categoriesRes] = await Promise.all([
-      getProducts({ limit: 8, sort: 'newest' }),
+    const [featuredRes, newestRes, categoriesRes] = await Promise.all([
+      // Featured Curations = best sellers; New Arrivals = newest. Fetched with
+      // distinct sorts so each strip means what its heading says.
+      getProducts({ limit: 3, sort: 'popularity' }),
+      getProducts({ limit: 11, sort: 'newest' }),
       getCategories(),
     ]);
-    products = productsRes.data;
+    featured = featuredRes.data;
+    // Don't repeat a featured product in the New Arrivals grid below.
+    const featuredIds = new Set(featured.map((p) => p.id));
+    newArrivals = newestRes.data
+      .filter((p) => !featuredIds.has(p.id))
+      .slice(0, 8);
     categories = categoriesRes;
   } catch {
     // Degrade gracefully — render the page shell without catalogue data.
-    products = [];
+    featured = [];
+    newArrivals = [];
     categories = [];
   }
 
-  const heroHref = categories[0]
+  const primaryCategoryHref = categories[0]
     ? `/categories/${encodeURIComponent(categories[0])}`
     : null;
 
   return (
     <>
-      {/* Hero / banner */}
-      <section className="relative h-[80vh] min-h-[520px] w-full overflow-hidden">
+      {/* Hero / banner — full-bleed editorial, LCP-prioritised */}
+      <section className="relative h-[86svh] min-h-[600px] w-full overflow-hidden">
         <Image
           src="/images/bg-signup.png"
           alt=""
           fill
           priority
           sizes="100vw"
-          className="object-cover"
+          className="object-cover object-center"
         />
-        <div className="absolute inset-0 bg-brown/30" />
-        <div className="relative z-10 flex h-full flex-col items-center justify-center px-5 text-center text-warm-white">
-          <span className="mb-6 text-label-sm uppercase tracking-[0.4em] opacity-90">
+        {/* Warm scrim — keeps the white headline legible over the bright image */}
+        <div className="absolute inset-0 bg-gradient-to-t from-brown/60 via-brown/25 to-brown/20" />
+
+        <div className="relative z-10 mx-auto flex h-full max-w-[1400px] flex-col items-center justify-center px-5 text-center text-warm-white">
+          <span className="mb-5 text-label-sm tracking-[0.4em] text-warm-white/90">
             The Oren Collection
           </span>
-          <h1 className="text-display-lg italic">The Art of Dressing</h1>
-          {heroHref && (
+          <h1 className="font-display-serif pb-1 text-[clamp(40px,7vw,76px)] italic leading-[1.15] drop-shadow-sm">
+            The Art of Dressing
+          </h1>
+          <p className="mt-6 max-w-[36ch] text-body-lg text-warm-white/85">
+            A curated edit of quietly luxurious pieces, made to be worn and worn
+            again.
+          </p>
+          {primaryCategoryHref && (
             <Link
-              href={heroHref}
-              className="mt-12 inline-flex items-center justify-center rounded-full bg-warm-white px-8 py-4 text-label-sm text-brown transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clay focus-visible:ring-offset-2"
+              href={primaryCategoryHref}
+              className="mt-10 inline-flex items-center justify-center rounded-full bg-warm-white px-8 py-4 text-label-sm text-brown transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clay focus-visible:ring-offset-2"
             >
               Shop the Collection
             </Link>
@@ -75,46 +94,9 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Category navigation row */}
-      {categories.length > 0 && (
-        <section className="mx-auto w-full max-w-[1400px] px-5 py-12 md:px-16">
-          <div className="flex flex-wrap items-center justify-center gap-4">
-            {categories.map((category) => (
-              <Link
-                key={category}
-                href={`/categories/${encodeURIComponent(category)}`}
-                className="inline-flex items-center rounded-full border border-transparent bg-warm-beige px-4 py-1.5 text-label-sm text-warm-gray transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] hover:border-clay hover:text-brown focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clay focus-visible:ring-offset-2"
-              >
-                {category}
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
+      <FeaturedCurations products={featured} />
 
-      {/* Featured products */}
-      <section className="mx-auto w-full max-w-[1400px] px-5 pb-20 md:px-16">
-        <div className="mb-12 flex items-end justify-between border-b border-hairline pb-4">
-          <div>
-            <span className="mb-1 block text-label-sm uppercase tracking-[0.3em] text-warm-gray">
-              Just In
-            </span>
-            <h2 className="text-headline-md uppercase text-brown">Featured</h2>
-          </div>
-        </div>
-
-        {products.length > 0 ? (
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-3 md:gap-6 lg:grid-cols-4">
-            {products.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
-        ) : (
-          <p className="py-12 text-center text-body-md text-warm-gray">
-            Our collection is being curated. Please check back soon.
-          </p>
-        )}
-      </section>
+      <NewArrivals products={newArrivals} viewAllHref={primaryCategoryHref} />
     </>
   );
 }

@@ -91,6 +91,11 @@ body::before {
   background: radial-gradient(ellipse at top, #e8dccb, #faf7f2);
 }
 
+/* Editorial diagonal — the warm "Featured Curations" band (DESIGN.md → home) */
+.bg-editorial-diagonal {
+  background: linear-gradient(135deg, #fdebdc 0%, #faf7f2 48%, #f1dfd1 100%);
+}
+
 /* Type scale */
 .text-display-lg {
   font-size: 48px;
