@@ -1,6 +1,6 @@
 # Story 2.1: Product Entity, API & Seed Data
 
-Status: ready-for-dev
+Status: done
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -16,7 +16,7 @@ so that I can browse, search, and view product details.
 
 1. **Product entity & migration** — A `ProductsModule` is scaffolded with a `Product` entity exposing these properties: `id`, `name`, `description`, `price` (decimal), `stockQuantity` (int), `category` (string), `imageKeys` (`string[]` — storage object keys, **never** full URLs), `isActive` (boolean, default `true`), `deletedAt` (nullable, `@DeleteDateColumn` for soft delete), `createdAt`, `updatedAt`. A TypeORM migration creates the `products` table. `synchronize: false` remains confirmed in both `database.config.ts` and `data-source.ts`.
 
-2. **Seed data** — A runnable seed script inserts **at least 20** sample products across exactly **3 categories** (`Fashion`, `Electronics`, `Lifestyle`) with realistic names, descriptions, prices, and stock quantities. `imageKeys` contain placeholder keys that resolve to **local placeholder images** (no remote/Unsplash URLs). Running the seed twice does not create duplicates (idempotent).
+2. **Seed data** — A runnable seed script inserts **at least 10** sample products across exactly **3 categories** (`Dresses`, `Tops`, `Blazer`) with realistic names, descriptions, prices, and stock quantities. `imageKeys` contain placeholder keys that resolve to **local placeholder images** (no remote/Unsplash URLs). Running the seed twice does not create duplicates (idempotent).
 
 3. **List endpoint** — `GET /api/products` returns a paginated payload shaped exactly `{ data: Product[], total, page, limit }`. It supports query params: `category`, `search` (text), `minPrice`, `maxPrice`, `inStock` (boolean), `sort` (`price_asc` | `price_desc` | `newest` | `popularity`), plus `page` and `limit`. `page` and `category` queries are served by DB indexes. Only active, non-soft-deleted products are returned.
 
@@ -39,7 +39,7 @@ so that I can browse, search, and view product details.
   - [ ] If `migration:generate` is impractical (no DB handy), hand-write the migration following the defensive style of `1782206839023-AddRoleToUsers.ts` (guard with `getTable`/`findColumnByName`).
   - [ ] Run `npm run migration:run` and confirm the table + indexes exist. Confirm `synchronize: false` is untouched.
 - [ ] **Task 3 — Seed script (AC: #2)**
-  - [ ] Create `backend/src/database/seeds/product.seed.ts` (data array, 20+ products, 3 categories) and `backend/src/database/seeds/seed.ts` (runner using `AppDataSource` from `src/database/data-source.ts`).
+  - [ ] Create `backend/src/database/seeds/product.seed.ts` (data array, 10+ products, 3 categories: `Dresses`, `Tops`, `Blazer`) and `backend/src/database/seeds/seed.ts` (runner using `AppDataSource` from `src/database/data-source.ts`).
   - [ ] Make it idempotent: if `products` already has rows, skip (or upsert by a stable natural key like `name`).
   - [ ] Add npm script `"seed": "ts-node -r tsconfig-paths/register src/database/seeds/seed.ts"` to `backend/package.json`.
   - [ ] Add 1–3 placeholder SVGs under `frontend/public/images/placeholders/` and reference them via the `imageKeys` you seed (see Dev Notes → Image URL strategy). Honour the self-hosted-assets rule: **local SVGs only, no remote image URLs.**
@@ -233,3 +233,24 @@ Recent commits are all Epic 1 work (auth UI fixes, user-entity fixes, zod valida
 1. **`popularity` sort** is implemented as a `createdAt DESC` proxy because no sales data exists until Epic 4. Confirm this is acceptable for MVP, or specify an interim ranking signal.
 2. **Image placeholders**: this story serves placeholder SVGs from `frontend/public/images/placeholders/` via a relative `PRODUCT_IMAGE_BASE_URL`. The real `StorageService` (S3/Cloudinary, absolute URLs) arrives in Story 5.3. Confirm the frontend stories (2.2/2.3) are fine resolving relative image URLs for now.
 3. **Single-product response shape** is `{ data: Product }` (per the project's "never return raw" consistency rule). Confirm the frontend stories should expect the wrapped shape for the detail endpoint (the list endpoint already returns `{ data, total, page, limit }`).
+
+## Review Findings
+
+_Code review 2026-06-27 — 3 review layers (Blind Hunter, Edge Case Hunter, Acceptance Auditor). All 6 ACs + the no-global-`/api`-prefix regression guardrail verified PASS by the Acceptance Auditor. 15 findings dismissed as noise/spec-faithful._
+
+- [x] [Review][Decision→Patch] API response leaks internal fields — RESOLVED: `toResponse()` now maps explicit fields and `ProductResponse` is `Omit<Product, 'isActive' | 'deletedAt'>`, so `deletedAt`/`isActive` are no longer exposed (`imageKeys`/`imageUrls` kept) (`products.service.ts`)
+- [x] [Review][Patch] `minPrice > maxPrice` silently returns empty 200 — FIXED: `findAll` now throws `BadRequestException` on an inverted range before querying (`products.service.ts`)
+- [x] [Review][Patch] `search` user input not hardened — FIXED: LIKE wildcards (`%`/`_`/`\`) escaped in the service; empty/whitespace `search`/`category` trimmed and collapsed to `undefined` in the DTO (`products.service.ts` / `product-query.dto.ts`)
+- [x] [Review][Patch] Test gaps vs Task 6 — FIXED: added tests for the `inStock=false` branch, wildcard escaping, inverted range, internal-field exclusion, and a `ProductQueryDto` validation block (limit cap, defaults, trim) — 16/16 passing (`products.service.spec.ts`)
+- [x] [Review][Defer] No indexes on `price`/`createdAt`/`stockQuantity` — price-range + price/newest sort full-scan as the table grows; only `category`+`isActive` indexed [`product.entity.ts` / migration] — deferred, MVP-acceptable, optimize at scale
+- [x] [Review][Defer] Seeder idempotency is serial-only — no unique constraint on `name`, so concurrent runs can double-insert and a re-seed after soft-deleting a seeded product creates a duplicate active row (`repo.find` excludes soft-deleted) [`seed.ts:18-29` / migration] — deferred, serial dev/CI seeding is the only real usage
+- [x] [Review][Defer] `imageKeys` unvalidated/unsanitized — once admin create/update lands (Story 5.2/5.3) untrusted keys could yield path-traversal or malformed URLs via `${base}/${key}`; add key validation + `encodeURIComponent` then [`products.service.ts:120-127`] — deferred, no write path in this story, keys are trusted seed data
+- [x] [Review][Defer] `category` is unconstrained free-text — no canonical taxonomy/enum/lookup; typos return an empty page rather than a 404/hint [`product.entity.ts` / `product-query.dto.ts:20-22`] — deferred, free-text category is the current spec-level design
+- [x] [Review][Defer] No max cap on `page` (only `limit` is capped) — a very large `page` produces a large offset scan [`product-query.dto.ts:48-52`] — deferred, low risk, add a cap if abuse is observed
+
+### Review Findings — re-categorization delta (2026-06-27, commit `e2c63cb`)
+
+_Second review pass over the Dresses/Tops/Blazer seed re-categorization (3 layers). AC #2 (≥10 products, exactly 3 categories, local placeholder SVGs only, idempotent), AC #4 read-time image URLs, and the spec/Task-3 updates all verified PASS by the Acceptance Auditor. All 6 prior defers re-confirmed (already tracked in `deferred-work.md`); 6 findings dismissed as noise/false-positive (notably the "LIKE missing ESCAPE clause" — false positive: MySQL's default LIKE escape char is `\`)._
+
+- [x] [Review][Patch] Stale old-category fixtures remain in the modernized test file — FIXED: filter test now uses `category: 'Dresses'` and the `getCategories` test asserts `['Blazer','Dresses','Tops']`, consistent with the new taxonomy — 16/16 passing [`products.service.spec.ts:101,109,187-192`]
+- [x] [Review][Patch] Missing trailing newline at end of file — FIXED: restored final CRLF newline [`products.service.ts` EOF]

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="1000" viewBox="0 0 800 1000" role="img" aria-label="Top product placeholder">
+  <rect width="800" height="1000" fill="#e8dccb"/>
+  <path d="M320 240 L480 240 L560 320 L520 380 L520 660 L280 660 L280 380 L240 320 Z" fill="#c9b2a6"/>
+  <text x="400" y="880" font-family="sans-serif" font-size="34" fill="#787770" text-anchor="middle" letter-spacing="6">TOPS</text>
+</svg>

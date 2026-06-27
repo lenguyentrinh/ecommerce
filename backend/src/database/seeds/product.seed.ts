@@ -15,56 +15,58 @@ export interface ProductSeed {
   isActive?: boolean;
 }
 
-const fashionImg = ['fashion-1.svg', 'fashion-2.svg'];
-const electronicsImg = ['electronics-1.svg', 'electronics-2.svg'];
-const lifestyleImg = ['lifestyle-1.svg', 'lifestyle-2.svg'];
+const dressesImg = ['dresses-1.svg', 'dresses-2.svg'];
+const topsImg = ['tops-1.svg', 'tops-2.svg'];
+const blazerImg = ['blazer-1.svg', 'blazer-2.svg'];
 
 export const productSeeds: ProductSeed[] = [
-  // ── Fashion ──────────────────────────────────────────────────────────────
+  // ── Dresses ────────────────────────────────────────────────────────────────
   {
     name: 'Silk Wrap Midi Dress',
     description:
       'A fluid silk midi cut on the bias, finished with a self-tie waist. Drapes effortlessly from desk to dinner.',
     price: 189.0,
     stockQuantity: 24,
-    category: 'Fashion',
-    imageKeys: fashionImg,
+    category: 'Dresses',
+    imageKeys: dressesImg,
   },
   {
-    name: 'Oversized Wool Blazer',
+    name: 'Pleated Satin Maxi Dress',
     description:
-      'A relaxed, double-breasted blazer in Italian wool. Structured shoulders, soft lapel, endlessly layerable.',
-    price: 245.0,
-    stockQuantity: 16,
-    category: 'Fashion',
-    imageKeys: fashionImg,
+      'A bias-cut satin maxi with knife pleats that catch the light. Sits at the natural waist and skims the floor.',
+    price: 168.0,
+    stockQuantity: 18,
+    category: 'Dresses',
+    imageKeys: dressesImg,
   },
   {
-    name: 'High-Rise Tailored Trousers',
+    name: 'Linen Shirt Dress',
     description:
-      'Pleated, high-rise trousers with a clean break. Cut from a crisp, recycled poly blend that holds its line.',
-    price: 128.0,
-    stockQuantity: 40,
-    category: 'Fashion',
-    imageKeys: fashionImg,
+      'A breezy, garment-washed linen shirt dress with a relaxed collar and removable belt. Your warm-weather staple.',
+    price: 119.0,
+    stockQuantity: 36,
+    category: 'Dresses',
+    imageKeys: dressesImg,
   },
+  {
+    name: 'Floral Tea Dress',
+    description:
+      'A vintage-inspired tea dress in a soft viscose print. Puff sleeves, smocked back, and a flattering midi length.',
+    price: 98.0,
+    stockQuantity: 0,
+    category: 'Dresses',
+    imageKeys: dressesImg,
+  },
+
+  // ── Tops ───────────────────────────────────────────────────────────────────
   {
     name: 'Cashmere Crewneck Sweater',
     description:
       'Grade-A Mongolian cashmere knit to a mid-weight gauge. Warm, weightless, and impossibly soft.',
     price: 165.0,
     stockQuantity: 30,
-    category: 'Fashion',
-    imageKeys: fashionImg,
-  },
-  {
-    name: 'Pleated Satin Skirt',
-    description:
-      'A bias-cut satin skirt with knife pleats that catch the light. Sits at the natural waist.',
-    price: 98.0,
-    stockQuantity: 0,
-    category: 'Fashion',
-    imageKeys: fashionImg,
+    category: 'Tops',
+    imageKeys: topsImg,
   },
   {
     name: 'Linen Button-Down Shirt',
@@ -72,146 +74,63 @@ export const productSeeds: ProductSeed[] = [
       'A breezy, garment-washed linen shirt with a relaxed collar. Your warm-weather staple.',
     price: 79.0,
     stockQuantity: 52,
-    category: 'Fashion',
-    imageKeys: fashionImg,
+    category: 'Tops',
+    imageKeys: topsImg,
   },
   {
-    name: 'Leather Ankle Boots',
+    name: 'Ribbed Cotton Tank',
     description:
-      'Hand-finished Spanish leather boots on a stacked block heel. Almond toe, side zip.',
-    price: 215.0,
-    stockQuantity: 12,
-    category: 'Fashion',
-    imageKeys: fashionImg,
-  },
-
-  // ── Electronics ──────────────────────────────────────────────────────────
-  {
-    name: 'Wireless Noise-Cancelling Headphones',
-    description:
-      'Over-ear headphones with adaptive ANC and 40-hour battery. Memory-foam cups for all-day comfort.',
-    price: 299.0,
-    stockQuantity: 35,
-    category: 'Electronics',
-    imageKeys: electronicsImg,
+      'A fitted, ribbed organic-cotton tank with a clean scoop neck. Layers under everything; stands alone in summer.',
+    price: 38.0,
+    stockQuantity: 88,
+    category: 'Tops',
+    imageKeys: topsImg,
   },
   {
-    name: 'Smart Fitness Watch',
+    name: 'Silk Camisole Top',
     description:
-      'A lightweight tracker with continuous heart-rate, GPS, and a 7-day battery. AMOLED always-on display.',
-    price: 179.0,
-    stockQuantity: 48,
-    category: 'Electronics',
-    imageKeys: electronicsImg,
-  },
-  {
-    name: 'Portable Bluetooth Speaker',
-    description:
-      '360° sound in a pocketable, IP67-rated body. 18 hours of playback and USB-C fast charge.',
+      'A slip-style camisole in washed silk with adjustable straps and a delicate bias hem. Dress up or down.',
     price: 89.0,
-    stockQuantity: 60,
-    category: 'Electronics',
-    imageKeys: electronicsImg,
-  },
-  {
-    name: 'Mechanical Keyboard 75%',
-    description:
-      'A hot-swappable 75% board with gasket mount and PBT keycaps. Wired or wireless, satisfyingly tactile.',
-    price: 139.0,
-    stockQuantity: 22,
-    category: 'Electronics',
-    imageKeys: electronicsImg,
-  },
-  {
-    name: '4K Webcam',
-    description:
-      'A 4K UHD webcam with HDR and an AI auto-framing sensor. Dual mics with noise reduction.',
-    price: 119.0,
-    stockQuantity: 0,
-    category: 'Electronics',
-    imageKeys: electronicsImg,
-  },
-  {
-    name: 'Fast Wireless Charging Pad',
-    description:
-      'A slim 15W Qi pad with a non-slip surface and over-temperature protection. Case-friendly.',
-    price: 39.0,
-    stockQuantity: 90,
-    category: 'Electronics',
-    imageKeys: electronicsImg,
-  },
-  {
-    name: 'USB-C Hub 8-in-1',
-    description:
-      'Expand one USB-C port into HDMI 4K, Ethernet, SD, and three USB-A. Aluminium shell stays cool.',
-    price: 64.0,
     stockQuantity: 44,
-    category: 'Electronics',
-    imageKeys: electronicsImg,
+    category: 'Tops',
+    imageKeys: topsImg,
   },
 
-  // ── Lifestyle ────────────────────────────────────────────────────────────
+  // ── Blazer ─────────────────────────────────────────────────────────────────
   {
-    name: 'Ceramic Pour-Over Coffee Set',
+    name: 'Oversized Wool Blazer',
     description:
-      'A hand-glazed ceramic dripper and carafe set. Brews a clean, bright cup, one pour at a time.',
-    price: 72.0,
-    stockQuantity: 28,
-    category: 'Lifestyle',
-    imageKeys: lifestyleImg,
+      'A relaxed, double-breasted blazer in Italian wool. Structured shoulders, soft lapel, endlessly layerable.',
+    price: 245.0,
+    stockQuantity: 16,
+    category: 'Blazer',
+    imageKeys: blazerImg,
   },
   {
-    name: 'Linen Bedding Bundle',
+    name: 'Tailored Linen Blazer',
     description:
-      'Stonewashed French linen in a calming oat tone. A duvet cover and two pillowcases that soften with every wash.',
-    price: 199.0,
-    stockQuantity: 18,
-    category: 'Lifestyle',
-    imageKeys: lifestyleImg,
+      'A single-breasted linen blazer with a half-canvas front and patch pockets. Crisp tailoring, summer-light.',
+    price: 198.0,
+    stockQuantity: 22,
+    category: 'Blazer',
+    imageKeys: blazerImg,
   },
   {
-    name: 'Soy Wax Scented Candle',
+    name: 'Cropped Tweed Blazer',
     description:
-      'A 60-hour soy candle in fig and cedar. Poured into a reusable amber glass vessel.',
-    price: 34.0,
-    stockQuantity: 75,
-    category: 'Lifestyle',
-    imageKeys: lifestyleImg,
+      'A boxy, cropped tweed blazer with frayed trims and gilt buttons. A polished finish over denim or tailoring.',
+    price: 215.0,
+    stockQuantity: 0,
+    category: 'Blazer',
+    imageKeys: blazerImg,
   },
   {
-    name: 'Bamboo Bath Caddy',
+    name: 'Double-Breasted Pinstripe Blazer',
     description:
-      'An extendable bamboo tray with a book rest and glass holder. Water-resistant and foldable.',
-    price: 48.0,
-    stockQuantity: 33,
-    category: 'Lifestyle',
-    imageKeys: lifestyleImg,
-  },
-  {
-    name: 'Wool Throw Blanket',
-    description:
-      'A chunky, oversized throw in 100% lambswool. Earthy herringbone weave with fringed edges.',
-    price: 119.0,
-    stockQuantity: 20,
-    category: 'Lifestyle',
-    imageKeys: lifestyleImg,
-  },
-  {
-    name: 'Stoneware Dinner Set (4)',
-    description:
-      'A reactive-glaze stoneware set for four — plates and bowls, each piece subtly unique. Dishwasher safe.',
-    price: 145.0,
+      'A sharp, double-breasted pinstripe blazer cut from a recycled wool blend. Peak lapels and a nipped waist.',
+    price: 229.0,
     stockQuantity: 14,
-    category: 'Lifestyle',
-    imageKeys: lifestyleImg,
-  },
-  {
-    name: 'Matte Glass Water Bottle',
-    description:
-      'A 750ml borosilicate glass bottle with a protective silicone sleeve and leak-proof bamboo lid.',
-    price: 29.0,
-    stockQuantity: 110,
-    category: 'Lifestyle',
-    imageKeys: lifestyleImg,
+    category: 'Blazer',
+    imageKeys: blazerImg,
   },
 ];
