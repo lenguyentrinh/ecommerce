@@ -1,11 +1,19 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
 import { Repository } from 'typeorm';
 import { Product } from './entities/product.entity';
 import { ProductQueryDto, ProductSort } from './dto/product-query.dto';
 
-export type ProductResponse = Product & { imageUrls: string[] };
+// Public product shape: internal flags (`isActive`, `deletedAt`) are stripped
+// at read time — they are constant for returned rows and not part of the API.
+export type ProductResponse = Omit<Product, 'isActive' | 'deletedAt'> & {
+  imageUrls: string[];
+};
 
 export interface PaginatedProducts {
   data: ProductResponse[];
@@ -32,6 +40,16 @@ export class ProductsService {
     const { category, search, minPrice, maxPrice, inStock, sort, page, limit } =
       query;
 
+    if (
+      minPrice !== undefined &&
+      maxPrice !== undefined &&
+      minPrice > maxPrice
+    ) {
+      throw new BadRequestException(
+        'minPrice must not be greater than maxPrice',
+      );
+    }
+
     const qb = this.productsRepository
       .createQueryBuilder('product')
       .where('product.isActive = :isActive', { isActive: true });
@@ -41,9 +59,12 @@ export class ProductsService {
     }
 
     if (search) {
+      // Escape LIKE wildcards so user input is matched literally (default
+      // MySQL escape char is backslash); otherwise a lone `%` matches all rows.
+      const escaped = search.replace(/[\\%_]/g, (ch) => `\\${ch}`);
       qb.andWhere(
         '(product.name LIKE :search OR product.description LIKE :search)',
-        { search: `%${search}%` },
+        { search: `%${escaped}%` },
       );
     }
 
@@ -117,11 +138,22 @@ export class ProductsService {
     }
   }
 
-  /** Generate public image URLs at read time — keys are never stored as URLs. */
+  /**
+   * Generate public image URLs at read time — keys are never stored as URLs.
+   * Internal flags (`isActive`, `deletedAt`) are intentionally not exposed.
+   */
   private toResponse(product: Product): ProductResponse {
     const keys = product.imageKeys ?? [];
     return {
-      ...product,
+      id: product.id,
+      name: product.name,
+      description: product.description,
+      price: product.price,
+      stockQuantity: product.stockQuantity,
+      category: product.category,
+      imageKeys: product.imageKeys,
+      createdAt: product.createdAt,
+      updatedAt: product.updatedAt,
       imageUrls: keys.map((key) => `${this.imageBaseUrl}/${key}`),
     };
   }

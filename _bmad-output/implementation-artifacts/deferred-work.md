@@ -27,10 +27,3 @@
 ## Deferred from: code review of 1-5-account-profile-and-shipping-address-management (2026-06-26)
 
 - **Edit-form stale-row cross-tab race** — `AddressForm.tsx` opens edit by calling `getAddressesAPI()` and `list.find(id)`. If the address was deleted in another tab/session between list render and edit-open, `find` returns undefined, the form stays blank, and a submit 404s with a generic toast. Rare cross-session UX edge; address if it surfaces in testing.
-
-## Deferred from: code review of 2-2-home-page-and-category-pages (2026-06-27)
-
-- **ProductCard links to a not-yet-existing `/products/[id]`** — both the image and title links navigate to the PDP, which 404s until Story 2.3 ships. Explicitly accepted in the 2.2 spec (forward-compatible link). Resolves when the PDP route lands.
-- **Backend offset pagination lacks a stable sort tiebreaker** — `products.service.ts` orders by `createdAt DESC` (non-unique across seed rows) with `skip`/`take`; without an `id` tiebreaker, two adjacent infinite-scroll pages could return overlapping rows (duplicate cards). Backend hardening, Story 2.1 scope. (Frontend dedupe-on-append mitigates the symptom.)
-- **Re-seed product prices in VND magnitudes (backend)** — Story 2.1 seeds dollar-scale decimals (`189.00`, `245.00`); the 2.2 frontend now displays prices in VND, so they render as "189 ₫" (≈ nothing). Decision (2026-06-27): keep VND display, re-seed realistic đồng amounts (e.g. `1.890.000 ₫`) in `backend/src/database/seeds/product.seed.ts`. Backend task, out of Story 2.2 scope.
-- **Pre-existing Epic 1 lint/type debt** — full-repo `pnpm lint` (20 errors) and `tsc --noEmit` fail in Epic 1 files/tests (`Header.tsx`, `store/authThunk.ts`, `store/authSlice.test.ts`, `features/account/*`, auth/`useRequireAuth` `*.test.tsx`). Not introduced by 2.2 and does not block `next build`. Address under Story 1.5's review or a dedicated cleanup task.

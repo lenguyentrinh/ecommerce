@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="1000" viewBox="0 0 800 1000" role="img" aria-label="Blazer product placeholder">
+  <rect width="800" height="1000" fill="#e8dccb"/>
+  <path d="M310 230 L400 270 L490 230 L560 320 L510 380 L520 740 L280 740 L290 380 L240 320 Z" fill="#c9b2a6"/>
+  <path d="M400 270 L370 740 L430 740 L400 270 Z" fill="#b39b8c"/>
+  <text x="400" y="880" font-family="sans-serif" font-size="34" fill="#787770" text-anchor="middle" letter-spacing="6">BLAZER</text>
+</svg>

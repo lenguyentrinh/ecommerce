@@ -1,6 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="800" height="1000" viewBox="0 0 800 1000" role="img" aria-label="Fashion product placeholder">
-  <rect width="800" height="1000" fill="#fdebdc"/>
-  <circle cx="400" cy="360" r="120" fill="#e7c6c1"/>
-  <rect x="300" y="460" width="200" height="320" rx="20" fill="#c9b2a6"/>
-  <text x="400" y="880" font-family="sans-serif" font-size="34" fill="#787770" text-anchor="middle" letter-spacing="6">FASHION</text>
-</svg>

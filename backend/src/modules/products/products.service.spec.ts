@@ -1,7 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { NotFoundException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { validate } from 'class-validator';
+import { plainToInstance } from 'class-transformer';
 import { ProductsService } from './products.service';
 import { Product } from './entities/product.entity';
 import { ProductQueryDto, ProductSort } from './dto/product-query.dto';
@@ -13,8 +15,8 @@ function makeProduct(overrides: Partial<Product> = {}): Product {
     description: 'A product',
     price: 100,
     stockQuantity: 5,
-    category: 'Fashion',
-    imageKeys: ['fashion-1.svg', 'fashion-2.svg'],
+    category: 'Dresses',
+    imageKeys: ['dresses-1.svg', 'dresses-2.svg'],
     isActive: true,
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -78,8 +80,8 @@ describe('ProductsService', () => {
       expect(result.page).toBe(2);
       expect(result.limit).toBe(10);
       expect(result.data[0].imageUrls).toEqual([
-        '/images/placeholders/fashion-1.svg',
-        '/images/placeholders/fashion-2.svg',
+        '/images/placeholders/dresses-1.svg',
+        '/images/placeholders/dresses-2.svg',
       ]);
       // Always filters to active products.
       expect(qb.where).toHaveBeenCalledWith('product.isActive = :isActive', {
@@ -96,7 +98,7 @@ describe('ProductsService', () => {
       await service.findAll({
         page: 1,
         limit: 12,
-        category: 'Fashion',
+        category: 'Dresses',
         search: 'dress',
         minPrice: 50,
         maxPrice: 200,
@@ -104,7 +106,7 @@ describe('ProductsService', () => {
       });
 
       expect(qb.andWhere).toHaveBeenCalledWith('product.category = :category', {
-        category: 'Fashion',
+        category: 'Dresses',
       });
       expect(qb.andWhere).toHaveBeenCalledWith(
         '(product.name LIKE :search OR product.description LIKE :search)',
@@ -129,6 +131,35 @@ describe('ProductsService', () => {
       await service.findAll({ page: 1, limit: 12, sort });
       expect(qb.orderBy).toHaveBeenCalledWith(column, dir);
     });
+
+    it('does not apply the stock filter when inStock is false', async () => {
+      qb.getManyAndCount.mockResolvedValue([[], 0]);
+      await service.findAll({ page: 1, limit: 12, inStock: false });
+      expect(qb.andWhere).not.toHaveBeenCalledWith('product.stockQuantity > 0');
+    });
+
+    it('escapes LIKE wildcards in the search term', async () => {
+      qb.getManyAndCount.mockResolvedValue([[], 0]);
+      await service.findAll({ page: 1, limit: 12, search: '50%_off' });
+      expect(qb.andWhere).toHaveBeenCalledWith(
+        '(product.name LIKE :search OR product.description LIKE :search)',
+        { search: '%50\\%\\_off%' },
+      );
+    });
+
+    it('rejects an inverted price range without querying', async () => {
+      await expect(
+        service.findAll({ page: 1, limit: 12, minPrice: 200, maxPrice: 50 }),
+      ).rejects.toBeInstanceOf(BadRequestException);
+      expect(repo.createQueryBuilder).not.toHaveBeenCalled();
+    });
+
+    it('excludes internal flags (isActive, deletedAt) from responses', async () => {
+      qb.getManyAndCount.mockResolvedValue([[makeProduct()], 1]);
+      const result = await service.findAll({ page: 1, limit: 12 });
+      expect(result.data[0]).not.toHaveProperty('isActive');
+      expect(result.data[0]).not.toHaveProperty('deletedAt');
+    });
   });
 
   describe('findOne', () => {
@@ -136,7 +167,7 @@ describe('ProductsService', () => {
       repo.findOne.mockResolvedValue(makeProduct({ id: 7 }));
       const result = await service.findOne(7);
       expect(result.id).toBe(7);
-      expect(result.imageUrls[0]).toBe('/images/placeholders/fashion-1.svg');
+      expect(result.imageUrls[0]).toBe('/images/placeholders/dresses-1.svg');
       expect(repo.findOne).toHaveBeenCalledWith({
         where: { id: 7, isActive: true },
       });
@@ -153,15 +184,41 @@ describe('ProductsService', () => {
   describe('getCategories', () => {
     it('returns distinct active category names', async () => {
       qb.getRawMany.mockResolvedValue([
-        { category: 'Electronics' },
-        { category: 'Fashion' },
-        { category: 'Lifestyle' },
+        { category: 'Blazer' },
+        { category: 'Dresses' },
+        { category: 'Tops' },
       ]);
       const result = await service.getCategories();
-      expect(result).toEqual(['Electronics', 'Fashion', 'Lifestyle']);
+      expect(result).toEqual(['Blazer', 'Dresses', 'Tops']);
       expect(qb.where).toHaveBeenCalledWith('product.isActive = :isActive', {
         isActive: true,
       });
     });
+  });
+});
+
+describe('ProductQueryDto validation', () => {
+  it('rejects a limit above the 100 cap', async () => {
+    const dto = plainToInstance(ProductQueryDto, { limit: '500' });
+    const errors = await validate(dto);
+    expect(errors.some((e) => e.property === 'limit')).toBe(true);
+  });
+
+  it('accepts a limit at the cap and applies page/limit defaults', async () => {
+    const capped = plainToInstance(ProductQueryDto, { limit: '100' });
+    expect((await validate(capped)).length).toBe(0);
+
+    const defaults = plainToInstance(ProductQueryDto, {});
+    expect(defaults.page).toBe(1);
+    expect(defaults.limit).toBe(12);
+  });
+
+  it('trims and drops empty/whitespace-only search and category', () => {
+    const dto = plainToInstance(ProductQueryDto, {
+      search: '  dress  ',
+      category: '   ',
+    });
+    expect(dto.search).toBe('dress');
+    expect(dto.category).toBeUndefined();
   });
 });
