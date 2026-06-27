@@ -27,11 +27,3 @@
 ## Deferred from: code review of 1-5-account-profile-and-shipping-address-management (2026-06-26)
 
 - **Edit-form stale-row cross-tab race** — `AddressForm.tsx` opens edit by calling `getAddressesAPI()` and `list.find(id)`. If the address was deleted in another tab/session between list render and edit-open, `find` returns undefined, the form stays blank, and a submit 404s with a generic toast. Rare cross-session UX edge; address if it surfaces in testing.
-
-## Deferred from: code review of 2-1-product-entity-api-and-seed-data (2026-06-27)
-
-- **No indexes on `price`/`createdAt`/`stockQuantity`** — `products.service.findAll` filters on price/stock and sorts by price/createdAt, but only `category` and `isActive` are indexed (`product.entity.ts` / `CreateProducts` migration). Price-range and price/newest-sort queries full-scan as the catalogue grows. MVP-acceptable; add composite/covering indexes at scale.
-- **Seeder idempotency is serial-only** — `seed.ts` dedups on `name` but the migration adds no unique constraint on `name`. Concurrent seed runs can double-insert, and re-seeding after soft-deleting a seeded product creates a duplicate active row (`repo.find` excludes soft-deleted rows from the existing-names set). Serial dev/CI seeding is the only real usage today; add a unique index on `name` / upsert if concurrent seeding is ever needed.
-- **`imageKeys` unvalidated/unsanitized** — `toResponse()` builds URLs via `${base}/${key}` with no validation. No write path exists in this story (keys come only from trusted seed data), but once admin create/update lands (Story 5.2/5.3) untrusted keys could produce path-traversal or malformed URLs. Add key validation + `encodeURIComponent` when the write path arrives.
-- **`category` is unconstrained free-text** — entity, migration, and query DTO all treat `category` as a plain string with no enum/lookup table. No canonical taxonomy; a typo'd category filter returns an empty page rather than a 404/hint. Revisit with an enum or lookup table in a future catalogue story.
-- **No max cap on `page`** — `product-query.dto.ts` caps `limit` (`@Max(100)`) but not `page`; a very large `page` yields a large offset scan. Low risk; add a cap if abuse is observed.

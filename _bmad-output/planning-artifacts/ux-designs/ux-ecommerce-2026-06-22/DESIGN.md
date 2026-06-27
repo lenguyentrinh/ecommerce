@@ -3,7 +3,7 @@ title: "Oren — Soft Minimal Luxury Visual Design System"
 project: "ecommerce (Oren)"
 status: "draft"
 created: "2026-06-22"
-updated: "2026-06-22"
+updated: "2026-06-27"
 form_factor: "mobile-first responsive (shopper), desktop-first (admin)"
 brand: "Oren Premium Women's Fashion"
 source_of_truth: "Stitch 'Oren Soft Minimal Boutique' design system (projects/2621556029010588670)"
@@ -30,6 +30,7 @@ colors:
   error-container: '#ffdad6'
 typography:
   font-family: "'Nunito Sans', sans-serif"
+  editorial-serif: "'Playfair Display', serif"   # italic only — reserved for the wordmark + hero headline
   display-lg:
     fontSize: 48px
     fontWeight: '700'
@@ -81,7 +82,7 @@ spacing:
 
 # DESIGN.md — Oren Visual Identity
 
-A **Soft Minimal Luxury** aesthetic for premium women's fashion. Feminine, calm, editorial, emotionally resonant — a high-end lookbook meets a serene boutique interior. Whitespace and silence are design tools. Nunito Sans exclusively. Warm-neutral palette with a single blush accent.
+A **Soft Minimal Luxury** aesthetic for premium women's fashion. Feminine, calm, editorial, emotionally resonant — a high-end lookbook meets a serene boutique interior. Whitespace and silence are design tools. Nunito Sans is the interface voice, with Playfair Display *italic* reserved for the wordmark and hero headline. Warm-neutral palette with a single blush accent.
 
 > **Source of truth:** This document is reconciled from the Stitch *"Oren Soft Minimal Boutique"* design system (`projects/2621556029010588670`). Where this file and any earlier mock/import disagree, **this file wins**. All pre-pivot tech styling (indigo `#4f46e5`, Inter/system fonts, hard shadows, 4px-default corners) has been removed — see `.decision-log.md` D4.
 
@@ -96,7 +97,7 @@ A **Soft Minimal Luxury** aesthetic for premium women's fashion. Feminine, calm,
 **Aesthetic anchors**:
 - Warm-neutral palette (ivory + beige + blush + clay) — no tech colors
 - Generous whitespace and breathing room (silence as luxury)
-- Nunito Sans exclusively (warmth, brand consistency)
+- Nunito Sans as the single UI voice; Playfair Display *italic* reserved for the wordmark + hero headline (editorial luxury accent)
 - Large product imagery dominates (60–70% of viewport)
 - Soft ambient shadows + 2–3% global film-grain overlay (paper-like materiality)
 - Slow, calm motion — 300ms `cubic-bezier(0.4, 0, 0.2, 1)`
@@ -146,15 +147,18 @@ The palette is a sophisticated range of **warm neutrals** for a soft, low-fatigu
 
 ## Typography
 
-### Font system — Nunito Sans exclusive
+### Font system — Nunito Sans voice + Playfair editorial accent
 
 ```css
-font-family: 'Nunito Sans', sans-serif;
+font-family: 'Nunito Sans', sans-serif;     /* the entire interface */
+font-family: 'Playfair Display', serif;     /* italic only — wordmark + hero headline */
 ```
 
-- **Single family**: Nunito Sans across all roles (warmth, femininity, consistency).
-- **Load locally** via `next/font/local` (per project convention — do **not** reintroduce a Google Fonts CDN dependency). Weights needed: 400, 600, 700.
-- **Fallback**: `sans-serif` only.
+- **Primary voice**: Nunito Sans across all UI roles (warmth, femininity, consistency) — headlines, body, labels, buttons, forms.
+- **Editorial accent**: **Playfair Display, *italic only*** — reserved strictly for the **"Oren" wordmark** and the **primary hero headline** (e.g. *The Art of Dressing*). This is the one permitted serif: a distinctive high-contrast display serif, justified by the luxury-editorial brand. Never use it for body, UI labels, buttons, or any dense/secondary text.
+- **Load locally** via `next/font/local` (per project convention — do **not** reintroduce a Google Fonts CDN dependency). Nunito weights: 400, 600, 700; Playfair: italic 400–700.
+- **Fallback**: `sans-serif` for the UI voice; `serif` for the editorial accent.
+- **Italic descender care**: when the hero serif word carries a descender (g, y, p), give it ≥1.1 line-height + a touch of bottom padding so the tail never clips.
 
 ### Type scale — editorial & luxury
 
@@ -192,9 +196,10 @@ font-family: 'Nunito Sans', sans-serif;
 
 ### Grid
 
-- **Desktop**: 12-column grid, **64px** outer margins, max-width container centered. Product cards may **stagger at different heights** for a dynamic, curated rhythm.
-- **Tablet**: transitional 3-column.
-- **Mobile**: 2-column **staggered masonry** for product listings, **20px** side padding minimum (content never feels "trapped").
+- **Desktop**: 12-column grid, **64px** outer margins, max-width container (1400px) centered. Product grid is **4-up**.
+- **Tablet**: transitional **3-up** grid.
+- **Mobile**: **2-up** grid, **20px** side padding minimum (content never feels "trapped").
+- **Grid rhythm**: the shipped default is a **uniform responsive grid** (4 / 3 / 2). *Staggered masonry — cards at varied heights — is an aspirational polish, not the default* (it complicates infinite-scroll column balancing; revisit as a later enhancement).
 
 ### Breathing room
 
@@ -289,6 +294,16 @@ Organic and friendly — roundedness removes "sharpness" and aligns with the cal
 - **Size selector**: pill chips, no harsh borders; selected state = blush fill / Soft Clay border
 - **Add to Cart**: primary pill button, full-width
 
+### Home Page — Collection-Focused composition
+
+The marketing home page is a calm editorial descent, not a feature wall:
+
+1. **Hero** — full-bleed editorial photography behind a warm Brown scrim (strong enough for WCAG-AA white text). Centered eyebrow (Label SM, tracked) + italic Playfair headline (*The Art of Dressing*) + one inverse pill CTA. Height driven by `svh`/`dvh`, never `h-screen`.
+2. **Featured Curations** — a **3-up** strip of large, image-led cards on the *Editorial Diagonal* warm gradient. The lead card carries a single semantic **"Best Seller"** badge (frosted Warm-White). Naked images with a category eyebrow + name + price below — no card chrome.
+3. **New Arrivals** — a **4-up** grid reusing the standard **Product Card** (contained, shadowed, hover-reveal CTA) on the plain Ivory canvas, with a "Just Dropped" eyebrow and a "View All" link.
+
+The two product bands are deliberately distinct (3-up gradient + naked images vs 4-up ivory + contained cards) so no two consecutive sections share a layout family. No carousel, no auto-advance, no scroll cues.
+
 ### Input fields
 
 - Rounded rectangle, **16px** radius, **Warm Beige** `#e8dccb` (or Sand `#fdebdc`) fill, border none
@@ -317,7 +332,7 @@ All hover/state changes use the calm easing `cubic-bezier(0.4, 0, 0.2, 1)` over 
 ## Do's and Don'ts
 
 ### Do's ✅
-- **Nunito Sans exclusively** — all UI, all sizes (load locally, not via CDN)
+- **Nunito Sans for all UI**; **Playfair Display *italic*** only for the wordmark + hero headline (load both locally, not via CDN)
 - **Tracked 600/700 headlines** + airy 400 body (editorial luxury)
 - **Generous whitespace** — ≥80px between major sections; silence = luxury
 - **Image-first** — product photos dominate (60–70%)
@@ -329,7 +344,7 @@ All hover/state changes use the calm easing `cubic-bezier(0.4, 0, 0.2, 1)` over 
 - **Touch-friendly** — 44px+ tap targets, generous padding
 
 ### Don'ts ❌
-- **Any font except Nunito Sans**; no system fallbacks beyond `sans-serif`
+- **Inter, generic system serifs** (Times/Georgia/Garamond), or **any font beyond Nunito Sans (UI) + Playfair Display italic (wordmark/hero)**
 - **Tech colors** — no blue, no indigo `#4f46e5`, no harsh accents
 - **Pure black or pure white** — use the warm palette
 - **Hard shadows / sharp edges / dense layouts** — this is silence, not clutter
@@ -343,7 +358,7 @@ All hover/state changes use the calm easing `cubic-bezier(0.4, 0, 0.2, 1)` over 
 ## Dark Mode & Responsive
 
 - **Dark mode**: deferred to v1.1 (light-only).
-- **Responsive**: Mobile 2-col masonry (20px padding) → Tablet 3-col → Desktop 12-col grid (64px margins, centered max-width).
+- **Responsive**: Mobile 2-up (20px padding) → Tablet 3-up → Desktop 4-up within a 12-col scaffold (64px margins, centered 1400px max-width). Uniform grid is the default; masonry is aspirational.
 - **Breakpoints**: Mobile 0–767px · Tablet 768–1023px · Desktop 1024px+.
 
 ---
@@ -358,5 +373,5 @@ All hover/state changes use the calm easing `cubic-bezier(0.4, 0, 0.2, 1)` over 
 
 ## Document Status
 
-**Status**: Draft (reconciled to Stitch source of truth) · **Last updated**: 2026-06-22
+**Status**: Draft (reconciled to Stitch source of truth) · **Last updated**: 2026-06-27 — codified Playfair Display *italic* as the editorial accent, reconciled the product grid to a uniform default (masonry now aspirational), and added the Collection-Focused home-page composition.
 **Next**: align EXPERIENCE.md token references, resolve off-brand microcopy/journeys, then Finalize + key-screen mockups.
