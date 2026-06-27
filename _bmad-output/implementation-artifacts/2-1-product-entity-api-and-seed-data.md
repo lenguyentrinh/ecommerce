@@ -247,3 +247,10 @@ _Code review 2026-06-27 — 3 review layers (Blind Hunter, Edge Case Hunter, Acc
 - [x] [Review][Defer] `imageKeys` unvalidated/unsanitized — once admin create/update lands (Story 5.2/5.3) untrusted keys could yield path-traversal or malformed URLs via `${base}/${key}`; add key validation + `encodeURIComponent` then [`products.service.ts:120-127`] — deferred, no write path in this story, keys are trusted seed data
 - [x] [Review][Defer] `category` is unconstrained free-text — no canonical taxonomy/enum/lookup; typos return an empty page rather than a 404/hint [`product.entity.ts` / `product-query.dto.ts:20-22`] — deferred, free-text category is the current spec-level design
 - [x] [Review][Defer] No max cap on `page` (only `limit` is capped) — a very large `page` produces a large offset scan [`product-query.dto.ts:48-52`] — deferred, low risk, add a cap if abuse is observed
+
+### Review Findings — re-categorization delta (2026-06-27, commit `e2c63cb`)
+
+_Second review pass over the Dresses/Tops/Blazer seed re-categorization (3 layers). AC #2 (≥10 products, exactly 3 categories, local placeholder SVGs only, idempotent), AC #4 read-time image URLs, and the spec/Task-3 updates all verified PASS by the Acceptance Auditor. All 6 prior defers re-confirmed (already tracked in `deferred-work.md`); 6 findings dismissed as noise/false-positive (notably the "LIKE missing ESCAPE clause" — false positive: MySQL's default LIKE escape char is `\`)._
+
+- [x] [Review][Patch] Stale old-category fixtures remain in the modernized test file — FIXED: filter test now uses `category: 'Dresses'` and the `getCategories` test asserts `['Blazer','Dresses','Tops']`, consistent with the new taxonomy — 16/16 passing [`products.service.spec.ts:101,109,187-192`]
+- [x] [Review][Patch] Missing trailing newline at end of file — FIXED: restored final CRLF newline [`products.service.ts` EOF]

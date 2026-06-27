@@ -98,7 +98,7 @@ describe('ProductsService', () => {
       await service.findAll({
         page: 1,
         limit: 12,
-        category: 'Fashion',
+        category: 'Dresses',
         search: 'dress',
         minPrice: 50,
         maxPrice: 200,
@@ -106,7 +106,7 @@ describe('ProductsService', () => {
       });
 
       expect(qb.andWhere).toHaveBeenCalledWith('product.category = :category', {
-        category: 'Fashion',
+        category: 'Dresses',
       });
       expect(qb.andWhere).toHaveBeenCalledWith(
         '(product.name LIKE :search OR product.description LIKE :search)',
@@ -184,12 +184,12 @@ describe('ProductsService', () => {
   describe('getCategories', () => {
     it('returns distinct active category names', async () => {
       qb.getRawMany.mockResolvedValue([
-        { category: 'Electronics' },
-        { category: 'Fashion' },
-        { category: 'Lifestyle' },
+        { category: 'Blazer' },
+        { category: 'Dresses' },
+        { category: 'Tops' },
       ]);
       const result = await service.getCategories();
-      expect(result).toEqual(['Electronics', 'Fashion', 'Lifestyle']);
+      expect(result).toEqual(['Blazer', 'Dresses', 'Tops']);
       expect(qb.where).toHaveBeenCalledWith('product.isActive = :isActive', {
         isActive: true,
       });
