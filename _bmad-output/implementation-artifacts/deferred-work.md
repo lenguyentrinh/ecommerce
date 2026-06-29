@@ -31,3 +31,11 @@
 ## Deferred from: code review of 2-3-product-detail-page (2026-06-29)
 
 - **Mixed currency on the PDP info panel** — product prices render in VND (e.g. `189.000 ₫` via `formatPrice`), but the trust line hardcodes "Free shipping over **$150**". Kept as decorative copy for this frontend story (story Question #2). Revisit alongside the deferred VND-magnitude re-seed so the threshold matches the displayed currency. [frontend/components/ui/ProductInfo.tsx]
+
+## Deferred from: code review of 2-4-search-bar-and-filter-sort-ui (2026-06-29)
+
+- **Search result count tracks first page only** — "Showing X of Y results" sets X = the SSR first-page count (≤ limit); it does not grow as infinite scroll appends more. Accepted MVP (story Question #3). To make X track the live count it must observe `ProductGrid` state (lift the count or have the grid report it). [frontend/app/search/page.tsx]
+
+## Deferred from: code review of 1-5-account-profile-and-shipping-address-management-frontend (2026-06-29)
+
+- **Deleting the default address doesn't re-promote another (backend)** — `backend/src/modules/users/user.service.ts removeAddress` deletes the row without promoting another address to default, leaving the account with no default address. Belongs to the 1-5 backend split story. The frontend mitigates by re-fetching the list after deleting a default so the UI is truthful, but the data-model invariant ("one default when ≥1 address exists") needs the backend fix. [backend/src/modules/users/user.service.ts]

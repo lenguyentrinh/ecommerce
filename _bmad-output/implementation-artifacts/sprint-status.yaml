@@ -38,7 +38,8 @@ generated: 2026-06-23
 last_updated: 2026-06-29
 project: ecommerce
 # 2026-06-29: story 2-3 implemented (dev-story) → review → done (code-review, 8 patches applied)
-# 2026-06-29: story 2-4 contexted (create-story) → ready-for-dev
+# 2026-06-29: story 2-4 contexted (create-story) → ready-for-dev → in-progress → review (dev-story) → done (code-review, 4 patches)
+# 2026-06-29: story 2-1 reconciled review → done (story file already done + reviewed 2026-06-27; sprint entry was stale)
 
 
 project_key: NOKEY
@@ -57,10 +58,10 @@ development_status:
 
   # ── Epic 2: Product Catalog & Discovery ──────────────────────────────────
   epic-2: in-progress
-  2-1-product-entity-api-and-seed-data: review
+  2-1-product-entity-api-and-seed-data: done
   2-2-home-page-and-category-pages: done
   2-3-product-detail-page: done
-  2-4-search-bar-and-filter-sort-ui: ready-for-dev
+  2-4-search-bar-and-filter-sort-ui: done
   epic-2-retrospective: optional
 
   # ── Epic 3: Shopping Cart ─────────────────────────────────────────────────

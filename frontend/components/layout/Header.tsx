@@ -3,10 +3,11 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { FiSearch, FiShoppingBag, FiUser } from "react-icons/fi";
+import { FiShoppingBag, FiUser } from "react-icons/fi";
 import { AppDispatch, RootState } from "@/store/store";
 import { useRouter } from "next/navigation";
 import { logoutThunk } from "@/store/authThunk";
+import SearchBar from "@/components/ui/SearchBar";
 
 const navItems = [
   { label: "Home", href: "/" },
@@ -76,11 +77,9 @@ export default function Header() {
           </nav>
         </div>
 
-        {/* Utility icons */}
-        <div className="flex items-center gap-md">
-          <button type="button" aria-label="Search" className={iconBtn}>
-            <FiSearch size={20} />
-          </button>
+        {/* Utility: search + icons */}
+        <div className="flex items-center gap-sm md:gap-md">
+          <SearchBar className="w-32 sm:w-44 md:w-56" />
           <Link href="/product" aria-label="Shopping bag" className={iconBtn}>
             <FiShoppingBag size={20} />
           </Link>

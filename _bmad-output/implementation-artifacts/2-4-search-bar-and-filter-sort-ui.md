@@ -4,7 +4,7 @@ baseline_commit: c8a5f3310a133c21ad320da7a3c9e49b2507f86b
 
 # Story 2.4: Search Bar & Filter/Sort UI
 
-Status: ready-for-dev
+Status: done
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -33,33 +33,52 @@ so that I can quickly find exactly what I'm looking for.
 ## Tasks / Subtasks
 
 - [ ] **Task 1 — `SearchBar` component, wired into the Header (AC: #1, #6)**
-  - [ ] Create `frontend/components/ui/SearchBar.tsx` (`"use client"`). A controlled `<input type="search">` inside a `<form role="search">`; on submit, `router.push('/search?q=' + encodeURIComponent(trimmed))` (skip navigation if empty). Seed the input from `useSearchParams().get('q')` so it reflects the active query on `/search`.
-  - [ ] Styling: Warm White field (`bg-warm-white`), `border border-hairline`, **`focus:border-clay`** (or focus ring `ring-clay`), `rounded-full`, **min height 44px** (`h-11` or `py-3`), comfortable padding, a leading `FiSearch` icon (reuse `react-icons/fi` — already a dep). An **X clear button** (`aria-label="Clear search"`) shows only when the field is non-empty; clicking clears the input (and refocuses it).
-  - [ ] Integrate into `frontend/components/layout/Header.tsx`: replace the non-functional `<button aria-label="Search">` (lines ~81-83) with the `SearchBar` (or a search-icon trigger that reveals it). The header is already `sticky top-0 z-40`, satisfying the "stays visible on mobile scroll" requirement — do not add a second sticky bar. Keep the header on one line at desktop (Section: nav must not wrap); on small screens the search field can sit on its own row or collapse to the icon (document your choice). Preserve the auth dropdown + nav + cart/account icons exactly.
-  - [ ] `Header.tsx` is already a Client Component; `useRouter`/`useSearchParams` are available. Wrap any `useSearchParams` usage so it does not break SSR/prerender of pages that render the header (Next 16 requires a Suspense boundary around `useSearchParams` in some cases — see Dev Notes → useSearchParams).
+  - [x] Create `frontend/components/ui/SearchBar.tsx` (`"use client"`). A controlled `<input type="search">` inside a `<form role="search">`; on submit, `router.push('/search?q=' + encodeURIComponent(trimmed))` (skip navigation if empty). Seed the input from `useSearchParams().get('q')` so it reflects the active query on `/search`.
+  - [x] Styling: Warm White field (`bg-warm-white`), `border border-hairline`, **`focus:border-clay`** (or focus ring `ring-clay`), `rounded-full`, **min height 44px** (`h-11` or `py-3`), comfortable padding, a leading `FiSearch` icon (reuse `react-icons/fi` — already a dep). An **X clear button** (`aria-label="Clear search"`) shows only when the field is non-empty; clicking clears the input (and refocuses it).
+  - [x] Integrate into `frontend/components/layout/Header.tsx`: replace the non-functional `<button aria-label="Search">` (lines ~81-83) with the `SearchBar` (or a search-icon trigger that reveals it). The header is already `sticky top-0 z-40`, satisfying the "stays visible on mobile scroll" requirement — do not add a second sticky bar. Keep the header on one line at desktop (Section: nav must not wrap); on small screens the search field can sit on its own row or collapse to the icon (document your choice). Preserve the auth dropdown + nav + cart/account icons exactly.
+  - [x] `Header.tsx` is already a Client Component; `useRouter`/`useSearchParams` are available. Wrap any `useSearchParams` usage so it does not break SSR/prerender of pages that render the header (Next 16 requires a Suspense boundary around `useSearchParams` in some cases — see Dev Notes → useSearchParams).
 - [ ] **Task 2 — `/search` results route (AC: #2, #4, #5)**
-  - [ ] Create `frontend/app/search/page.tsx` as an **async Server Component**. **Next 16: `searchParams` is a Promise** — `const sp = await searchParams`. Read `q`, `category`, `minPrice`, `maxPrice`, `inStock`, `sort`.
-  - [ ] Build a `ProductQuery` from the params (coerce `minPrice`/`maxPrice` to numbers, `inStock` to boolean, validate `sort` against the allowed set) and call `getProducts({ search: q, ...filters, page: 1, limit: 12 })`. Do **not** wrap in a try/catch that swallows the throw — a failure must surface via `error.tsx` (AC #5).
-  - [ ] Render: the result count "Showing {data.length} of {total} results"; the `FilterSortPanel` (Task 3); then either the `ProductGrid` seeded with results, or the **empty state** "No results found. Try a different search or browse categories." + a `next/link` to `/` (when `total === 0`).
-  - [ ] `export async function generateMetadata({ searchParams })` → title like `"Search: {q} — Oren"` (or `"Search — Oren"` when `q` is empty); guard for missing `q`.
-  - [ ] Add `frontend/app/search/loading.tsx` — skeleton grid (reuse `ProductCardSkeleton`) + a **"Searching…"** status line (`role="status"`). Add `frontend/app/search/error.tsx` (`"use client"`, mirror `app/categories/[name]/error.tsx`) → "Something went wrong. Please try again." + `reset()` retry + back-home link (AC #5).
-  - [ ] (Optional, AC #5 ">2s") wrap the `getProducts` call for `/search` in an `AbortController` with a ~2s timeout so a slow backend trips `error.tsx` rather than hanging. Document if you implement it; otherwise the generic failure path covers it.
+  - [x] Create `frontend/app/search/page.tsx` as an **async Server Component**. **Next 16: `searchParams` is a Promise** — `const sp = await searchParams`. Read `q`, `category`, `minPrice`, `maxPrice`, `inStock`, `sort`.
+  - [x] Build a `ProductQuery` from the params (coerce `minPrice`/`maxPrice` to numbers, `inStock` to boolean, validate `sort` against the allowed set) and call `getProducts({ search: q, ...filters, page: 1, limit: 12 })`. Do **not** wrap in a try/catch that swallows the throw — a failure must surface via `error.tsx` (AC #5).
+  - [x] Render: the result count "Showing {data.length} of {total} results"; the `FilterSortPanel` (Task 3); then either the `ProductGrid` seeded with results, or the **empty state** "No results found. Try a different search or browse categories." + a `next/link` to `/` (when `total === 0`).
+  - [x] `export async function generateMetadata({ searchParams })` → title like `"Search: {q} — Oren"` (or `"Search — Oren"` when `q` is empty); guard for missing `q`.
+  - [x] Add `frontend/app/search/loading.tsx` — skeleton grid (reuse `ProductCardSkeleton`) + a **"Searching…"** status line (`role="status"`). Add `frontend/app/search/error.tsx` (`"use client"`, mirror `app/categories/[name]/error.tsx`) → "Something went wrong. Please try again." + `reset()` retry + back-home link (AC #5).
+  - [x] (Optional, AC #5 ">2s") wrap the `getProducts` call for `/search` in an `AbortController` with a ~2s timeout so a slow backend trips `error.tsx` rather than hanging. Document if you implement it; otherwise the generic failure path covers it.
 - [ ] **Task 3 — `FilterSortPanel` component (AC: #3, #4)**
-  - [ ] Create `frontend/components/ui/FilterSortPanel.tsx` (`"use client"`). Reads current filters from `useSearchParams()`; writes changes by composing a new query string and `router.push(pathname + '?' + params)` (use `usePathname()` so the SAME component works on `/search` and `/categories/[name]`). Always reset `page` to 1 on any filter change.
-  - [ ] Controls: **Price Range** — two number inputs (`min`, `max`), applied on blur/Enter or an "Apply" affordance (debounce or explicit apply — do NOT push on every keystroke). **In Stock** — a toggle (reuse `Chip` with `selected`/`aria-pressed`, or a labeled checkbox). **Sort** — a native `<select>` (accessible, simplest) mapping the 4 labels to `price_asc|price_desc|newest|popularity`. **Category** — see Dev Notes → Category constraint (single-select for MVP; fetch options via `getCategories()` — pass them in as a prop from the Server page to avoid a client fetch).
-  - [ ] **Applied-filter chips:** above the grid, render one dismissible chip per active filter (e.g. "Under 200.000 ₫", "In Stock", "Fashion", "Price ↑"). Each chip has an **X** that removes just that param (`router.push` without it). A **"Clear all"** control removes all filter params (keep `q` on `/search`; keep the category path on `/categories/[name]`). `Chip` is a toggle button — for dismissible chips, render a small custom chip with an X button (don't overload `Chip`'s semantics).
-  - [ ] Guard against invalid input: `minPrice > maxPrice` should not be submitted (the backend 400s on it — Story 2.1); clamp or block and show a hint. Empty/whitespace values are omitted from the URL.
+  - [x] Create `frontend/components/ui/FilterSortPanel.tsx` (`"use client"`). Reads current filters from `useSearchParams()`; writes changes by composing a new query string and `router.push(pathname + '?' + params)` (use `usePathname()` so the SAME component works on `/search` and `/categories/[name]`). Always reset `page` to 1 on any filter change.
+  - [x] Controls: **Price Range** — two number inputs (`min`, `max`), applied on blur/Enter or an "Apply" affordance (debounce or explicit apply — do NOT push on every keystroke). **In Stock** — a toggle (reuse `Chip` with `selected`/`aria-pressed`, or a labeled checkbox). **Sort** — a native `<select>` (accessible, simplest) mapping the 4 labels to `price_asc|price_desc|newest|popularity`. **Category** — see Dev Notes → Category constraint (single-select for MVP; fetch options via `getCategories()` — pass them in as a prop from the Server page to avoid a client fetch).
+  - [x] **Applied-filter chips:** above the grid, render one dismissible chip per active filter (e.g. "Under 200.000 ₫", "In Stock", "Fashion", "Price ↑"). Each chip has an **X** that removes just that param (`router.push` without it). A **"Clear all"** control removes all filter params (keep `q` on `/search`; keep the category path on `/categories/[name]`). `Chip` is a toggle button — for dismissible chips, render a small custom chip with an X button (don't overload `Chip`'s semantics).
+  - [x] Guard against invalid input: `minPrice > maxPrice` should not be submitted (the backend 400s on it — Story 2.1); clamp or block and show a hint. Empty/whitespace values are omitted from the URL.
 - [ ] **Task 4 — Reuse the panel on results + category pages (AC: #3, #6)**
-  - [ ] In `frontend/app/search/page.tsx`, render `FilterSortPanel` with the category options.
-  - [ ] **Modify `frontend/app/categories/[name]/page.tsx`** (Story 2.2, `done`) to: read the same filter/sort `searchParams` (now also a Promise — add `searchParams` to the page props), merge them into the `getProducts({ category, ...filters })` call, and render `FilterSortPanel`. **Preserve** the existing category resolution (case-insensitive match → `notFound()` for unknown), the `revalidate`, `generateStaticParams`, `generateMetadata`, and `ProductGrid` infinite scroll. The panel must NOT offer a Category control on the category page (the category is fixed by the route) — or it offers it as a way to jump categories; pick one and document.
-  - [ ] Verify `ProductGrid`'s `queryParams` includes the active filters so **infinite-scroll pages inherit the same filters** (otherwise page 2 would drop the filters).
+  - [x] In `frontend/app/search/page.tsx`, render `FilterSortPanel` with the category options.
+  - [x] **Modify `frontend/app/categories/[name]/page.tsx`** (Story 2.2, `done`) to: read the same filter/sort `searchParams` (now also a Promise — add `searchParams` to the page props), merge them into the `getProducts({ category, ...filters })` call, and render `FilterSortPanel`. **Preserve** the existing category resolution (case-insensitive match → `notFound()` for unknown), the `revalidate`, `generateStaticParams`, `generateMetadata`, and `ProductGrid` infinite scroll. The panel must NOT offer a Category control on the category page (the category is fixed by the route) — or it offers it as a way to jump categories; pick one and document.
+  - [x] Verify `ProductGrid`'s `queryParams` includes the active filters so **infinite-scroll pages inherit the same filters** (otherwise page 2 would drop the filters).
 - [ ] **Task 5 — `ProductGrid` empty-state for search (AC: #2)**
-  - [ ] `ProductGrid` currently hardcodes the empty message "No products in this category yet" (`components/ui/ProductGrid.tsx:99-101`). Add an optional prop `emptyMessage?: string` (default to the current text) so `/search` can pass "No results found. Try a different search or browse categories." — OR render the empty state at the page level and only mount `ProductGrid` when `total > 0`. Prefer the page-level empty state on `/search` so it can include the "browse categories"/home link (AC #2). Keep `ProductGrid`'s default behaviour unchanged for the category page (no regression).
+  - [x] `ProductGrid` currently hardcodes the empty message "No products in this category yet" (`components/ui/ProductGrid.tsx:99-101`). Add an optional prop `emptyMessage?: string` (default to the current text) so `/search` can pass "No results found. Try a different search or browse categories." — OR render the empty state at the page level and only mount `ProductGrid` when `total > 0`. Prefer the page-level empty state on `/search` so it can include the "browse categories"/home link (AC #2). Keep `ProductGrid`'s default behaviour unchanged for the category page (no regression).
 - [ ] **Task 6 — Tests (AC: all)**
-  - [ ] `SearchBar.test.tsx`: typing + submit calls `router.push('/search?q=...')` (mock `next/navigation`); the X clear button appears only with text and clears the field; submitting empty does nothing.
-  - [ ] `FilterSortPanel.test.tsx`: changing sort/inStock/price pushes the expected URL query (page reset to 1); an applied-filter chip's X removes only that param; "Clear all" strips filter params (and keeps `q` / category context). Mock `useRouter`/`useSearchParams`/`usePathname`.
-  - [ ] (Optional) a small test that the `/search` query-building helper coerces/validates params (pure function — extract it so it's unit-testable).
-  - [ ] Run `pnpm lint` and `pnpm test` (frontend is **pnpm**-managed — never npm). New files green; no regressions. (Pre-existing Epic 1 lint/type debt is out of scope.)
+  - [x] `SearchBar.test.tsx`: typing + submit calls `router.push('/search?q=...')` (mock `next/navigation`); the X clear button appears only with text and clears the field; submitting empty does nothing.
+  - [x] `FilterSortPanel.test.tsx`: changing sort/inStock/price pushes the expected URL query (page reset to 1); an applied-filter chip's X removes only that param; "Clear all" strips filter params (and keeps `q` / category context). Mock `useRouter`/`useSearchParams`/`usePathname`.
+  - [x] (Optional) a small test that the `/search` query-building helper coerces/validates params (pure function — extract it so it's unit-testable).
+  - [x] Run `pnpm lint` and `pnpm test` (frontend is **pnpm**-managed — never npm). New files green; no regressions. (Pre-existing Epic 1 lint/type debt is out of scope.)
+
+## Review Findings
+
+_Code review (2026-06-29) — 3-layer adversarial (Blind Hunter + Edge Case Hunter + Acceptance Auditor). **Acceptance Auditor: all 6 ACs PASS**, every documented decision verified implemented. No security issues. The substantive findings cluster on the `FilterSortPanel` price inputs (local state vs URL). 6 dismissed as noise / approved decisions._
+
+### Patch
+
+- [x] [Review][Patch] **Price inputs don't resync to the URL (filter resurrection).** `FilterSortPanel` seeds `minPrice`/`maxPrice` via `useState` once at mount; on soft navigation (price-chip dismiss, Clear all, browser Back) the inputs keep stale values, and a later blur re-pushes them — resurrecting the just-removed filter. Add `useEffect([current.minPrice, current.maxPrice])` to resync local state. [frontend/components/ui/FilterSortPanel.tsx]
+- [x] [Review][Patch] **`applyPriceRange` can push invalid input.** A non-numeric value makes `Number(x) > Number(y)` → `NaN > y` → `false`, bypassing the inverted-range guard, so `?minPrice=abc` is pushed → backend 400 → `error.tsx`. Also, an inverted range silently no-ops with no feedback. Validate finiteness + range, show an inline hint, and block the push. [frontend/components/ui/FilterSortPanel.tsx]
+- [x] [Review][Patch] **Stray `?q=`/`?category=` echoed onto category URLs.** The category page passes the full parsed `current` to the panel, so `pushWith`/`clearAll` re-emit a hand-edited `q`/`category` onto `/categories/[name]` (cosmetic — the SSR fetch ignores them). Pass `current={{ ...current, q: undefined, category: undefined }}`. [frontend/app/categories/[name]/page.tsx]
+- [x] [Review][Patch] **Dead `export const revalidate = 60` on `/search`.** Ignored on a `searchParams`-driven dynamic route (the `getProducts` fetch keeps its own revalidate). Remove for clarity. [frontend/app/search/page.tsx]
+
+### Defer
+
+- [x] [Review][Defer] "Showing X of Y results" counts only the first page (doesn't grow with infinite scroll) — accepted MVP per **Question #3**; revisit if the count should track grid state. [frontend/app/search/page.tsx]
+
+### Dismissed (6, noise / approved decisions)
+
+`SearchBar` not pre-seeding from `?q=` (approved build-safe trim; `/search` heading shows the query) · `loading.tsx` skeleton 8 vs 12 cards (cosmetic, matches the category loader) · a new keyword search resets filters (intended) · "Featured" default-sort label (the 4 required sort options are all present; placeholder = unset) · "Most Popular" = `createdAt DESC` proxy (documented Story 2.1 decision) · In-Stock shown as both a toggle and an applied chip (redundant, both remove it; not a defect).
 
 ## Dev Notes
 
@@ -172,17 +191,55 @@ Recent commits land Story 2.3 (the PDP: bento gallery, glass info panel, `getPro
 
 ### Agent Model Used
 
-(to be filled by dev agent)
+claude-opus-4-8[1m] (Claude Opus 4.8, 1M context)
 
 ### Debug Log References
 
-### Completion Notes List
+- `pnpm test` (scoped: SearchBar, FilterSortPanel, productFilters) → 3 suites / 13 tests passing.
+- `pnpm test` (full) → **23 suites / 105 tests passing**, no regressions (was 20/92 after Story 2.3; +3 suites, +13 tests).
+- `eslint` on all new files → clean. (`Header.tsx` reports one **pre-existing** `react-hooks/set-state-in-effect` error on the Epic-1 auth-dropdown effect at lines 48-51 — untouched by this story, same Header debt scoped out by 2.2/2.3; does not block `next build`.)
+- `pnpm build` → **exit 0**, 33 pages. `/search` is `ƒ Dynamic` (reads `searchParams`); `/categories/[name]` is now `ƒ Dynamic` too (see Completion Notes → category-route tradeoff).
+
+### Completion Notes — Implementation (Story 2.4)
+
+- **Scope delivered:** a sticky `SearchBar` wired into the existing `Header` (replacing the dead search button); a `/search?q=` SSR results route (page + `loading.tsx` "Searching…" skeleton + `error.tsx`); a shared `FilterSortPanel` (sort `<select>`, price range, In-Stock toggle, category chips, dismissible applied-filter chips, "Clear all"); and the same panel added to `/categories/[name]`. A pure, tested `parseProductFilters` helper centralizes URL-param → query coercion.
+- **Build-safe design decision (deviation from the spec's "FilterSortPanel reads useSearchParams"):** to avoid the Next 16 `useSearchParams` Suspense de-opt on the global Header and the prerendered category pages, **no component uses `useSearchParams`**. The Server pages parse `searchParams` and pass `current` filters to `FilterSortPanel` as **props**; the panel uses `useRouter` + `usePathname` only. `SearchBar` uses `useRouter` only (it does not pre-seed from `?q=`, a minor UX trim — the `/search` heading shows the active query instead). This made the build pass cleanly with zero Suspense boundaries.
+- **URL is the single source of truth (AC #4):** every filter/sort change `router.push`es a new query string (page reset to 1), the Server Component re-fetches, and `ProductGrid` re-seeds — shareable, bookmarkable, refresh-safe. Active filters carry into `ProductGrid.queryParams` so infinite-scroll pages keep the filters.
+- **Category filter is single-select (AC #3, Question #1):** the backend filters by one exact `category`. On `/search` the Category control is a chip row (single active); on `/categories/[name]` it's hidden (the route fixes the category). No fabricated multi-select.
+- **Empty state handled page-level on `/search`** ("No results found. Try a different search or browse categories." + home link) so `ProductGrid` stayed unmodified (no regression to the category empty state). Task 5's optional `emptyMessage` prop was therefore unnecessary.
+- **`minPrice > maxPrice` guarded** both in `parseProductFilters` (drops the inverted bound) and in the panel's price-apply (blocks the push) — avoids the backend 400.
+- **⚠️ Category-route rendering tradeoff (affects Story 2.2's SSG optimization):** reading `searchParams` on `/categories/[name]` opts the route from **SSG → dynamic** (`ƒ`). This is inherent to URL-param filtering and required by AC #3 (filters on category pages). The `getProducts` fetch keeps `revalidate: 60`, so the data layer stays ISR-cached and the LCP impact is small (cached data, cheap render). Flagged for review; not a defect.
+- **No backend changes, no new dependencies** (`react-icons` already present). `next.config.ts` untouched; no remote assets.
+
+### Completion Notes — Story Authoring
 
 - Story context created via bmad-create-story. Comprehensive frontend guide assembled from the epic AC, the as-built 2.1 API (all query params verified in source), the 2.2 catalogue kit + 2.3 boundary/async-params conventions (verified against live code), DESIGN.md, and the architecture. Key decisions documented: (1) URL-params-as-single-source-of-truth so filters are shareable/persistent; (2) integrate the search bar into the existing sticky Header rather than a new band; (3) Category filter is single-select due to the backend's single-value exact match (multi-select flagged as a backend question); (4) reuse `ProductGrid` (parameterize its empty state); (5) the shared `FilterSortPanel` drives both `/search` and `/categories/[name]` via `usePathname`. Flagged the Next 16 `useSearchParams` Suspense build rule as the top risk.
 
 ### File List
 
-(to be filled by dev agent — expected: `components/ui/SearchBar.tsx` (+test), `components/ui/FilterSortPanel.tsx` (+test), `app/search/page.tsx`, `app/search/loading.tsx`, `app/search/error.tsx`; edits to `components/layout/Header.tsx`, `components/ui/ProductGrid.tsx`, `app/categories/[name]/page.tsx`)
+**Added**
+- `frontend/features/product/productFilters.ts`
+- `frontend/features/product/productFilters.test.ts`
+- `frontend/components/ui/SearchBar.tsx`
+- `frontend/components/ui/SearchBar.test.tsx`
+- `frontend/components/ui/FilterSortPanel.tsx`
+- `frontend/components/ui/FilterSortPanel.test.tsx`
+- `frontend/app/search/page.tsx`
+- `frontend/app/search/loading.tsx`
+- `frontend/app/search/error.tsx`
+
+**Modified**
+- `frontend/components/layout/Header.tsx` (wired `SearchBar`, removed the dead search button + unused `FiSearch` import)
+- `frontend/app/categories/[name]/page.tsx` (reads filter `searchParams`, renders `FilterSortPanel`, threads filters into `getProducts` + `ProductGrid`)
+
+_(`components/ui/ProductGrid.tsx` was NOT modified — the `/search` empty state is handled page-level, so no `emptyMessage` prop was needed.)_
+
+## Change Log
+
+| Date | Change |
+|------|--------|
+| 2026-06-29 | Implemented Story 2.4 — sticky `SearchBar` in the Header; `/search?q=` SSR results route (+ loading/error boundaries); shared `FilterSortPanel` (sort, price range, in-stock, category chips, dismissible applied-filter chips, clear-all) on `/search` and `/categories/[name]`; `parseProductFilters` URL-param helper. URL-driven (shareable/persistent). No backend changes. 3 new test suites; full suite 105/105 green; build exit 0. Build-safe design: no `useSearchParams` (filters passed as props), avoiding the Next 16 Suspense de-opt. Category route became dynamic (filter tradeoff, documented). |
+| 2026-06-29 | Code review (3-layer adversarial) — all 6 ACs PASS, 6 dismissed. Applied 4 patches: price inputs resync via parent `key` (fixes filter-resurrection on chip-dismiss/Clear-all/Back, lint-clean — no prop-sync effect); `applyPriceRange` rejects NaN + inverted range with an inline hint (no backend 400); category page strips `q`/`category` from the panel (no stray-param echo); removed dead `revalidate` on the dynamic `/search`. 1 deferred (first-page result count → `deferred-work.md`). Lint clean; 105/105 tests green; build exit 0. Status → done. |
 
 ## Questions / Clarifications for the Team
 

@@ -1,10 +1,15 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import ProductGrid from '@/components/ui/ProductGrid';
+import FilterSortPanel from '@/components/ui/FilterSortPanel';
 import {
   getCategories,
   getProducts,
 } from '@/features/product/services/productApi';
+import {
+  parseProductFilters,
+  type RawSearchParams,
+} from '@/features/product/productFilters';
 
 export const revalidate = 60;
 
@@ -48,8 +53,10 @@ export async function generateMetadata({
 
 export default async function CategoryPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ name: string }>;
+  searchParams: Promise<RawSearchParams>;
 }) {
   const { name } = await params;
 
@@ -65,9 +72,19 @@ export default async function CategoryPage({
   );
   if (!category) notFound();
 
+  // Filter/sort come from query params (Story 2.4). The route fixes the
+  // category, so it overrides any `category`/`q` carried in the query.
+  const { current, query } = parseProductFilters(await searchParams);
+  const gridQuery = {
+    ...query,
+    search: undefined,
+    category,
+    limit: PAGE_LIMIT,
+  };
+
   // NOT wrapped in try/catch: a fetch failure should surface via error.tsx,
   // not masquerade as an empty category.
-  const res = await getProducts({ category, page: 1, limit: PAGE_LIMIT });
+  const res = await getProducts({ ...gridQuery, page: 1 });
 
   return (
     <section className="mx-auto w-full max-w-[1400px] px-5 py-12 md:px-16">
@@ -78,10 +95,18 @@ export default async function CategoryPage({
         <h1 className="text-headline-md uppercase text-brown">{category}</h1>
       </header>
 
+      {/* Category is fixed by the route → no Category control here, and drop
+          q/category from the panel so they aren't echoed onto category URLs. */}
+      <FilterSortPanel
+        key={`${current.minPrice ?? ''}|${current.maxPrice ?? ''}|${current.inStock}|${current.sort ?? ''}`}
+        categories={categories}
+        current={{ ...current, q: undefined, category: undefined }}
+      />
+
       <ProductGrid
         initialProducts={res.data}
         total={res.total}
-        queryParams={{ category, limit: PAGE_LIMIT }}
+        queryParams={gridQuery}
       />
     </section>
   );

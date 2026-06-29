@@ -114,6 +114,33 @@ The backend split story implements these — call them **unprefixed** via the sh
   - [x] `frontend/features/account/components/AddressFormModal.test.tsx` — opens with the form, Esc/backdrop close, locks the scroll container.
   - [ ] **Not covered:** the max-2 add-card gate (see AC3 deviation — behavior not implemented, so no test).
 
+## Review Findings
+
+_Code review (2026-06-29) — 3-layer adversarial (Blind Hunter + Edge Case Hunter + Acceptance Auditor). **Acceptance Auditor: all 6 ACs PASS, API contract consumed exactly** (unprefixed `/users/...`, `res.data.data` list reads, `email` never in the PATCH body). Findings below are correctness/UX/a11y hardening on older committed code. Backend-only items deferred to the backend split story._
+
+### Decision Needed
+
+- [ ] [Review][Decision] **Max-2 "Add New Address" gate (the spec's open AC3 deviation).** The "Add New Address" card renders unconditionally; a shopper with 2 addresses fills the whole form and only then hits the backend `409` (a dead-end). Options: **(a)** add the client gate — hide/disable the add card + show "Maximum 2 addresses reached" once `addresses.length >= 2` (~5 lines, removes the dead-end); **(b)** accept server-only 409 enforcement (already wired to a toast). **Recommendation: (a).** [frontend/features/account/components/AddressPreview.tsx]
+
+### Patch
+
+- [ ] [Review][Patch] **Profile save destructively clears the phone.** `ProfileSection.onSubmit` always sends `phoneNumber: data.phoneNumber`, which is `''` when the field is blank; the backend persists `''`, wiping a stored number even when the user only edited their name. Omit when blank: `phoneNumber: data.phoneNumber?.trim() || undefined`. [frontend/features/account/components/ProfileSection.tsx]
+- [ ] [Review][Patch] **Edit-address form shows a blank/stale form and can silently fail.** `AddressForm` refetches the whole list on edit-open and `.find()`s the target — no loading state (blank fields mid-fetch), a fast submit races the late `reset()`, and an id-not-found silently leaves an empty form whose submit 404s. Pass the `Address` object down as a prop from `AddressPreview` (it already holds the list) instead of refetching; on not-found, toast + close. [frontend/features/account/components/AddressForm.tsx, AddressFormModal.tsx, AddressPreview.tsx]
+- [ ] [Review][Patch] **Address modal has no focus management (WCAG 2.4.3/2.1.2).** `role="dialog" aria-modal` is set but focus never moves into the dialog, Tab isn't trapped, and focus isn't restored to the opener on close. Add focus-on-open, a Tab trap, and focus-restore. [frontend/features/account/components/AddressFormModal.tsx]
+- [ ] [Review][Patch] **`showToast.error(err as string)` can render `[object Object]`.** A non-`rejectWithValue` rejection is an `Error`, not a string. Coerce: `showToast.error(typeof err === 'string' ? err : 'Profile update failed')`. [frontend/features/account/components/ProfileSection.tsx]
+- [ ] [Review][Patch] **Address-load failure is a silent empty grid.** `AddressPreview` only toasts on `getAddressesAPI()` failure; the grid then looks identical to "no addresses" with no retry. Track a load-error flag and render an inline error + retry. [frontend/features/account/components/AddressPreview.tsx]
+- [ ] [Review][Patch] **Deleting the default address leaves the UI with no default.** The optimistic filter can't reflect a re-promotion. When the deleted address was the default, re-fetch the list instead of optimistic-filtering so the UI shows the server's default state. [frontend/features/account/components/AddressPreview.tsx]
+- [ ] [Review][Patch] **`setDefaultAddressAPI` sends no body.** `api.patch(url)` omits the body/Content-Type; send an explicit `{}` for consistency with the other PATCH calls. [frontend/services/usersAPI.ts]
+- [ ] [Review][Patch] **Whitespace-only values pass validation + profile form doesn't re-sync.** `z.string().min(1)` accepts `' '` — use `.trim().min(1)` in `accountSchemas`. Separately, the profile read-only fields show blank on a cold load until "Edit" is clicked — use RHF's `values` prop so the form tracks `user`. [frontend/lib/validation/accountSchemas.ts, frontend/features/account/components/ProfileSection.tsx]
+
+### Defer
+
+- [x] [Review][Defer] **Backend: deleting the default address doesn't re-promote another.** `user.service.removeAddress` just deletes the row, leaving the account with no default. Belongs to the **backend split story** (frontend mitigates by re-fetching after a default delete — see Patch above). [backend/src/modules/users/user.service.ts]
+
+### Dismissed (8, noise / verified-correct / low-value)
+
+`setEditId` not reset after close (latent — modal unmounts) · backdrop closes on `onMouseDown` (minor UX nit) · `EmailField` truncation-measure fragility (works in the common case) · `getAddressesAPI` `res.data.data` assumption (contract verified exact by the auditor) · address-card `aria-label` uses street (minor ambiguity) · `aria-required="false"` literal (harmless) · stale "body scroll locked" doc comment (behavior is correct — locks the scroll container) · `Header.tsx` repoint not in this diff (verified satisfied on disk: `href="/account"`, `my-account` deleted).
+
 ## Dev Notes
 
 ### Story shape: this is a FULL-STACK story (unlike 1.4)
