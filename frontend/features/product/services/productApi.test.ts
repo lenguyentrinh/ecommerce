@@ -2,6 +2,7 @@ import {
   buildProductQueryString,
   getProducts,
   getCategories,
+  getProduct,
 } from './productApi';
 
 describe('buildProductQueryString', () => {
@@ -64,5 +65,40 @@ describe('getCategories', () => {
     }) as unknown as typeof fetch;
 
     await expect(getCategories()).resolves.toEqual(['Fashion', 'Electronics']);
+  });
+});
+
+describe('getProduct', () => {
+  afterEach(() => jest.restoreAllMocks());
+
+  it('returns the unwrapped product data on a 200', async () => {
+    const product = { id: 1, name: 'Silk Wrap Midi Dress' };
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({ data: product }),
+    }) as unknown as typeof fetch;
+
+    await expect(getProduct(1)).resolves.toEqual(product);
+    expect(global.fetch).toHaveBeenCalledWith(
+      expect.stringContaining('/api/products/1'),
+      expect.any(Object),
+    );
+  });
+
+  it('returns null on a 404 (so the caller can render notFound)', async () => {
+    global.fetch = jest
+      .fn()
+      .mockResolvedValue({ ok: false, status: 404 }) as unknown as typeof fetch;
+
+    await expect(getProduct(999)).resolves.toBeNull();
+  });
+
+  it('throws on a non-404 error (so the error boundary catches it)', async () => {
+    global.fetch = jest
+      .fn()
+      .mockResolvedValue({ ok: false, status: 500 }) as unknown as typeof fetch;
+
+    await expect(getProduct(1)).rejects.toThrow();
   });
 });

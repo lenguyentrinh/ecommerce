@@ -71,5 +71,25 @@ export async function getCategories(
   return json.data ?? [];
 }
 
+// Fetch a single product by id (Story 2.3 PDP). Returns `null` on a 404 so the
+// page can render notFound() (branded 404); throws on any other non-OK status
+// so the route error boundary catches a real backend failure. The detail
+// endpoint returns `{ data: Product }` and 404s for inactive/soft-deleted rows.
+export async function getProduct(
+  id: number | string,
+  options: { revalidate?: number } = {},
+): Promise<Product | null> {
+  const url = `${API_BASE_URL}/api/products/${id}`;
+  const res = await fetch(url, {
+    next: { revalidate: options.revalidate ?? 60 },
+  } as FetchInit);
+  if (res.status === 404) return null;
+  if (!res.ok) {
+    throw new Error(`Failed to load product (${res.status})`);
+  }
+  const json = (await res.json()) as { data: Product };
+  return json.data;
+}
+
 // Re-export so consumers can import the type alongside the functions.
 export type { Product };
