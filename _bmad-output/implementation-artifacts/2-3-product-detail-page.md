@@ -4,7 +4,7 @@ baseline_commit: c7718382a4a2265b7c19bed840e2836c131f92e8
 
 # Story 2.3: Product Detail Page (PDP)
 
-Status: review
+Status: done
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -60,10 +60,33 @@ so that I can make an informed purchase decision.
   - [x] Add `frontend/app/products/[id]/error.tsx` (`"use client"`) mirroring `app/categories/[name]/error.tsx` — log `error`, offer "Try again" (`reset()`) + "Back to home". This catches **non-404** fetch failures (AC #6). (404 is handled by `notFound()` → `not-found.tsx`, not here.)
   - [x] Add `frontend/app/products/[id]/loading.tsx` — a PDP-shaped skeleton (a large `bg-warm-beige rounded-lg aspect-[4/5]` gallery block + a few `bg-warm-beige` text-line blocks for the info panel), `motion-safe:animate-pulse`, matching the `categories/[name]/loading.tsx` style. Suspense fallback for client-side navigation into a PDP.
 - [x] **Task 6 — Tests (AC: all)**
-  - [x] `ProductGallery.test.tsx`: with an explicit **multi-image** fixture — renders the main image with **non-empty `alt`**, renders a thumbnail row, clicking a thumbnail switches the main image `src`, thumbnails are keyboard-focusable buttons with `aria-current` on the active one; with an explicit **single-image** fixture — renders the main image and **no thumbnail row**; with an **empty** `images` array — falls back to the placeholder without crashing. Mock `next/image` as needed (follow `ProductCard.test.tsx`).
+  - [x] `ProductGallery.test.tsx` (as-shipped **bento** gallery, not the superseded thumbnail-switcher): renders the **hero image with non-empty `alt`**; **tiles every provided image** (multi-image fixture); a **single-image** fixture renders only the hero; an **empty** `images` array falls back to the placeholder without crashing. Mock `next/image` as needed (follow `ProductCard.test.tsx`).
   - [x] `ProductInfo.test.tsx`: renders name, formatted VND price, description as paragraph text (not a list), trust line; shows an active "Add to Cart" affordance when in stock and the disabled **"Out of Stock"** control when `stockQuantity === 0`; variant selector is **absent** for a product with no variant data.
   - [x] Optionally extend `productApi.test.ts` for `getProduct`: returns `data` on 200, returns `null` on 404, throws on 500. (Pure-ish; mock `fetch`.)
   - [x] Run `pnpm lint` and `pnpm test` (frontend is **pnpm**-managed — never npm). New files green. (Pre-existing Epic 1 lint/type debt is out of scope — see Story 2.2 notes / `deferred-work.md`.)
+
+## Review Findings
+
+_Code review (2026-06-29) — 3-layer adversarial (Blind Hunter + Edge Case Hunter + Acceptance Auditor). **Acceptance Auditor: all 7 ACs PASS** (the bento gallery / full-width CTA / Display-style name / glass+mesh are verified-implemented, pre-approved overrides). No High issues confirmed; 8 dismissed as noise. The "malformed-200" finding was flagged High by Edge but is low-likelihood and the page already degrades safely; treated as a defensive patch._
+
+### Patch
+
+- [x] [Review][Patch] `getProduct` doesn't guard a 200 with missing/empty body — `res.json()` can throw or `json.data` can be `undefined` (returns `undefined`, not the declared `Product | null`). Guard with `.catch(() => null)` + `json?.data ?? null` [frontend/features/product/services/productApi.ts]
+- [x] [Review][Patch] Out-of-stock control is a bare `<span>` (no role / no accessible name) — the PDP's primary purchase affordance is invisible to AT. Render a real `<button type="button" disabled aria-label="Out of Stock: {name}">` [frontend/components/ui/PdpAddToCart.tsx]
+- [x] [Review][Patch] `isNumericId` (`/^\d+$/`) accepts leading-zero ids (`/products/007` → product 7 under a non-canonical URL) and INT-overflow ids (env-dependent 500 instead of branded 404). Tighten to `/^[1-9]\d{0,9}$/` and `Number(id) <= 2147483647` [frontend/app/products/[id]/page.tsx]
+- [x] [Review][Patch] `generateMetadata` does `product.description.trim()` unguarded — throws if the payload ever has a null description. Use `(product.description ?? '')` [frontend/app/products/[id]/page.tsx]
+- [x] [Review][Patch] Empty/whitespace description renders an empty open `<details>` "Product Description" panel (and an empty OG description). Only render the accordion when `paragraphs.length > 0` [frontend/components/ui/ProductInfo.tsx]
+- [x] [Review][Patch] `loading.tsx` skeleton predates the Stitch alignment — it uses `bg-warm-white` + `grid-cols-[60%_40%]` while the page now uses `.account-mesh` + `.glass-panel` + `flex 58/42`. Update the skeleton to mirror the shipped layout [frontend/app/products/[id]/loading.tsx]
+- [x] [Review][Patch] Doc: Completion Notes label the name "Display-LG", but the code uses a hand-rolled `text-[32px]` (the `.text-display-lg` utility is 48px). Correct the wording to "32px bold" [this story]
+- [x] [Review][Patch] Doc: Task 6's gallery-test line still describes thumbnail-switching + `aria-current` assertions that the bento override removed. Update to the as-shipped bento tests [this story]
+
+### Defer
+
+- [x] [Review][Defer] Mixed currency — prices render in VND (`189.000`) but the trust line reads "Free shipping over **$150**". Already tracked as **Question #2** (keep decorative for this story; revisit with the deferred VND-magnitude re-seed) [frontend/components/ui/ProductInfo.tsx]
+
+### Dismissed (8, noise / false-positive / handled)
+
+`getRelatedProducts` self-exclusion buffer (degrades gracefully 4→3) · gallery hero has no "view 1" anchor (hero alt = product name is correct, and changing it breaks the test) · duplicate `revalidate` 60 (both match; works) · `as FetchInit` cast (the established `getProducts`/`getCategories` pattern) · `formatPrice(0)` → "0 ₫" (no zero-price data; product decision) · `generateStaticParams` >100-product coverage (handled by default `dynamicParams`) · two `<h1>` (self-retracted; single h1 on page) · `inStock` coupling (defended upstream — endpoint 404s inactive rows).
 
 ## Dev Notes
 
@@ -228,7 +251,7 @@ Compared the PDP against the canonical Stitch screen (project `26215560290105886
 - **CTA → full-width "Add to Shopping Bag" (overrides AC #3 half-width-desktop + "Add to Cart" label):** matches Stitch; out-of-stock control also full-width (still `bg-sand`+`text-brown`, AA-pass). `aria-label` contains the visible text (WCAG 2.5.3).
 - **Added "Complete the Look"** — a same-category product strip via `getProducts({ category })` (excludes current, ≤4), reusing the existing `ProductCard`. Wrapped in try/catch so its failure never breaks the PDP. (Honest substitute for Stitch's curated-complements bento, which has no data source.)
 
-**Second pass — full visual parity (2026-06-29, user requested faithful Stitch match of background/text/layout/card color):** adopted the **pastel-mesh background** (`.account-mesh`) and **frosted-glass cards** (`.glass-panel` + `.soft-shadow`) for the info panel, gallery tiles, and "Complete the Look" — these utilities already exist in `globals.css` (the `/account` screens use them), so this stays within the self-hosted system (no Google Fonts / Material Symbols / remote images / CDN). Product **name → Display-LG (32px, bold)** and **price → Headline-MD (normal weight, Warm Gray)**, matching Stitch's PDP hierarchy. The Oren warm palette is the brand's documented identity (DESIGN.md), so the premium-consumer palette ban does not apply. `.glass-panel` ships a `prefers-reduced-transparency` solid fallback.
+**Second pass — full visual parity (2026-06-29, user requested faithful Stitch match of background/text/layout/card color):** adopted the **pastel-mesh background** (`.account-mesh`) and **frosted-glass cards** (`.glass-panel` + `.soft-shadow`) for the info panel, gallery tiles, and "Complete the Look" — these utilities already exist in `globals.css` (the `/account` screens use them), so this stays within the self-hosted system (no Google Fonts / Material Symbols / remote images / CDN). Product **name → a 32px bold display style** (a hand-rolled `text-[32px] font-bold tracking-tight`, matching Stitch's PDP name; note this is NOT the `.text-display-lg` utility, which is 48px) and **price → Headline-MD (normal weight, Warm Gray)**, matching Stitch's PDP hierarchy. The Oren warm palette is the brand's documented identity (DESIGN.md), so the premium-consumer palette ban does not apply. `.glass-panel` ships a `prefers-reduced-transparency` solid fallback.
 
 **Still not applied (data-blocked / dishonest to fake):** the **size selector** (no variant model — would be fabricated UX; Question #1), the bespoke **"Styling Notes" quote + "Curated by Oren Studio"** card (needs a second content field; only `description` exists), and the **"New Arrival • Limited Edition"** eyebrow (no data flag — the real `category` is used instead).
 
@@ -263,7 +286,8 @@ Compared the PDP against the canonical Stitch screen (project `26215560290105886
 | 2026-06-29 | Implemented Story 2.3 — Oren SSR Product Detail Page (`/products/[id]`): `getProduct` data accessor (null-on-404 / throw-otherwise), `ProductGallery` (thumbnail switching, 1..N images), `ProductInfo` panel (name/price/stock/Styling Notes/trust line), persistent `PdpAddToCart` (out-of-stock disabled), `error.tsx`/`loading.tsx` boundaries, numeric-id 404 guard, guarded `generateStaticParams`. 3 new/extended test suites; full suite 93/93 green; production build passes with backend offline (cold cache). |
 | 2026-06-29 | Pre-dev validation fixes folded into the spec + implementation: out-of-stock contrast corrected to `text-brown` (WCAG AA); gallery made image-count-agnostic; non-numeric-id guard promoted to a task; dead `fashion-1.svg` fallback avoided. |
 | 2026-06-29 | Stitch design alignment (user-requested, "safe alignments"): gallery → editorial bento (Server Component); info panel sticky on desktop; description → "Product Description" accordion; CTA → full-width "Add to Shopping Bag"; added "Complete the Look" same-category strip (reuses `ProductCard`). Overrides AC #2 (thumbnail-nav) and parts of AC #3 (CTA width/label) per request — see Completion Notes → Stitch Design Alignment. Suite 92/92 green; build prerenders 11 PDPs + 7 categories with live data. |
-| 2026-06-29 | CSS audit + full Stitch visual parity (user-requested): removed off-spec `leading-relaxed` (token already lh 1.6) and duplicated `uppercase`/`font-semibold`; added Safari `::-webkit-details-marker` hide. Then matched the Stitch PDP faithfully — pastel-mesh background (`.account-mesh`), frosted-glass info/gallery/recommendations cards (`.glass-panel`+`.soft-shadow`), Display-LG name, Headline-MD price. Reuses existing self-hosted utilities (no remote deps). Lint clean; 92/92 tests green; build prerenders 11 PDPs. |
+| 2026-06-29 | CSS audit + full Stitch visual parity (user-requested): removed off-spec `leading-relaxed` (token already lh 1.6) and duplicated `uppercase`/`font-semibold`; added Safari `::-webkit-details-marker` hide. Then matched the Stitch PDP faithfully — pastel-mesh background (`.account-mesh`), frosted-glass info/gallery/recommendations cards (`.glass-panel`+`.soft-shadow`), 32px bold name, Headline-MD price. Reuses existing self-hosted utilities (no remote deps). Lint clean; 92/92 tests green; build prerenders 11 PDPs. |
+| 2026-06-29 | Code review (3-layer adversarial) — all 7 ACs PASS, 0 High/Med confirmed defects, 8 dismissed. Applied 8 patches: `getProduct` malformed-200 guard; out-of-stock → accessible `<button disabled aria-label>`; tightened `isNumericId` (no leading-zero / INT-overflow); `generateMetadata` description null-guard; render `<details>` only when non-empty; `loading.tsx` skeleton mirrors mesh/glass/bento; 2 doc fixes (name-label, stale gallery-test description). 1 deferred (VND vs `$150` trust copy → `deferred-work.md`). Lint clean; 92/92 tests green (full `next build` not re-run after patches per user — changes are minor/type-safe). Status → done. |
 
 ## Questions / Clarifications for the Team
 
