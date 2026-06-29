@@ -87,8 +87,13 @@ export async function getProduct(
   if (!res.ok) {
     throw new Error(`Failed to load product (${res.status})`);
   }
-  const json = (await res.json()) as { data: Product };
-  return json.data;
+  // Tolerate a malformed/empty 200 body: a non-JSON body or a missing `data`
+  // resolves to null (→ the page renders the branded 404) rather than throwing
+  // or returning undefined.
+  const json = (await res.json().catch(() => null)) as {
+    data?: Product;
+  } | null;
+  return json?.data ?? null;
 }
 
 // Re-export so consumers can import the type alongside the functions.

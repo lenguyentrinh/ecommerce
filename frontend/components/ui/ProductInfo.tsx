@@ -66,22 +66,24 @@ export default function ProductInfo({ product }: { product: Product }) {
 
       <PdpAddToCart productName={product.name} inStock={inStock} />
 
-      <details open className="group border-t border-hairline/50 pt-4">
-        <summary className="flex cursor-pointer list-none items-center justify-between text-label-sm tracking-widest text-brown [&::-webkit-details-marker]:hidden">
-          Product Description
-          <FaChevronDown
-            className="text-warm-gray transition-transform duration-300 group-open:rotate-180"
-            aria-hidden="true"
-          />
-        </summary>
-        <div className="flex flex-col gap-4 pt-3">
-          {paragraphs.map((paragraph, index) => (
-            <p key={index} className="text-body-lg text-brown">
-              {paragraph}
-            </p>
-          ))}
-        </div>
-      </details>
+      {paragraphs.length > 0 && (
+        <details open className="group border-t border-hairline/50 pt-4">
+          <summary className="flex cursor-pointer list-none items-center justify-between text-label-sm tracking-widest text-brown [&::-webkit-details-marker]:hidden">
+            Product Description
+            <FaChevronDown
+              className="text-warm-gray transition-transform duration-300 group-open:rotate-180"
+              aria-hidden="true"
+            />
+          </summary>
+          <div className="flex flex-col gap-4 pt-3">
+            {paragraphs.map((paragraph, index) => (
+              <p key={index} className="text-body-lg text-brown">
+                {paragraph}
+              </p>
+            ))}
+          </div>
+        </details>
+      )}
 
       <p className="text-label-sm tracking-widest text-warm-gray">
         Free shipping over $150 • 30-day returns

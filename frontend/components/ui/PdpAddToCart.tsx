@@ -16,9 +16,14 @@ export default function PdpAddToCart({
 }) {
   if (!inStock) {
     return (
-      <span className="inline-flex w-full cursor-not-allowed items-center justify-center rounded-full bg-sand px-6 py-4 text-label-sm tracking-widest text-brown">
+      <button
+        type="button"
+        disabled
+        aria-label={`Out of Stock: ${productName}`}
+        className="inline-flex w-full cursor-not-allowed items-center justify-center rounded-full bg-sand px-6 py-4 text-label-sm tracking-widest text-brown"
+      >
         Out of Stock
-      </span>
+      </button>
     );
   }
 

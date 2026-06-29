@@ -27,3 +27,7 @@
 ## Deferred from: code review of 1-5-account-profile-and-shipping-address-management (2026-06-26)
 
 - **Edit-form stale-row cross-tab race** — `AddressForm.tsx` opens edit by calling `getAddressesAPI()` and `list.find(id)`. If the address was deleted in another tab/session between list render and edit-open, `find` returns undefined, the form stays blank, and a submit 404s with a generic toast. Rare cross-session UX edge; address if it surfaces in testing.
+
+## Deferred from: code review of 2-3-product-detail-page (2026-06-29)
+
+- **Mixed currency on the PDP info panel** — product prices render in VND (e.g. `189.000 ₫` via `formatPrice`), but the trust line hardcodes "Free shipping over **$150**". Kept as decorative copy for this frontend story (story Question #2). Revisit alongside the deferred VND-magnitude re-seed so the threshold matches the displayed currency. [frontend/components/ui/ProductInfo.tsx]

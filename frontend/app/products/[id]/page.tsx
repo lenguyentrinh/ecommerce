@@ -11,10 +11,13 @@ import type { Product } from '@/types/product';
 
 export const revalidate = 60;
 
-// The backend `:id` is ParseIntPipe, so a non-numeric id 400s. Treat malformed
-// ids as a branded 404 (notFound) rather than letting them hit error.tsx,
-// keeping the 404-vs-error discipline consistent.
-const isNumericId = (id: string) => /^\d+$/.test(id);
+// The backend `:id` is ParseIntPipe (MySQL INT). Accept only a canonical
+// positive id: no leading zeros (`/products/007` would otherwise resolve to a
+// non-canonical duplicate URL) and within signed-INT range (a huge id would
+// otherwise overflow → a backend 500 instead of a branded 404). Anything else
+// → notFound(), keeping the 404-vs-error discipline consistent.
+const isNumericId = (id: string) =>
+  /^[1-9]\d{0,9}$/.test(id) && Number(id) <= 2147483647;
 
 // "Complete the Look" — same-category products (excluding the current one).
 // Supplementary: a fetch failure here must NOT break the PDP, so it's wrapped
@@ -52,7 +55,7 @@ export async function generateMetadata({
   const product = await getProduct(id);
   if (!product) return { title: 'Product — Oren' };
 
-  const description = product.description.trim().slice(0, 200);
+  const description = (product.description ?? '').trim().slice(0, 200);
   const title = `${product.name} — Oren`;
   return {
     title,
