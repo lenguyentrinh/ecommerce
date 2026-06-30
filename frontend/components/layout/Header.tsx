@@ -7,6 +7,7 @@ import { FiShoppingBag, FiUser } from "react-icons/fi";
 import { AppDispatch, RootState } from "@/store/store";
 import { useRouter } from "next/navigation";
 import { logoutThunk } from "@/store/authThunk";
+import { selectCartCount } from "@/store/cartSlice";
 import SearchBar from "@/components/ui/SearchBar";
 
 const navItems = [
@@ -21,6 +22,7 @@ export default function Header() {
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
   const { isAuthenticated, user } = useSelector((state: RootState) => state.auth);
+  const cartCount = useSelector(selectCartCount);
   const accountDisplayName = user?.userName || user?.email || "Account";
 
   const handleLogout = async () => {
@@ -80,8 +82,22 @@ export default function Header() {
         {/* Utility: search + icons */}
         <div className="flex items-center gap-sm md:gap-md">
           <SearchBar className="w-32 sm:w-44 md:w-56" />
-          <Link href="/product" aria-label="Shopping bag" className={iconBtn}>
+          <Link
+            href="/cart"
+            aria-label={
+              cartCount > 0 ? `Cart, ${cartCount} item${cartCount === 1 ? "" : "s"}` : "Cart"
+            }
+            className={`relative ${iconBtn}`}
+          >
             <FiShoppingBag size={20} />
+            {cartCount > 0 && (
+              <span
+                aria-hidden="true"
+                className="absolute -right-2 -top-2 flex min-w-[18px] items-center justify-center rounded-full bg-brown px-1 text-[10px] font-semibold leading-none text-ivory"
+              >
+                {cartCount > 99 ? "99+" : cartCount}
+              </span>
+            )}
           </Link>
 
           {isAuthenticated ? (

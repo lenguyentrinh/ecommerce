@@ -2,6 +2,17 @@ import { render, screen } from '@testing-library/react';
 import ProductInfo from './ProductInfo';
 import type { Product } from '@/types/product';
 
+// ProductInfo embeds the wired PdpAddToCart (useAddToCart → react-redux +
+// next/navigation). Mock both so the panel renders without a real store/router.
+jest.mock('react-redux', () => ({
+  useSelector: () => false, // isAuthenticated
+  useDispatch: () => jest.fn(),
+}));
+jest.mock('next/navigation', () => ({
+  useRouter: () => ({ push: jest.fn() }),
+  usePathname: () => '/products/1',
+}));
+
 const base: Product = {
   id: 1,
   name: 'Silk Wrap Midi Dress',

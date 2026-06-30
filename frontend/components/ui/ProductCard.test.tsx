@@ -2,6 +2,17 @@ import { render, screen } from '@testing-library/react';
 import ProductCard from './ProductCard';
 import type { Product } from '@/types/product';
 
+// ProductCard now embeds the wired AddToCartButton (useAddToCart → react-redux
+// + next/navigation). Mock both so the card renders without a real store/router.
+jest.mock('react-redux', () => ({
+  useSelector: () => false, // isAuthenticated
+  useDispatch: () => jest.fn(),
+}));
+jest.mock('next/navigation', () => ({
+  useRouter: () => ({ push: jest.fn() }),
+  usePathname: () => '/',
+}));
+
 // Render next/image as a plain <img> so jsdom assertions are deterministic.
 jest.mock('next/image', () => ({
   __esModule: true,

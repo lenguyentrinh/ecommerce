@@ -36,10 +36,12 @@
 
 generated: 2026-06-23
 last_updated: 2026-06-30
+# story 3-2 contexted
 project: ecommerce
 # 2026-06-29: story 2-3 implemented (dev-story) → review → done (code-review, 8 patches applied)
 # 2026-06-29: story 2-4 contexted (create-story) → ready-for-dev → in-progress → review (dev-story) → done (code-review, 4 patches)
 # 2026-06-29: story 2-1 reconciled review → done (story file already done + reviewed 2026-06-27; sprint entry was stale)
+# 2026-06-30: story 3-2 contexted (create-story) → ready-for-dev. While contexting, found+fixed a 3.1 contract gap: GET /api/cart lines lacked the cart-item id needed for PATCH/DELETE :itemId — added line.id (backend, 51/51 green).
 
 
 project_key: NOKEY
@@ -67,7 +69,7 @@ development_status:
   # ── Epic 3: Shopping Cart ─────────────────────────────────────────────────
   epic-3: in-progress
   3-1-cart-backend-entity-api-and-inventory-reserve: review
-  3-2-cart-ui-add-to-cart-and-cart-page: backlog
+  3-2-cart-ui-add-to-cart-and-cart-page: in-progress
   3-3-cart-persistence-and-out-of-stock-sync: backlog
   epic-3-retrospective: optional
 

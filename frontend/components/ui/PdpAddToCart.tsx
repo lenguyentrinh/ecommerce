@@ -1,19 +1,23 @@
 'use client';
 
 import Button from '@/components/Button';
-import { showToast } from '@/lib/toast';
+import { useAddToCart } from '@/hooks/useAddToCart';
 
 // PDP "Add to Shopping Bag" — persistent, full-width, prominent (Stitch PDP).
-// Wired to a "coming soon" toast; the real cart dispatch lands in Epic 3.
+// Wired to the cart API (Story 3.2) via the shared useAddToCart hook.
 // Out of stock → a disabled "Out of Stock" control (bg-sand + text-brown so it
 // passes WCAG AA, matching the shipped ProductCard).
 export default function PdpAddToCart({
+  productId,
   productName,
   inStock,
 }: {
+  productId: number;
   productName: string;
   inStock: boolean;
 }) {
+  const { addToCart, status } = useAddToCart();
+
   if (!inStock) {
     return (
       <button
@@ -27,14 +31,17 @@ export default function PdpAddToCart({
     );
   }
 
+  const label = status === 'added' ? '✓ Added to Cart' : 'Add to Shopping Bag';
+
   return (
     <Button
       variant="primary"
+      disabled={status === 'adding'}
       aria-label={`Add to Shopping Bag: ${productName}`}
-      onClick={() => showToast.info('Add to Cart is coming soon')}
+      onClick={() => addToCart(productId)}
       className="w-full py-4 tracking-widest"
     >
-      Add to Shopping Bag
+      {label}
     </Button>
   );
 }

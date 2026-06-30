@@ -2,6 +2,17 @@ import { render, screen } from '@testing-library/react';
 import ProductGrid from './ProductGrid';
 import type { Product } from '@/types/product';
 
+// ProductGrid renders ProductCard → the wired AddToCartButton (useAddToCart →
+// react-redux + next/navigation). Mock both so the grid renders standalone.
+jest.mock('react-redux', () => ({
+  useSelector: () => false, // isAuthenticated
+  useDispatch: () => jest.fn(),
+}));
+jest.mock('next/navigation', () => ({
+  useRouter: () => ({ push: jest.fn() }),
+  usePathname: () => '/',
+}));
+
 jest.mock('next/image', () => ({
   __esModule: true,
   default: (props: Record<string, unknown>) => {

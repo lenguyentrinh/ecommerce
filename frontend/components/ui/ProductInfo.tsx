@@ -64,7 +64,11 @@ export default function ProductInfo({ product }: { product: Product }) {
         </div>
       )}
 
-      <PdpAddToCart productName={product.name} inStock={inStock} />
+      <PdpAddToCart
+        productId={product.id}
+        productName={product.name}
+        inStock={inStock}
+      />
 
       {paragraphs.length > 0 && (
         <details open className="group border-t border-hairline/50 pt-4">

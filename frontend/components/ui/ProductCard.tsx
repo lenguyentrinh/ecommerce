@@ -31,7 +31,7 @@ export default function ProductCard({ product }: { product: Product }) {
         {/* CTA / stock state — overlaid on the image, sibling of the link (no nested interactives) */}
         <div className="absolute inset-x-0 bottom-0 p-4">
           {inStock ? (
-            <AddToCartButton productName={product.name} />
+            <AddToCartButton productId={product.id} productName={product.name} />
           ) : (
             <span className="block w-full rounded-full bg-sand px-4 py-2.5 text-center text-label-sm text-brown">
               Out of Stock

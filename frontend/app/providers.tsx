@@ -1,15 +1,35 @@
 "use client";
 
-import { Provider } from "react-redux";
+import { Provider, useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
-import { store } from "@/store/store";
+import { store, type AppDispatch, type RootState } from "@/store/store";
 import { Toaster } from "react-hot-toast";
 import { fetchMeThunk } from "@/store/authThunk";
+import { fetchCartThunk } from "@/store/cartThunk";
+import { clearCart } from "@/store/cartSlice";
 
 function AuthBootstrap() {
+  const dispatch = useDispatch<AppDispatch>();
+  const { isAuthenticated, authChecked } = useSelector(
+    (s: RootState) => s.auth,
+  );
+
+  // Hydrate the session once on mount.
   useEffect(() => {
-    store.dispatch(fetchMeThunk());
-  }, []);
+    dispatch(fetchMeThunk());
+  }, [dispatch]);
+
+  // Once auth is known: fetch the server cart when authenticated (so the Header
+  // badge + /cart are populated app-wide), or clear it on logout so the next
+  // user never sees the previous cart. Guest carts are Story 3.3.
+  useEffect(() => {
+    if (!authChecked) return;
+    if (isAuthenticated) {
+      dispatch(fetchCartThunk());
+    } else {
+      dispatch(clearCart());
+    }
+  }, [authChecked, isAuthenticated, dispatch]);
 
   return null;
 }
@@ -23,7 +43,7 @@ export default function Providers({
     <Provider store={store}>
       <AuthBootstrap />
       {children}
-      <Toaster 
+      <Toaster
         position="bottom-left"
         toastOptions={{
           duration: 3000,
