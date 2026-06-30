@@ -36,6 +36,7 @@
 
 generated: 2026-06-23
 last_updated: 2026-06-30
+# 2026-06-30: story 3-3 contexted (create-story) → ready-for-dev
 # story 3-2 contexted
 project: ecommerce
 # 2026-06-29: story 2-3 implemented (dev-story) → review → done (code-review, 8 patches applied)
@@ -71,7 +72,7 @@ development_status:
   epic-3: in-progress
   3-1-cart-backend-entity-api-and-inventory-reserve: review
   3-2-cart-ui-add-to-cart-and-cart-page: review
-  3-3-cart-persistence-and-out-of-stock-sync: backlog
+  3-3-cart-persistence-and-out-of-stock-sync: ready-for-dev
   epic-3-retrospective: optional
 
   # ── Epic 4: Checkout & Order Lifecycle ───────────────────────────────────
