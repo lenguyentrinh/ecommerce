@@ -28,12 +28,13 @@ so that my items are preserved across devices and sessions.
    ```json
    {
      "items": [
-       { "product": { "id": 1, "name": "…", "price": 189000, "imageUrl": "/images/placeholders/…svg",
+       { "id": 10, "product": { "id": 1, "name": "…", "price": 189000, "imageUrl": "/images/placeholders/…svg",
                        "stockQuantity": 7, "isActive": true }, "quantity": 2 }
      ],
      "subtotal": 378000
    }
    ```
+   Each line carries `id` — the **`cart_items` row id** (distinct from `product.id`) — so the frontend (3.2) can target `PATCH`/`DELETE /api/cart/:itemId` for that line. Without it the qty +/– and remove controls have no id to call.
    `imageUrl` is generated at read time from the product's stored `imageKeys` (first image; **never persisted** — reuse the Products image-URL logic). `subtotal` = Σ `product.price × quantity` over all items (a JS `number`). Items are returned **even when** `stockQuantity === 0` or `isActive === false` so the frontend (3.3) can warn — do **not** silently drop them. Empty cart → `{ "items": [], "subtotal": 0 }`.
 
 5. **Update quantity — `PATCH /api/cart/:itemId`** — Authenticated, ownership-scoped. Body `{ quantity: number }`. If `quantity > 0` and `≤ product.stockQuantity`: update. If `quantity === 0`: **remove** the item. If `quantity > product.stockQuantity`: **400** `"Insufficient stock"`. If `:itemId` is not a positive int → **400** (`ParseIntPipe`). If the item doesn't exist **or belongs to another user** → **404** `"Cart item not found"` (no row leakage). Returns the updated full cart (AC4 shape).
@@ -252,3 +253,4 @@ claude-opus-4-8[1m] (Bruno — backend dev agent)
 | Date | Change |
 |------|--------|
 | 2026-06-30 | Implemented Story 3.1 — Cart backend (`CartModule`: `cart_items` entity + migration, JWT-guarded `@Controller('api/cart')` CRUD, transactional add with stock validation, ownership-scoped update/remove, read-time `imageUrl` + `subtotal`) and `InventoryModule` (`inventory_reserves` table + `@nestjs/schedule` `@Cron` 5-min expiry cleanup). 2 new test suites; full backend suite 51/51 green; eslint clean on new files; `tsc --noEmit` clean; `migration:run` applied both tables to the live DB. Installed `@nestjs/schedule@6.1.3` via **pnpm** (backend is pnpm-managed — corrected the story's "npm" assumption). Status → review. |
+| 2026-06-30 | **Contract fix (mapping gap found while contexting 3.2):** added `id` (the `cart_items` row id) to each `CartLine` in `GET /api/cart` so the 3.2 UI can target `PATCH`/`DELETE /api/cart/:itemId`. The original AC4 shape (`{ product, quantity }`) exposed no line id, leaving the qty +/– and remove controls with nothing to call. Updated `CartService.getCart` (`id: item.id`), `cart.service.spec.ts` (asserts `items[0].id`), and AC4 above. `pnpm jest cart.service` → 11/11 green. |

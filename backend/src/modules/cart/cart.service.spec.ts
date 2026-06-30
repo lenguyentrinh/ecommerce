@@ -115,13 +115,17 @@ describe('CartService', () => {
     });
 
     it('computes subtotal and a read-time imageUrl', async () => {
-      cartRepo.find.mockResolvedValue([makeCartItem({ quantity: 2 })]);
+      cartRepo.find.mockResolvedValue([makeCartItem({ id: 10, quantity: 2 })]);
       productRepo.find.mockResolvedValue([makeProduct({ price: 189000 })]);
 
       const result = await service.getCart(1);
 
       expect(result.subtotal).toBe(378000);
       expect(result.items).toHaveLength(1);
+      // The cart_items row id is exposed so the frontend can target
+      // PATCH/DELETE /api/cart/:itemId.
+      expect(result.items[0].id).toBe(10);
+      expect(result.items[0].product.id).toBe(1);
       expect(result.items[0].product.imageUrl).toBe(
         '/images/placeholders/tops-1.svg',
       );

@@ -13,6 +13,9 @@ import AddCartItemDto from './dto/add-cart-item.dto';
 import UpdateCartItemDto from './dto/update-cart-item.dto';
 
 export interface CartLine {
+  // The cart_items row id — the frontend needs this to target
+  // PATCH/DELETE /api/cart/:itemId (NOT the product id below).
+  id: number;
   product: {
     id: number;
     name: string;
@@ -78,6 +81,7 @@ export class CartService {
       subtotal += price * item.quantity;
 
       lines.push({
+        id: item.id,
         product: {
           id: product.id,
           name: product.name,
