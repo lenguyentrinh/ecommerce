@@ -5,14 +5,19 @@ import Button from '@/components/Button';
 import { formatPrice } from '@/lib/helpers';
 import { SHIPPING_FEE, TAX_RATE, calcTax, calcTotal } from '@/lib/constants';
 
-// Order summary panel (AC4): subtotal (from the API) + client-side flat shipping
-// + tax + total, then "Continue Shopping" (secondary link) and "Proceed to
-// Checkout" (primary). Checkout is Epic 4 — the button is disabled with a
-// tooltip for now (Story 3.2 Question #3).
-export default function CartSummary({ subtotal }: { subtotal: number }) {
+interface Props {
+  subtotal: number;
+  hasOutOfStock?: boolean;
+}
+
+export default function CartSummary({ subtotal, hasOutOfStock = false }: Props) {
   const tax = calcTax(subtotal);
   const total = calcTotal(subtotal);
   const taxPercent = Math.round(TAX_RATE * 100);
+  const checkoutDisabled = true;
+  const checkoutTitle = hasOutOfStock
+    ? 'Remove out-of-stock items before checking out.'
+    : 'Checkout coming soon';
 
   return (
     <aside className="glass-panel soft-shadow flex h-fit flex-col gap-4 rounded-lg p-6">
@@ -43,8 +48,8 @@ export default function CartSummary({ subtotal }: { subtotal: number }) {
 
       <Button
         variant="primary"
-        disabled
-        title="Checkout coming soon"
+        disabled={checkoutDisabled}
+        title={checkoutTitle}
         className="mt-2 w-full"
       >
         Proceed to Checkout

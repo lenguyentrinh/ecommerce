@@ -17,6 +17,7 @@ import { CartService } from './cart.service';
 import type { User } from '../users/entities/user.entity';
 import AddCartItemDto from './dto/add-cart-item.dto';
 import UpdateCartItemDto from './dto/update-cart-item.dto';
+import MergeCartDto from './dto/merge-cart.dto';
 
 @ApiTags('cart')
 // NOTE: controller-level `api/` prefix is intentional. The app has NO global
@@ -40,6 +41,11 @@ export class CartController {
   @Post()
   addItem(@Req() req: Request, @Body() dto: AddCartItemDto) {
     return this.cartService.addItem(this.currentUser(req).id, dto);
+  }
+
+  @Post('merge')
+  mergeCart(@Req() req: Request, @Body() dto: MergeCartDto) {
+    return this.cartService.mergeCart(this.currentUser(req).id, dto);
   }
 
   @Patch(':itemId')

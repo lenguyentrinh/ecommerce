@@ -9,16 +9,12 @@ import { showToast } from '@/lib/toast';
 
 interface Props {
   line: CartLine;
-  // Resolve on success; REJECT on failure (so the row can toast + recover).
   onUpdateQuantity: (itemId: number, quantity: number) => Promise<unknown>;
   onRemove: (itemId: number) => Promise<unknown>;
 }
 
-// A single cart line (AC4/5/6): image thumb, name, price, +/- quantity controls
-// and a remove (×). The controls disable while a request is in flight; – is
-// disabled at qty 1 (× removes), + is disabled at available stock. Removal fades
-// the row out (300ms) while the DELETE is in flight; on success the slice update
-// unmounts it, on failure it recovers.
+const isOutOfStock = (s: number) => s === 0;
+
 export default function CartItemRow({
   line,
   onUpdateQuantity,
@@ -29,8 +25,11 @@ export default function CartItemRow({
   const [removing, setRemoving] = useState(false);
 
   const imageSrc = product.imageUrl ?? '/images/placeholders/fashion-1.svg';
-  const atMin = quantity <= 1;
-  const atMax = quantity >= product.stockQuantity;
+  const oos = isOutOfStock(product.stockQuantity);
+  const lowStock = !oos && product.stockQuantity < quantity;
+  const displayQty = lowStock ? product.stockQuantity : quantity;
+  const atMin = displayQty <= 1;
+  const atMax = displayQty >= product.stockQuantity;
 
   const changeQuantity = async (next: number) => {
     setBusy(true);
@@ -50,7 +49,7 @@ export default function CartItemRow({
   const remove = async () => {
     setRemoving(true);
     try {
-      await onRemove(id); // success → slice removes the line → this unmounts
+      await onRemove(id);
     } catch {
       showToast.error("Couldn't remove the item. Please try again.");
       setRemoving(false);
@@ -82,6 +81,20 @@ export default function CartItemRow({
             <p className="text-[16px] font-normal text-warm-gray">
               {formatPrice(product.price)}
             </p>
+            {oos && (
+              <span
+                role="status"
+                aria-label="Out of stock"
+                className="inline-flex w-fit rounded-full bg-[#c4a896] px-2.5 py-0.5 text-label-sm uppercase text-white"
+              >
+                Out of stock
+              </span>
+            )}
+            {lowStock && (
+              <p className="text-label-sm text-warm-gray">
+                Only {product.stockQuantity} left in stock
+              </p>
+            )}
           </div>
           <button
             type="button"
@@ -94,32 +107,34 @@ export default function CartItemRow({
           </button>
         </div>
 
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={() => changeQuantity(quantity - 1)}
-            disabled={busy || atMin}
-            aria-label={`Decrease quantity of ${product.name}`}
-            className="flex h-8 w-8 items-center justify-center rounded-full border border-hairline text-brown transition-colors duration-300 hover:border-clay focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clay disabled:cursor-not-allowed disabled:opacity-40"
-          >
-            <FiMinus size={14} />
-          </button>
-          <span
-            className="min-w-[2ch] text-center text-body-md text-brown"
-            aria-live="polite"
-          >
-            {quantity}
-          </span>
-          <button
-            type="button"
-            onClick={() => changeQuantity(quantity + 1)}
-            disabled={busy || atMax}
-            aria-label={`Increase quantity of ${product.name}`}
-            className="flex h-8 w-8 items-center justify-center rounded-full border border-hairline text-brown transition-colors duration-300 hover:border-clay focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clay disabled:cursor-not-allowed disabled:opacity-40"
-          >
-            <FiPlus size={14} />
-          </button>
-        </div>
+        {!oos && (
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => changeQuantity(displayQty - 1)}
+              disabled={busy || atMin}
+              aria-label={`Decrease quantity of ${product.name}`}
+              className="flex h-8 w-8 items-center justify-center rounded-full border border-hairline text-brown transition-colors duration-300 hover:border-clay focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clay disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              <FiMinus size={14} />
+            </button>
+            <span
+              className="min-w-[2ch] text-center text-body-md text-brown"
+              aria-live="polite"
+            >
+              {displayQty}
+            </span>
+            <button
+              type="button"
+              onClick={() => changeQuantity(displayQty + 1)}
+              disabled={busy || atMax}
+              aria-label={`Increase quantity of ${product.name}`}
+              className="flex h-8 w-8 items-center justify-center rounded-full border border-hairline text-brown transition-colors duration-300 hover:border-clay focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clay disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              <FiPlus size={14} />
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

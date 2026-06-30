@@ -8,6 +8,7 @@ import { AppDispatch, RootState } from "@/store/store";
 import { useRouter } from "next/navigation";
 import { logoutThunk } from "@/store/authThunk";
 import { selectCartCount } from "@/store/cartSlice";
+import { getGuestCartCount } from "@/lib/guestCart";
 import SearchBar from "@/components/ui/SearchBar";
 
 const navItems = [
@@ -22,7 +23,17 @@ export default function Header() {
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
   const { isAuthenticated, user } = useSelector((state: RootState) => state.auth);
-  const cartCount = useSelector(selectCartCount);
+  const authCartCount = useSelector(selectCartCount);
+  const [guestCartCount, setGuestCartCount] = useState(0);
+
+  useEffect(() => {
+    setGuestCartCount(getGuestCartCount());
+    const handleStorage = () => setGuestCartCount(getGuestCartCount());
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
+  }, []);
+
+  const cartCount = isAuthenticated ? authCartCount : guestCartCount;
   const accountDisplayName = user?.userName || user?.email || "Account";
 
   const handleLogout = async () => {

@@ -35,3 +35,10 @@ export const removeCartItemAPI = async (itemId: number): Promise<CartView> => {
   const res = await api.delete(`/api/cart/${itemId}`);
   return res.data as CartView;
 };
+
+export const mergeCartAPI = async (
+  items: { productId: number; quantity: number }[],
+): Promise<CartView> => {
+  const res = await api.post('/api/cart/merge', { items });
+  return res.data as CartView;
+};

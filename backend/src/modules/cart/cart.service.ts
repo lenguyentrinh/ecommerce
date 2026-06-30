@@ -11,6 +11,7 @@ import { CartItem } from './entities/cart-item.entity';
 import { Product } from '../products/entities/product.entity';
 import AddCartItemDto from './dto/add-cart-item.dto';
 import UpdateCartItemDto from './dto/update-cart-item.dto';
+import MergeCartDto from './dto/merge-cart.dto';
 
 export interface CartLine {
   // The cart_items row id — the frontend needs this to target
@@ -186,6 +187,64 @@ export class CartService {
     } catch (error) {
       throw this.toHttpException(error);
     }
+    return this.getCart(userId);
+  }
+
+  // Merge a guest (localStorage) cart into the server cart after login.
+  // For each item: sum quantities (capped at stockQuantity). Skip items where
+  // the product is inactive / out of stock. Runs in a transaction.
+  async mergeCart(userId: number, dto: MergeCartDto): Promise<CartView> {
+    if (!dto.items || dto.items.length === 0) {
+      return this.getCart(userId);
+    }
+
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      const productIds = dto.items.map((i) => i.productId);
+      const products = await queryRunner.manager.find(Product, {
+        where: { id: In(productIds) },
+      });
+      const byId = new Map(products.map((p) => [p.id, p]));
+
+      for (const mergeItem of dto.items) {
+        const product = byId.get(mergeItem.productId);
+        if (!product || !product.isActive || product.stockQuantity <= 0) {
+          continue;
+        }
+
+        const existing = await queryRunner.manager.findOne(CartItem, {
+          where: { userId, productId: mergeItem.productId },
+        });
+
+        const targetQuantity = Math.min(
+          (existing?.quantity ?? 0) + mergeItem.quantity,
+          product.stockQuantity,
+        );
+
+        if (existing) {
+          existing.quantity = targetQuantity;
+          await queryRunner.manager.save(existing);
+        } else {
+          const item = queryRunner.manager.create(CartItem, {
+            userId,
+            productId: mergeItem.productId,
+            quantity: targetQuantity,
+          });
+          await queryRunner.manager.save(item);
+        }
+      }
+
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw this.toHttpException(error);
+    } finally {
+      await queryRunner.release();
+    }
+
     return this.getCart(userId);
   }
 
