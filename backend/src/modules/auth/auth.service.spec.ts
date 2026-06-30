@@ -44,7 +44,11 @@ describe('AuthService - login', () => {
         },
         {
           provide: UserService,
-          useValue: { findByEmail: jest.fn(), create: jest.fn(), setEmailOTP: jest.fn() },
+          useValue: {
+            findByEmail: jest.fn(),
+            create: jest.fn(),
+            setEmailOTP: jest.fn(),
+          },
         },
         {
           provide: MailService,

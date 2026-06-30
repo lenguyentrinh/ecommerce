@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-06-23
-last_updated: 2026-06-29
+last_updated: 2026-06-30
 project: ecommerce
 # 2026-06-29: story 2-3 implemented (dev-story) → review → done (code-review, 8 patches applied)
 # 2026-06-29: story 2-4 contexted (create-story) → ready-for-dev → in-progress → review (dev-story) → done (code-review, 4 patches)
@@ -62,11 +62,11 @@ development_status:
   2-2-home-page-and-category-pages: done
   2-3-product-detail-page: done
   2-4-search-bar-and-filter-sort-ui: done
-  epic-2-retrospective: optional
+  epic-2-retrospective: done
 
   # ── Epic 3: Shopping Cart ─────────────────────────────────────────────────
-  epic-3: backlog
-  3-1-cart-backend-entity-api-and-inventory-reserve: backlog
+  epic-3: in-progress
+  3-1-cart-backend-entity-api-and-inventory-reserve: review
   3-2-cart-ui-add-to-cart-and-cart-page: backlog
   3-3-cart-persistence-and-out-of-stock-sync: backlog
   epic-3-retrospective: optional

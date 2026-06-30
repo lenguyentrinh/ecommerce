@@ -9,9 +9,7 @@ describe('RolesGuard', () => {
   let guard: RolesGuard;
   let reflector: Reflector;
 
-  const mockExecutionContext = (
-    role: UserRole | undefined,
-  ): ExecutionContext =>
+  const mockExecutionContext = (role: UserRole | undefined): ExecutionContext =>
     ({
       getHandler: jest.fn(),
       getClass: jest.fn(),

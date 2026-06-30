@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../users/user.service';
-import SignupDto  from './dto/signup.dto';
+import SignupDto from './dto/signup.dto';
 import * as bcrypt from 'bcrypt';
 import LoginDto from './dto/login.dto';
 import { randomUUID } from 'crypto';
@@ -35,10 +35,10 @@ export class AuthService {
 
       // await this.userService.setEmailOTP(user.id, code, expiresAt);
       // await this.sendEmailOtp(user.email, code, expiresAt);
-      return { 
+      return {
         message: 'Signup successful, OTP sent to your email.',
-         email: user.email, 
-        };
+        email: user.email,
+      };
     } catch (error) {
       if (error instanceof QueryFailedError) {
         const msg = (error as any).message || '';
