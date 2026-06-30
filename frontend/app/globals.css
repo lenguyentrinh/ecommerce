@@ -319,3 +319,60 @@ body::before {
     -webkit-backdrop-filter: none;
   }
 }
+
+/* ── Dual-thumb price slider (Stitch "Collection with Price Slider") ───── */
+/* Two stacked native range inputs over a visual track. The input itself is
+   transparent and pointer-transparent; only the styled thumb catches events,
+   so both handles stay independently draggable and keyboard-accessible. */
+.oren-range {
+  -webkit-appearance: none;
+  appearance: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 24px;
+  margin: 0;
+  background: transparent;
+  pointer-events: none;
+}
+
+.oren-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  pointer-events: auto;
+  width: 18px;
+  height: 18px;
+  border-radius: 9999px;
+  background: #fff;
+  border: 1px solid var(--color-hairline);
+  box-shadow: 0 2px 8px rgba(74, 63, 53, 0.15);
+  cursor: grab;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.oren-range::-webkit-slider-thumb:active {
+  cursor: grabbing;
+  transform: scale(1.1);
+}
+
+.oren-range::-moz-range-thumb {
+  pointer-events: auto;
+  width: 18px;
+  height: 18px;
+  border-radius: 9999px;
+  background: #fff;
+  border: 1px solid var(--color-hairline);
+  box-shadow: 0 2px 8px rgba(74, 63, 53, 0.15);
+  cursor: grab;
+}
+
+.oren-range:focus-visible::-webkit-slider-thumb {
+  outline: 2px solid var(--color-clay);
+  outline-offset: 2px;
+}
+
+.oren-range:focus-visible::-moz-range-thumb {
+  outline: 2px solid var(--color-clay);
+  outline-offset: 2px;
+}

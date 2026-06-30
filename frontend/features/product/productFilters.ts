@@ -17,6 +17,14 @@ export const SORT_LABELS: Record<ProductSort, string> = {
   popularity: 'Most Popular',
 };
 
+// Bounds for the sidebar price-range slider (Stitch "Collection with Price
+// Slider"). The seeded catalog tops out ~245, so 500 is a comfortable ceiling;
+// a thumb at PRICE_FLOOR/PRICE_CEILING is treated as "no bound" and omitted
+// from the URL so the default full range produces a clean, param-free link.
+export const PRICE_FLOOR = 0;
+export const PRICE_CEILING = 500;
+export const PRICE_STEP = 10;
+
 // Raw Next.js searchParams shape (every value is string | string[] | undefined).
 export type RawSearchParams = Record<string, string | string[] | undefined>;
 

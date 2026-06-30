@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import ProductGrid from '@/components/ui/ProductGrid';
-import FilterSortPanel from '@/components/ui/FilterSortPanel';
+import FilterSidebar from '@/components/ui/FilterSidebar';
 import {
   getCategories,
   getProducts,
@@ -45,45 +45,55 @@ export default async function SearchPage({
   const res = await getProducts({ ...query, page: 1, limit: PAGE_LIMIT });
 
   return (
-    <section className="mx-auto w-full max-w-[1400px] px-5 py-12 md:px-16">
-      <header className="mb-8 border-b border-hairline pb-4">
-        <span className="mb-1 block text-label-sm tracking-[0.3em] text-warm-gray">
-          Search
-        </span>
-        <h1 className="text-headline-md text-brown">
-          {current.q ? `Results for “${current.q}”` : 'All products'}
-        </h1>
-        <p className="mt-2 text-label-sm tracking-widest text-warm-gray">
-          Showing {res.data.length} of {res.total} results
-        </p>
-      </header>
-
-      <FilterSortPanel
-        key={`${current.q ?? ''}|${current.category ?? ''}|${current.minPrice ?? ''}|${current.maxPrice ?? ''}|${current.inStock}|${current.sort ?? ''}`}
-        categories={categories}
-        current={current}
-        showCategory
-      />
-
-      {res.total === 0 ? (
-        <div className="flex min-h-[40vh] flex-col items-center justify-center gap-4 text-center">
-          <p className="text-body-md text-warm-gray">
-            No results found. Try a different search or browse categories.
-          </p>
-          <Link
-            href="/"
-            className="inline-flex items-center justify-center rounded-full border border-sand px-6 py-2.5 text-label-sm text-brown transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] hover:border-clay hover:bg-blush focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clay focus-visible:ring-offset-2"
-          >
-            Back to home
-          </Link>
-        </div>
-      ) : (
-        <ProductGrid
-          initialProducts={res.data}
-          total={res.total}
-          queryParams={{ ...query, limit: PAGE_LIMIT }}
+    <section className="mx-auto w-full max-w-[1440px] px-5 py-12 md:px-16">
+      <div className="flex flex-col gap-6 md:flex-row md:items-start md:gap-10">
+        {/* Sidebar — `key` re-seeds the draft whenever the active filters change */}
+        <FilterSidebar
+          key={`${current.q ?? ''}|${current.category ?? ''}|${current.minPrice ?? ''}|${current.maxPrice ?? ''}|${current.inStock}|${current.sort ?? ''}`}
+          categories={categories}
+          current={current}
+          showCategory
         />
-      )}
+
+        <div className="min-w-0 flex-1">
+          {/* Results header card */}
+          <div className="glass-panel soft-shadow mb-6 rounded-lg px-5 py-4 md:px-6">
+            <div className="flex flex-col gap-1 md:flex-row md:items-end md:justify-between">
+              <div>
+                <span className="mb-1 block text-label-sm tracking-[0.3em] text-warm-gray">
+                  Search
+                </span>
+                <h1 className="text-headline-md text-brown">
+                  {current.q ? `Results for “${current.q}”` : 'All products'}
+                </h1>
+              </div>
+              <p className="text-label-sm tracking-widest text-warm-gray">
+                Showing {res.data.length} of {res.total} items
+              </p>
+            </div>
+          </div>
+
+          {res.total === 0 ? (
+            <div className="flex min-h-[40vh] flex-col items-center justify-center gap-4 text-center">
+              <p className="text-body-md text-warm-gray">
+                No results found. Try a different search or adjust your filters.
+              </p>
+              <Link
+                href="/"
+                className="inline-flex items-center justify-center rounded-full border border-sand px-6 py-2.5 text-label-sm text-brown transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] hover:border-clay hover:bg-blush focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clay focus-visible:ring-offset-2"
+              >
+                Back to home
+              </Link>
+            </div>
+          ) : (
+            <ProductGrid
+              initialProducts={res.data}
+              total={res.total}
+              queryParams={{ ...query, limit: PAGE_LIMIT }}
+            />
+          )}
+        </div>
+      </div>
     </section>
   );
 }
