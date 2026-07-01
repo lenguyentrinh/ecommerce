@@ -1,17 +1,15 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { CartLine, CartView } from "@/types/cart";
-import { getGuestCart, updateGuestCartQuantity, removeFromGuestCart, getGuestCartCount } from "@/lib/guestCart";
+import type { CartLine } from "@/types/cart";
+import { getGuestCart } from "@/lib/guestCart";
 import { getProductsByIds } from "@/services/productPublicAPI";
-import { formatPrice } from "@/lib/helpers";
 
 export interface GuestCartState {
   items: CartLine[];
   subtotal: number;
   loading: boolean;
   error: string | null;
-  count: number;
   refresh: () => void;
 }
 
@@ -20,7 +18,6 @@ export function useGuestCart(): GuestCartState {
   const [subtotal, setSubtotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [count, setCount] = useState(0);
   const [refreshKey, setRefreshKey] = useState(0);
   const cachedProducts = useRef<Map<number, CartLine['product']>>(new Map());
 
@@ -28,9 +25,9 @@ export function useGuestCart(): GuestCartState {
     setRefreshKey((k) => k + 1);
   }, []);
 
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     const guestItems = getGuestCart();
-    setCount(getGuestCartCount());
 
     if (guestItems.length === 0) {
       setItems([]);
@@ -68,8 +65,9 @@ export function useGuestCart(): GuestCartState {
         setLoading(false);
       });
   }, [refreshKey]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
-  return { items, subtotal, loading, error, count, refresh };
+  return { items, subtotal, loading, error, refresh };
 }
 
 function buildLines(

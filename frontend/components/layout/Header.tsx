@@ -24,10 +24,9 @@ export default function Header() {
   const router = useRouter();
   const { isAuthenticated, user } = useSelector((state: RootState) => state.auth);
   const authCartCount = useSelector(selectCartCount);
-  const [guestCartCount, setGuestCartCount] = useState(0);
+  const [guestCartCount, setGuestCartCount] = useState(getGuestCartCount);
 
   useEffect(() => {
-    setGuestCartCount(getGuestCartCount());
     const handleStorage = () => setGuestCartCount(getGuestCartCount());
     window.addEventListener("storage", handleStorage);
     return () => window.removeEventListener("storage", handleStorage);
@@ -59,9 +58,11 @@ export default function Header() {
     };
   }, []);
 
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (!isAuthenticated) setIsOpen(false);
   }, [isAuthenticated]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const iconBtn =
     "text-brown transition-colors duration-300 hover:text-clay";

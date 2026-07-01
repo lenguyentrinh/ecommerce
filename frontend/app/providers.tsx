@@ -7,7 +7,7 @@ import { Toaster } from "react-hot-toast";
 import { fetchMeThunk } from "@/store/authThunk";
 import { fetchCartThunk } from "@/store/cartThunk";
 import { clearCart } from "@/store/cartSlice";
-import { getGuestCart, clearGuestCart, getGuestCartCount } from "@/lib/guestCart";
+import { getGuestCart, clearGuestCart } from "@/lib/guestCart";
 import { mergeCartAPI } from "@/services/cartAPI";
 
 function AuthBootstrap() {

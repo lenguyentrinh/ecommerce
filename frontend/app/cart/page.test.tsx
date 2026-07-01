@@ -3,21 +3,31 @@ import CartPage from './page';
 
 // Mutable across tests (names MUST start with `mock` for jest factory hoisting).
 let mockAuth = { isAuthenticated: true, authChecked: true };
+const mockProduct = (id: number) => ({
+  id,
+  name: `Product ${id}`,
+  price: 100000,
+  imageUrl: '/test.jpg',
+  stockQuantity: 5,
+  isActive: true,
+});
 let mockCartState = {
-  items: [] as Array<{ id: number }>,
+  items: [] as Array<{ id: number; product: ReturnType<typeof mockProduct>; quantity: number }>,
   subtotal: 0,
   loading: false,
   error: null as string | null,
   loaded: true,
 };
 const mockDispatch = jest.fn(() => ({ unwrap: jest.fn().mockResolvedValue(undefined) }));
+const mockFetchCartThunk = jest.fn();
 
-jest.mock('@/hooks/useRequireAuth', () => ({
-  useRequireAuth: () => mockAuth,
-}));
 jest.mock('react-redux', () => ({
   useDispatch: () => mockDispatch,
-  useSelector: (sel: (s: unknown) => unknown) => sel({ cart: mockCartState }),
+  useSelector: (sel: (s: unknown) => unknown) =>
+    sel({ auth: mockAuth, cart: mockCartState }),
+}));
+jest.mock('@/store/cartThunk', () => ({
+  fetchCartThunk: () => mockFetchCartThunk,
 }));
 jest.mock('@/components/cart/CartItemRow', () => ({
   __esModule: true,
@@ -40,7 +50,7 @@ describe('CartPage', () => {
 
   it('renders item rows and the summary for a populated cart', () => {
     mockCartState = {
-      items: [{ id: 10 }],
+      items: [{ id: 10, product: mockProduct(10), quantity: 2 }],
       subtotal: 378000,
       loading: false,
       error: null,

@@ -1,6 +1,6 @@
 # Story 3.3: Cart Persistence & Out-of-Stock Sync
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 

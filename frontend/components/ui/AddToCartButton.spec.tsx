@@ -4,20 +4,19 @@ import { showToast } from '@/lib/toast';
 
 // Mutable across tests (names MUST start with `mock` for jest factory hoisting).
 let mockAuthState = { isAuthenticated: true };
-const mockPush = jest.fn();
 const mockUnwrap = jest.fn();
 const mockDispatch = jest.fn(() => ({ unwrap: mockUnwrap }));
+const mockAddToGuestCart = jest.fn();
 
 jest.mock('react-redux', () => ({
   useDispatch: () => mockDispatch,
   useSelector: (sel: (s: unknown) => unknown) => sel({ auth: mockAuthState }),
 }));
-jest.mock('next/navigation', () => ({
-  useRouter: () => ({ push: mockPush }),
-  usePathname: () => '/products/1',
+jest.mock('@/lib/guestCart', () => ({
+  addToGuestCart: (...args: unknown[]) => mockAddToGuestCart(...args),
 }));
 jest.mock('@/lib/toast', () => ({
-  showToast: { info: jest.fn(), success: jest.fn(), error: jest.fn() },
+  showToast: { success: jest.fn(), error: jest.fn() },
 }));
 
 describe('AddToCartButton', () => {
@@ -34,12 +33,12 @@ describe('AddToCartButton', () => {
     ).toBeEnabled();
   });
 
-  it('logged-out click warns and routes to login (no dispatch)', () => {
+  it('logged-out click adds to guest cart and shows success (no dispatch)', () => {
     mockAuthState = { isAuthenticated: false };
     render(<AddToCartButton productId={1} productName="Dress" />);
     fireEvent.click(screen.getByRole('button'));
-    expect(showToast.info).toHaveBeenCalled();
-    expect(mockPush).toHaveBeenCalledWith('/login?return=%2Fproducts%2F1');
+    expect(mockAddToGuestCart).toHaveBeenCalledWith(1, 1);
+    expect(showToast.success).toHaveBeenCalled();
     expect(mockDispatch).not.toHaveBeenCalled();
   });
 
